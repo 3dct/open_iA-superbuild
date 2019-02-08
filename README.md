@@ -7,7 +7,7 @@ The build steps here were tested on Ubuntu 18.04.1. On other operating systems, 
 ## Build steps
 
 1. Install required applications and libraries (CMake, g++, make, git, OpenCL, OpenGL, Qt):
-
+  
   $ sudo apt install cmake g++ make git \
     libgl1-mesa-dev libxt-dev \
     ocl-icd-opencl-dev opencl-headers opencl-clhpp-headers \
@@ -17,19 +17,19 @@ The build steps here were tested on Ubuntu 18.04.1. On other operating systems, 
 2. Open a shell in the folder where you want to place open_iA (preferrably, use a short folder name, e.g. directly in "/home/youruser")
 
 3. Clone this repository:
- 
+  
   $ git clone https://github.com/3dct/open_iA-superbuild.git
 
 4. Enter the newly created working copy:
-
+  
   $ cd open_iA-superbuild
 
 5. Execute cmake:
-
+  
   $ cmake .
 
 6. Build everything:
-
+  
   $ make -j 4
   
 7. When finished successfully, open_iA executables will be built in the `open_iA/bin/bin` subdirectory of where you issued `make`!
