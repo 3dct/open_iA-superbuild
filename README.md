@@ -6,7 +6,15 @@ The build steps here were tested only on Ubuntu 18.04.1 so far, and might fail o
 
 ## Build steps
 
-1. Install required applications, headers and libraries (CMake, g++, make, git, OpenCL, OpenGL, Qt):
+1. Install required applications, headers and libraries:
+  - CMake
+  - g++
+  - make
+  - git
+  - OpenCL development headers & libraries
+  - OpenGL development headers & libraries
+  - Qt libraries & headers
+  Below is the command to install these packages on Ubuntu. The command to install packages as well as the names of the packages to install will differ on other distributions, please consult the manual or community of your distribution.
 ```
   $ sudo apt install cmake g++ make git \
     libgl1-mesa-dev libxt-dev \
@@ -14,7 +22,6 @@ The build steps here were tested only on Ubuntu 18.04.1 so far, and might fail o
     qtbase5-dev libqt5x11extras5-dev qttools5-dev qt5-default \
     libxt-dev libqt5opengl5-dev
 ```
-  Above command works for Ubuntu. The command to install packages as well as the names of the packages to install will differ on other distributions, please consult the manual or community of your distribution.
 
 2. Open a shell in the folder where you want to place open_iA (preferrably, use a short folder name, e.g. directly in "/home/youruser")
 
