@@ -40,16 +40,14 @@ The build steps here were tested on Ubuntu 18.04.1. On other operating systems, 
 - If there is any error you cannot fix yourself, feel free to [post an issue](https://github.com/3dct/open_iA-superbuild/issues)!
 
 - If you have more than 4 cores in your system, you will probably want to increase the number 4 in step 6 above to that number, e.g.
-  `$ make -j 8' 
+  `$ make -j 8`
 
 - If you'd like to rename the `open_iA-superbuild` folder created in step 3 above:
   - Either add the desired folder name as additional parameter to the command line given above, e.g.:
-  
-    $ git clone https://github.com/3dct/open_iA-superbuild.git my_open_iA
+    `$ git clone https://github.com/3dct/open_iA-superbuild.git my_open_iA`
   
   - Or rename the folder directly after cloning, i.e., after step 3, do:
-
-    $ mv open_iA-superbuild my_open_iA
+    `$ mv open_iA-superbuild my_open_iA`
     
 - If you want to put the build environment for open_iA somewhere else as where you checked out the superbuild,
   or if you want to keep the root folder of the superbuild clear (i.e. if you want to do a so-called out-of-source build),
