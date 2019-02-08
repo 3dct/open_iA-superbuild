@@ -6,15 +6,7 @@ The build steps here were tested only on Ubuntu 18.04.1 so far, and might fail o
 
 ## Build steps
 
-1. Install required applications, headers and libraries:
-  - CMake
-  - g++
-  - make
-  - git
-  - OpenCL development headers & libraries
-  - OpenGL development headers & libraries
-  - Qt libraries & headers
-  - On Ubuntu, execute:
+1. Install required applications, headers and libraries (CMake, g++, make, git, OpenCL, OpenGL, Qt). On Ubuntu, execute:
 ```
   $ sudo apt install cmake g++ make git \
     libgl1-mesa-dev libxt-dev \
@@ -22,7 +14,6 @@ The build steps here were tested only on Ubuntu 18.04.1 so far, and might fail o
     qtbase5-dev libqt5x11extras5-dev qttools5-dev qt5-default \
     libxt-dev libqt5opengl5-dev
 ```
-  - The command to install packages as well as the names of the packages to install will differ on other distributions, please consult the manual or community of your distribution.
 
 2. Open a shell in the folder where you want to place open_iA (preferrably, use a short folder name, e.g. directly in "/home/youruser")
 
@@ -43,6 +34,8 @@ The build steps here were tested only on Ubuntu 18.04.1 so far, and might fail o
 ## Troubleshooting / Adaptations:
 
 - The `$` sign in the code above indicates the shell prompt, do not enter this sign.
+
+- The command to install packages as well as the names of the packages to install will differ on other distributions, please consult the manual or community of your distribution.
 
 - The method described here currently only sets up VTK and ITK libraries
   - It will only enable the build of the core executables, but none of the advanced analysis modules. To enable these, after the build has finished, you will have to open another CMake, switch to the `open_iA/bin` binaries folder and enable the required modules.
