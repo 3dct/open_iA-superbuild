@@ -1,8 +1,7 @@
 ## open_iA Superbuild
 
-The goal of this repository is to simplify setting up the build environment of [open_iA](https://github.com/3dct/open_iA).
-The instructions here therefore can be seen as an alternative to [the detailed build instructions in the open_iA repository](https://github.com/3dct/open_iA/wiki/Linux-Build).
-The build steps here were tested only on Ubuntu 18.04.1 so far, and might fail on other distributions (and very likely on other operating systems). We will continue to improve them, please keep your eyes open for updates! See also the troubleshooting section below.
+This document provides the currently simplest way of setting up the build environment of [open_iA](https://github.com/3dct/open_iA) under Linux. More [detailed Linux build instructions](https://github.com/3dct/open_iA/wiki/Linux-Build) are available in the open_iA repository.
+The build steps here were tested only on Ubuntu 18.04.1 and 18.10 so far, and might fail on other distributions (and very likely on other operating systems). We will continue to improve them, please keep your eyes open for updates! See also the troubleshooting section below.
 
 ## Build steps
 
