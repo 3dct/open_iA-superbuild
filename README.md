@@ -31,6 +31,8 @@ The build steps here were tested on Ubuntu 18.04.1. On other operating systems, 
 6. Build everything:
 
   $ make -j 4
+  
+7. When finished successfully, open_iA executables will be built in the `open_iA/bin/bin` subdirectory of where you issued `make`!
 
 If CMake encounters an error, it probably will tell you that some library is missing which you still need to install.
 If there is any error you cannot fix yourself, feel free to [post an issue](https://github.com/3dct/open_iA-superbuild/issues)!
