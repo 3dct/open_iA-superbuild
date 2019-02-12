@@ -3,7 +3,6 @@ project(open_iA_superbuild LANGUAGES CXX)
 
 include(ExternalProject)
 
-SET (CMAKE_GENERATOR "Unix Makefiles")
 option (BUILD_SHARED_LIBS "Build shared libraries" ON)
 
 set (VTK_SHORT_VERSION "8.1")
@@ -12,8 +11,19 @@ set (VTK_LONG_VERSION  "${VTK_SHORT_VERSION}.2")
 set (ITK_SHORT_VERSION "4.13")
 set (ITK_LONG_VERSION  "${ITK_SHORT_VERSION}.1")
 
-set (VTK_URL "https://www.vtk.org/files/release/${VTK_SHORT_VERSION}/VTK-${VTK_LONG_VERSION}.tar.gz")
-set (ITK_URL "https://sourceforge.net/projects/itk/files/itk/${ITK_SHORT_VERSION}/InsightToolkit-${ITK_LONG_VERSION}.tar.xz/download")
+FIND_PACKAGE(Qt5 COMPONENTS Widgets Xml Network Test OpenGL PrintSupport REQUIRED)
+
+if (WIN32)
+	set (VTK_URL "https://www.vtk.org/files/release/${VTK_SHORT_VERSION}/VTK-${VTK_LONG_VERSION}.zip")
+	set (ITK_URL "https://sourceforge.net/projects/itk/files/itk/${ITK_SHORT_VERSION}/InsightToolkit-${ITK_LONG_VERSION}.zip/download")
+	set (VTK_URL_HASH "5B7B1C7D3CA1E2F8F02E891800F64627A894673EB5B47354EECC28FCBEF4815E")
+	set (ITK_URL_HASH "7F3AE1200604608D5E8C2066CC60B7ED836C7DB56F670544D8B88829A78D92A4")
+else()
+	set (VTK_URL "https://www.vtk.org/files/release/${VTK_SHORT_VERSION}/VTK-${VTK_LONG_VERSION}.tar.gz")
+	set (ITK_URL "https://sourceforge.net/projects/itk/files/itk/${ITK_SHORT_VERSION}/InsightToolkit-${ITK_LONG_VERSION}.tar.xz/download")
+	set (VTK_URL_HASH "")
+	set (ITK_URL_HASH "")
+endif()
 
 set (VTK_CMAKE_ARGS
 	"-DBUILD_SHARED_LIBS=On"
@@ -23,10 +33,11 @@ set (VTK_CMAKE_ARGS
 	"-DModule_vtkRenderingQt=On"
 	"-DModule_vtkViewsQt=On"
 	"-DVTK_RENDERING_BACKEND=OpenGL2"
-	"-DVTK_Qt_VERSION=5")
+	"-DQt5_DIR=${Qt5_DIR}")
 set (VTK_BIN_DIR "${CMAKE_BINARY_DIR}/vtk/bin-${VTK_LONG_VERSION}")
 ExternalProject_Add( VTK
 	URL	              ${VTK_URL}
+	URL_HASH          "SHA256=${VTK_URL_HASH}"
 	SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src-${VTK_LONG_VERSION}"
 	BINARY_DIR        "${VTK_BIN_DIR}"
 	CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
@@ -39,10 +50,12 @@ set (ITK_CMAKE_ARGS
 	"-DITK_USE_64BITS_IDS:BOOL=On"
 	"-DModule_ITKReview:BOOL=On"
 	"-DModule_ITKVtkGlue:BOOL=On"
-	"-DVTK_DIR=${VTK_BIN_DIR}")
+	"-DVTK_DIR=${VTK_BIN_DIR}"
+	"-DQt5_DIR=${Qt5_DIR}")
 set (ITK_BIN_DIR "${CMAKE_BINARY_DIR}/itk/bin-${ITK_LONG_VERSION}")
 ExternalProject_Add( ITK
 	URL	              ${ITK_URL}
+	URL_HASH          "SHA256=${ITK_URL_HASH}"
 	SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src-${ITK_LONG_VERSION}"
 	BINARY_DIR        "${ITK_BIN_DIR}"
 	CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
