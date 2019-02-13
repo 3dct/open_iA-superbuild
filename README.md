@@ -5,12 +5,14 @@ This document provides the currently simplest way of setting up a build environm
 ## Build steps
 
 In short, these are the steps required to build open\_iA and the required vtk and itk libraries:
-1. Install prerequisites - CMake, g++, build tool (e.g. make, ninja or Visual Studo), OpenCL, OpenGL and Qt libraries and headers
+1. Install prerequisites - git, CMake, and C++ build toolchain; libraries and headers for OpenCL, OpenGL and Qt
 2. Clone  this repository to some folder on your machine
-3. Run CMake on the checked out repository
-4. Build with the build tool selected in CMake
+3. Run CMake on the checked out repository for the desired toolchain
+4. Build with the toolchain configured in CMake
+5. Done!
 
-If you are unclear about any of these setps, please see the more detailed descriptions below. Additional information can also be found in the [Windows build instructions](https://github.com/3dct/open_iA/wiki/Windows-Build) and the [Linux build instructions](https://github.com/3dct/open_iA/wiki/Linux-Build) in the open\_iA wiki.
+Detailed descriptions of these steps are given below.
+Additional information can also be found in the [Windows build instructions](https://github.com/3dct/open_iA/wiki/Windows-Build) and the [Linux build instructions](https://github.com/3dct/open_iA/wiki/Linux-Build) in the open\_iA wiki.
 
 ### 1. Install Prerequisites
 First, you need to install the following applications:
@@ -32,8 +34,8 @@ On Linux, those packages should be available from the distribution repository. F
 ```
 
 On Windows, download and install:
-- [git](https://git-scm.com/download/win)
 - [CMake](https://cmake.org/)
+- [git](https://git-scm.com/download/win)
 - Visual Studio 2015 (e.g. the free [Community Edition](https://visualstudio.microsoft.com/de/vs/older-downloads)
 - Open GL headers are included in the Windows SDK installed along with Visual Studio
 - An OpenCL SDK best fitting your build system, e.g. the AMD OpenCL SDK for an AMD graphics card, or the Intel OpenCL SDK
@@ -47,7 +49,7 @@ Through git executed on the shell:
 
 Alternatively, use a git GUI tool of your choice.
 
-### 3. CMake Configuration
+### 3. CMake Configure+Generate
 
 Run CMake; you have two options:
 1. If you prefer the command line, open a shell in the cloned repository, and execute `$ cmake .`. In case of errors, we recommend to switch to option 2.
