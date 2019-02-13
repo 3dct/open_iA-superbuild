@@ -75,7 +75,7 @@ set (ITK_CMAKE_ARGS
 	"-DQt5_DIR=${Qt5_DIR}")
 set (ITK_BIN_DIR "${CMAKE_BINARY_DIR}/itk/bin-${ITK_LONG_VERSION}")
 if (USE_GIT_REPOS)
-	ExternalProject_Add( VTK
+	ExternalProject_Add( ITK
 		GIT_REPOSITORY    "${ITK_REPOSITORY}"
 		GIT_TAG           "${ITK_LONG_VERSION}"
 		SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src-${ITK_LONG_VERSION}"
@@ -84,9 +84,9 @@ if (USE_GIT_REPOS)
 		CMAKE_ARGS        "${ITK_CMAKE_ARGS}"
 		INSTALL_COMMAND   ""
 		DEPENDS           VTK)
-else(
+else()
 	ExternalProject_Add( ITK
-		URL	              ${ITK_URL}
+		URL               "${ITK_URL}"
 		URL_HASH          "SHA256=${ITK_ARCHIVE_SHA256}"
 		SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src-${ITK_LONG_VERSION}"
 		BINARY_DIR        "${ITK_BIN_DIR}"
