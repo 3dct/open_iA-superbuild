@@ -4,7 +4,7 @@ This document provides the currently simplest way of setting up a build environm
 
 ## Build steps
 
-In short, these are the steps required to build open\_iA and the required vtk and itk libraries:
+In short, these are the steps required to set up a build environment for open\_iA:
 1. Install prerequisites - git, CMake, and C++ build toolchain; libraries and headers for OpenCL, OpenGL and Qt
 2. Clone  this repository to some folder on your machine
 3. Run CMake on the checked out repository for the desired toolchain
