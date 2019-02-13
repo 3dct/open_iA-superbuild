@@ -3,8 +3,7 @@ project(open_iA_superbuild LANGUAGES CXX)
 
 include(ExternalProject)
 
-option (BUILD_SHARED_LIBS "Build shared libraries" ON)
-option (USE_GIT_REPOS "Use git repositories for VTK and ITK libraries" ON)
+option (USE_GIT_REPOS "Whether to use git repositories for VTK and ITK libraries. If disabled (default), the release archives will be used instead." OFF)
 
 set (VTK_SHORT_VERSION "8.1")
 set (VTK_LONG_VERSION  "${VTK_SHORT_VERSION}.2")
@@ -36,14 +35,14 @@ else()
 endif()
 
 set (VTK_CMAKE_ARGS
-	"-DBUILD_SHARED_LIBS=On"
-	"-DVTK_LEGACY_REMOVE=On"
-	"-DModule_vtkGUISupportQt=On"
-	"-DModule_vtkGUISupportQtOpenGL=On"
-	"-DModule_vtkRenderingQt=On"
-	"-DModule_vtkViewsQt=On"
-	"-DVTK_RENDERING_BACKEND=OpenGL2"
-	"-DQt5_DIR=${Qt5_DIR}")
+	"-DBUILD_SHARED_LIBS:BOOL=On"
+	"-DVTK_LEGACY_REMOVE:BOOL=On"
+	"-DModule_vtkGUISupportQt:BOOL=On"
+	"-DModule_vtkGUISupportQtOpenGL:BOOL=On"
+	"-DModule_vtkRenderingQt:BOOL=On"
+	"-DModule_vtkViewsQt:BOOL=On"
+	"-DVTK_RENDERING_BACKEND:STRING=OpenGL2"
+	"-DQt5_DIR:PATH=${Qt5_DIR}")
 set (VTK_BIN_DIR "${CMAKE_BINARY_DIR}/vtk/bin-${VTK_LONG_VERSION}")
 if (USE_GIT_REPOS)
 	ExternalProject_Add( VTK
@@ -71,8 +70,8 @@ set (ITK_CMAKE_ARGS
 	"-DITK_USE_64BITS_IDS:BOOL=On"
 	"-DModule_ITKReview:BOOL=On"
 	"-DModule_ITKVtkGlue:BOOL=On"
-	"-DVTK_DIR=${VTK_BIN_DIR}"
-	"-DQt5_DIR=${Qt5_DIR}")
+	"-DVTK_DIR:PATH=${VTK_BIN_DIR}"
+	"-DQt5_DIR:PATH=${Qt5_DIR}")
 set (ITK_BIN_DIR "${CMAKE_BINARY_DIR}/itk/bin-${ITK_LONG_VERSION}")
 if (USE_GIT_REPOS)
 	ExternalProject_Add( ITK
@@ -97,7 +96,7 @@ else()
 endif()
 
 set (OPEN_IA_CMAKE_ARGS
-	"-DITK_DIR=${ITK_BIN_DIR}")
+	"-DITK_DIR:PATH=${ITK_BIN_DIR}")
 ExternalProject_Add( open_iA
 	GIT_REPOSITORY    "https://github.com/3dct/open_iA.git"
 	GIT_TAG           4623f34d9ae1ecddef36975e3bff3d36a5d2039d
