@@ -1,20 +1,29 @@
-## open_iA Superbuild
+## open\_iA Superbuild
 
-This document provides the currently simplest way of setting up the build environment of [open_iA](https://github.com/3dct/open_iA) under Linux. More [detailed Linux build instructions](https://github.com/3dct/open_iA/wiki/Linux-Build) are available in the open_iA repository.
-The build steps here were tested only on Ubuntu 18.04.1 and 18.10 so far, and might fail on other distributions (and very likely on other operating systems). We will continue to improve them, please keep your eyes open for updates! See also the troubleshooting section below.
+This document provides the currently simplest way of setting up a build environment for [open\_iA](https://github.com/3dct/open_iA). The build steps here were tested so far on Ubuntu 18.04.1 and 18.10, as well as on Windows 10 so far. They might be incomplete due to only limited tests so far. They might or might not work on other distributions and operating systems. Please let us know of your experience [in the issue tracker](https://github.com/3dct/open_iA-superbuild/issues). Please also keep your eyes open for updates, and in case of problems, make sure to check the troubleshooting section below.
 
 ## Build steps
 
-1. Install required applications, headers and libraries (CMake, g++, make, git, OpenCL, OpenGL, Qt). On Ubuntu, execute:
+1. Install required applications, headers and libraries (CMake, g++, make, git, OpenCL, OpenGL, Qt).
+  On Linux, those packages should be available from the distribution repository. For example, on Ubuntu, execute:
 ```
   $ sudo apt install cmake g++ make git \
     libgl1-mesa-dev libxt-dev \
     ocl-icd-opencl-dev opencl-headers opencl-clhpp-headers \
     qtbase5-dev libqt5x11extras5-dev qttools5-dev qt5-default \
     libxt-dev libqt5opengl5-dev
-```
 
-2. Open a shell in the folder where you want to place open_iA (preferrably, use a short folder name, e.g. directly in "/home/youruser")
+```
+  If you require more detailed instructions on this or any of the further steps, please refer to the [Detailed Linux Build instructions](https://github.com/3dct/open_iA/wiki/Linux-Build) in the open\_iA wiki.
+
+  On Windows, download and install:
+  - [git](https://git-scm.com/download/win)
+  - [CMake](https://cmake.org/)
+  - Visual Studio 2015 (e.g. the free Community Edition)
+  - Open Source version of Qt 5 >= 5.9 (install 64 bit binaries for Visual Studio 2015, recommended is e.g. 5.11.x or 5.12.x) 
+  In case you need more information here, see [the detailed build instructions](https://github.com/3dct/open_iA/wiki/Windows-Build)
+
+2. Open a shell in the folder where you want to place open\_iA (preferrably, use a short folder name, e.g. directly in "/home/youruser")
 
 3. Clone this repository:
    `$ git clone https://github.com/3dct/open_iA-superbuild.git`
@@ -28,7 +37,7 @@ The build steps here were tested only on Ubuntu 18.04.1 and 18.10 so far, and mi
 6. Build everything:
    `$ make -j 4`
   
-7. When finished successfully, open_iA executables will be built in the `open_iA/bin/bin` subdirectory of where you issued `make`!
+7. When finished successfully, open\_iA executables will be built in the `open_iA/bin/bin` subdirectory of where you issued `make`!
 
 ## Troubleshooting / Adaptations:
 
@@ -54,18 +63,18 @@ The build steps here were tested only on Ubuntu 18.04.1 and 18.10 so far, and mi
   - Or rename the folder directly after cloning, i.e., after step 3, do:
     `$ mv open_iA-superbuild my_open_iA`
     
-- If you want to put the build environment for open_iA somewhere else as where you checked out the superbuild,
+- If you want to put the build environment for open\_iA somewhere else as where you checked out the superbuild,
   or if you want to keep the root folder of the superbuild clear (i.e. if you want to do a so-called out-of-source build),
   you can also call CMake from another folder; the relative path given as parameter just has to reference the superbuild directory.
 
   For example:
-  If you checked out this repository to /home/youruser/open_iA-superbuild,
-  and want to create the build environment, in /home/youruser/open_iA_Env, then, instead of step 5 above, execute:
+  If you checked out this repository to `/home/youruser/open_iA-superbuild`,
+  and want to create the build environment, in `/home/youruser/open_iA_Env`, then, instead of step 5 above, execute:
   ```
   $ mkdir /home/youruser/open_iA_Env
   $ cd /home/youruser/open_iA_Env
   $ cmake /home/youruser/open_iA-superbuild
   ```
-- You can change the build tool by modifying the CMakeLists.txt in the open_iA-superbuild folder after step 3.
+- You can change the build tool by modifying the CMakeLists.txt in the `open_iA-superbuild` folder after step 3.
   Search for the line `SET (CMAKE_GENERATOR "Unix Makefiles")` and change it to e.g. `SET (CMAKE_GENERATOR "ninja")`.
   Note that you probably need to execute the cmake command twice before this change will be used everywhere!
