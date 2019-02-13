@@ -7,10 +7,10 @@ This document provides the currently simplest way of setting up a build environm
 In short, these are the steps required to build open\_iA and the required vtk and itk libraries:
 1. Install prerequisites - CMake, g++, build tool (e.g. make, ninja or Visual Studo), OpenCL, OpenGL and Qt libraries and headers
 2. Clone  this repository to some folder on your machine
-3. Run CMake with this repository as the source folder
+3. Run CMake on the checked out repository
 4. Build with the build tool selected in CMake
 
-If you are unclear about any of these setps, please see the more detailed descriptions below. Additional information can be found in the [Windows build instructions](https://github.com/3dct/open_iA/wiki/Windows-Build) and the [Linux build instructions](https://github.com/3dct/open_iA/wiki/Linux-Build) in the open\_iA wiki.
+If you are unclear about any of these setps, please see the more detailed descriptions below. Additional information can also be found in the [Windows build instructions](https://github.com/3dct/open_iA/wiki/Windows-Build) and the [Linux build instructions](https://github.com/3dct/open_iA/wiki/Linux-Build) in the open\_iA wiki.
 
 ### 1. Install Prerequisites
 First, you need to install the following applications:
@@ -42,17 +42,16 @@ On Windows, download and install:
 ### 2. Clone Repository
 
 Through git executed on the shell:
-- Open a shell in the folder where you want to place open\_iA (preferrably, use a short folder name, e.g. directly in "/home/youruser")
+- Open a shell in the folder where you want to place open\_iA. Preferrably, use a folder such that the overall path string is short.
 - Clone this repository: `$ git clone https://github.com/3dct/open_iA-superbuild.git`
-- Enter the newly created working copy: `$ cd open_iA-superbuild`
 
 Alternatively, use a git GUI tool of your choice.
 
 ### 3. CMake Configuration
 
-Run CMake:
-- Either open a shell in the cloned repository, and execute `$ cmake .`. In case of errors, we recommend to switch to option 2: 
-- Or, run the graphical user interface version of CMake:
+Run CMake; you have two options:
+1. If you prefer the command line, open a shell in the cloned repository, and execute `$ cmake .`. In case of errors, we recommend to switch to option 2.
+2. run the graphical user interface version of CMake:
   - Enter the cloned repository folder under "Where is the source code"
   - Enter the folder you wish that vtk, itk and open\_iA sources and binaries shall be put in, under "Where to build the binaries".
   - Press "Configure"
