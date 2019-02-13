@@ -18,6 +18,7 @@ set (VTK_REPOSITORY "https://github.com/Kitware/VTK.git")
 # set (VTK_REPOSITORY "https://gitlab.kitware.com/vtk/vtk.git")
 set (ITK_REPOSITORY "https://github.com/InsightSoftwareConsortium/ITK.git")
 # set (ITK_REPOSITORY "https://github.com/Kitware/ITK.git")
+# set (ITK_REPOSITORY "http://itk.org/ITK.git")
 
 # TODO:
 #   - Think about calling Qt installer?
