@@ -44,10 +44,12 @@ On Windows, download and install:
 ### 2. Clone Repository
 
 Through git executed on the shell:
-- Open a shell in the folder where you want to place open\_iA. Preferrably, use a folder such that the overall path string is short.
+- Open a shell in the folder where you want to place open\_iA.
 - Clone this repository: `$ git clone https://github.com/3dct/open_iA-superbuild.git`
 
 Alternatively, use a git GUI tool of your choice.
+
+**Note:** Especially on Windows, take care that the path string is very short; ideally something like `C:\open_iA`. The exact possible maximum length is currently untested, but you should be on the safe side with paths shorter than 20 characters. For example `C:\open_iA\build` should be fine, while `C:\open_iA\superbuild-bin` is definitely too long.
 
 ### 3. CMake Configure+Generate
 
