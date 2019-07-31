@@ -49,7 +49,7 @@ Through git executed on the shell:
 
 Alternatively, use a git GUI tool of your choice.
 
-**Note:** Especially on Windows, take care that the path string is very short; ideally something like `C:\open_iA`. The exact possible maximum length is currently untested, but you should be on the safe side with paths shorter than 20 characters. For example `C:\open_iA\build` should be fine, while `C:\open_iA\superbuild-bin` is definitely too long.
+**Note:** On Windows, take care that the full path string of the folder where you place open\_iA is very short; ideally something like `C:\open_iA`. The exact possible maximum length is currently untested, but you should be on the safe side with paths shorter than 20 characters. For example `C:\open_iA\build` (16 characters) should be fine, while `C:\open_iA\superbuild-bin` (25 characters) is definitely too long (for someone interested in technical details: the path will be incorporated into command lines created by CMake; and on Windows, there is a limit of 32.768 characters on the length of a command; and in some created command lines, the chosen path appears many times).
 
 ### 3. CMake Configure+Generate
 
