@@ -90,6 +90,7 @@ set (ITK_CMAKE_ARGS
 	"-DITK_USE_64BITS_IDS:BOOL=On"
 	"-DModule_ITKReview:BOOL=On"
 	"-DModule_ITKVtkGlue:BOOL=On"
+	"-DModule_HigherOrderAccurateGradient:BOOL=On"
 	"-DVTK_DIR:PATH=${VTK_BIN_DIR}"
 	"-DQt5_DIR:PATH=${Qt5_DIR}")
 set (ITK_BIN_DIR "${CMAKE_BINARY_DIR}/itk/bin-${ITK_VERSION}")
