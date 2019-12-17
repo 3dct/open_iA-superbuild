@@ -3,10 +3,24 @@ project(open_iA_superbuild LANGUAGES CXX)
 
 include(ExternalProject)
 
-option (USE_GIT_REPOS "Whether to use git repositories for VTK and ITK libraries. If disabled (default), the release archives will be used instead." OFF)
-#option (BUILD_ASTRA "Whether to build astra" OFF)
-#option (USE_HDF5 "Whether to build HDF5 library and use it in open_iA" OFF)
-#option (USE_EIGEN "Whether to fetch and use eigen" OFF)
+option (USE_GIT_REPOS "Whether to use git repositories for VTK and ITK libraries. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times." OFF)
+
+option (BUILD_ALL "Enables all optional modules and filters (see also separate BUILD_xyz options)" OFF)
+option (BUILD_FILTERS "Whether to build image processing filters (smoothing, segmentation, intensity transformations, geometric transformations, ...)" ON)
+#option (BUILD_TOOLS "Whether to build common tool modules, e.g. FeatureScout, 4DCT, GEMSe, Dynamic Volume Lines, FIAKER, ..." ON)
+#option (BUILD_ASTRA "Whether to build ASTRA reconstruction library and open_iA ASTRA module" OFF)
+#option (BUILD_VR "Whether to build VR module" OFF)
+#option (BUILD_HDF5 "Whether to build HDF5 library and use it in open_iA" OFF)
+#option (BUILD_EIGEN "Whether to fetch and use eigen" OFF)
+
+if (BUILD_ALL)
+	SET (BUILD_FILTERS ON)
+	#SET (BUILD_TOOLS ON)
+	#SET (BUILD_ASTRA ON)
+	#SET (BUILD_VR ON)
+	#SET (BUILD_HDF5 ON)
+	#SET (BUILD_EIGEN ON)
+endif()
 
 set (VTK_SHORT_VERSION "8.2")
 set (VTK_LONG_VERSION  "${VTK_SHORT_VERSION}.0")
@@ -17,7 +31,8 @@ set (ITK_VERSION  "5.0.1")
 set (ITK_ZIP_SHA512 "f1a871742247e9596b39126ee70b9ab5e6e3dc6fabfc54fc2f84d1f174b51f4f9086eae5769f6bc1a28eaf81183ebe77d66ca0199d65e65ef689ab9344bd81f2")
 set (ITK_GZIP_SHA512 "f36613ff72c513ded3d32504f71308a94fe75555cf9fd22b77485d1375601f6e1f1539cc5ac82a9e1e229bcf514a88ccb55122a7dfc74a6ae1b6604aa70bd814")
 
-set (OPEN_IA_GIT_TAG "a6372f8c9f1d9b1051345f10523ab2b9c306da09") # = "2019.07"
+#set (OPEN_IA_GIT_TAG "a6372f8c9f1d9b1051345f10523ab2b9c306da09") # = "2019.07"
+set (OPEN_IA_GIT_TAG "develop")
 
 FIND_PACKAGE(Qt5 COMPONENTS Widgets Xml Network Test OpenGL PrintSupport REQUIRED)
 
@@ -120,6 +135,9 @@ endif()
 
 set (OPEN_IA_CMAKE_ARGS
 	"-DITK_DIR:PATH=${ITK_BIN_DIR}")
+if (BUILD_FILTERS)
+	SET (OPEN_IA_CMAKE_ARGS ${OPEN_IA_CMAKE_ARGS} "-DModule_CommonImageFilters:BOOL=ON")
+endif()
 ExternalProject_Add( open_iA
 	GIT_REPOSITORY    "https://github.com/3dct/open_iA.git"
 	GIT_TAG           "${OPEN_IA_GIT_TAG}"
