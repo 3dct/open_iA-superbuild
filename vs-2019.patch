@@ -1,0 +1,636 @@
+diff --git a/astra_vc14.vcxproj b/astra_vc14.vcxproj
+index 2fca01b..e329864 100644
+--- a/astra_vc14.vcxproj
++++ b/astra_vc14.vcxproj
+@@ -1,5 +1,5 @@
+ ﻿<?xml version="1.0" encoding="utf-8"?>
+-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
++<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup Label="ProjectConfigurations">
+     <ProjectConfiguration Include="Debug_CUDA|Win32">
+       <Configuration>Debug_CUDA</Configuration>
+@@ -37,63 +37,65 @@
+   <PropertyGroup Label="Globals">
+     <ProjectGuid>{DABD9D82-609E-4C71-B1CA-A41B07495290}</ProjectGuid>
+     <RootNamespace>astra_vc14</RootNamespace>
++    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
++    <CudaToolkitCustomDir>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.2</CudaToolkitCustomDir>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+     <UseDebugLibraries>true</UseDebugLibraries>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+     <CharacterSet>MultiByte</CharacterSet>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+     <UseDebugLibraries>true</UseDebugLibraries>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+     <CharacterSet>MultiByte</CharacterSet>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+     <UseDebugLibraries>true</UseDebugLibraries>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+     <CharacterSet>MultiByte</CharacterSet>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+     <UseDebugLibraries>true</UseDebugLibraries>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+     <CharacterSet>MultiByte</CharacterSet>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+     <UseDebugLibraries>false</UseDebugLibraries>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+     <WholeProgramOptimization>true</WholeProgramOptimization>
+     <CharacterSet>MultiByte</CharacterSet>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+     <UseDebugLibraries>false</UseDebugLibraries>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+     <WholeProgramOptimization>true</WholeProgramOptimization>
+     <CharacterSet>MultiByte</CharacterSet>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+     <UseDebugLibraries>false</UseDebugLibraries>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+     <WholeProgramOptimization>true</WholeProgramOptimization>
+     <CharacterSet>MultiByte</CharacterSet>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+     <UseDebugLibraries>false</UseDebugLibraries>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+     <WholeProgramOptimization>true</WholeProgramOptimization>
+     <CharacterSet>MultiByte</CharacterSet>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+   <ImportGroup Label="ExtensionSettings">
+-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 9.0.props" />
++    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 10.2.props" />
+   </ImportGroup>
+   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'">
+     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+@@ -866,6 +868,6 @@
+   </ItemGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+   <ImportGroup Label="ExtensionTargets">
+-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 9.0.targets" />
++    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 10.2.targets" />
+   </ImportGroup>
+-</Project>
+\ No newline at end of file
++</Project>
+diff --git a/matlab/mex/astra_mex_algorithm_vc14.vcxproj b/matlab/mex/astra_mex_algorithm_vc14.vcxproj
+index 639338b..818734b 100644
+--- a/matlab/mex/astra_mex_algorithm_vc14.vcxproj
++++ b/matlab/mex/astra_mex_algorithm_vc14.vcxproj
+@@ -1,5 +1,5 @@
+ ﻿<?xml version="1.0" encoding="utf-8"?>
+-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
++<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup Label="ProjectConfigurations">
+     <ProjectConfiguration Include="Debug_CUDA|Win32">
+       <Configuration>Debug_CUDA</Configuration>
+@@ -38,39 +38,40 @@
+     <ProjectName>astra_mex_algorithm</ProjectName>
+     <ProjectGuid>{CE5EF874-830C-4C10-8651-CCA2A34ED9E4}</ProjectGuid>
+     <RootNamespace>astraMatlab</RootNamespace>
++    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+   <ImportGroup Label="ExtensionSettings">
+diff --git a/matlab/mex/astra_mex_data2d_vc14.vcxproj b/matlab/mex/astra_mex_data2d_vc14.vcxproj
+index d695f4b..f5974ea 100644
+--- a/matlab/mex/astra_mex_data2d_vc14.vcxproj
++++ b/matlab/mex/astra_mex_data2d_vc14.vcxproj
+@@ -1,5 +1,5 @@
+ ﻿<?xml version="1.0" encoding="utf-8"?>
+-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
++<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup Label="ProjectConfigurations">
+     <ProjectConfiguration Include="Debug_CUDA|Win32">
+       <Configuration>Debug_CUDA</Configuration>
+@@ -38,39 +38,40 @@
+     <ProjectName>astra_mex_data2d</ProjectName>
+     <ProjectGuid>{D2CDCDB3-7AD9-4853-8D87-BDB1DAD9C9C1}</ProjectGuid>
+     <RootNamespace>astraMatlab</RootNamespace>
++    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+   <ImportGroup Label="ExtensionSettings">
+diff --git a/matlab/mex/astra_mex_data3d_vc14.vcxproj b/matlab/mex/astra_mex_data3d_vc14.vcxproj
+index ee6b001..1901e58 100644
+--- a/matlab/mex/astra_mex_data3d_vc14.vcxproj
++++ b/matlab/mex/astra_mex_data3d_vc14.vcxproj
+@@ -1,5 +1,5 @@
+ ﻿<?xml version="1.0" encoding="utf-8"?>
+-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
++<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup Label="ProjectConfigurations">
+     <ProjectConfiguration Include="Debug_CUDA|Win32">
+       <Configuration>Debug_CUDA</Configuration>
+@@ -38,39 +38,40 @@
+     <ProjectName>astra_mex_data3d</ProjectName>
+     <ProjectGuid>{2A7084C6-62ED-4235-85F4-094C17689DEB}</ProjectGuid>
+     <RootNamespace>astraMatlab</RootNamespace>
++    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+   <ImportGroup Label="ExtensionSettings">
+diff --git a/matlab/mex/astra_mex_direct_vc14.vcxproj b/matlab/mex/astra_mex_direct_vc14.vcxproj
+index a293699..4b47d7c 100644
+--- a/matlab/mex/astra_mex_direct_vc14.vcxproj
++++ b/matlab/mex/astra_mex_direct_vc14.vcxproj
+@@ -1,5 +1,5 @@
+ ﻿<?xml version="1.0" encoding="utf-8"?>
+-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
++<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup Label="ProjectConfigurations">
+     <ProjectConfiguration Include="Debug_CUDA|Win32">
+       <Configuration>Debug_CUDA</Configuration>
+@@ -38,39 +38,40 @@
+     <ProjectName>astra_mex_direct</ProjectName>
+     <ProjectGuid>{47460476-912B-4313-8B10-BDF1D60A84C4}</ProjectGuid>
+     <RootNamespace>astraMatlab</RootNamespace>
++    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+   <ImportGroup Label="ExtensionSettings">
+diff --git a/matlab/mex/astra_mex_log_vc14.vcxproj b/matlab/mex/astra_mex_log_vc14.vcxproj
+index 3e81ae5..03b53cd 100644
+--- a/matlab/mex/astra_mex_log_vc14.vcxproj
++++ b/matlab/mex/astra_mex_log_vc14.vcxproj
+@@ -1,5 +1,5 @@
+ ﻿<?xml version="1.0" encoding="utf-8"?>
+-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
++<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup Label="ProjectConfigurations">
+     <ProjectConfiguration Include="Debug_CUDA|Win32">
+       <Configuration>Debug_CUDA</Configuration>
+@@ -38,39 +38,40 @@
+     <ProjectName>astra_mex_log</ProjectName>
+     <ProjectGuid>{88539382-66DB-4BBC-A48E-8B6B3CA6064F}</ProjectGuid>
+     <RootNamespace>astraMatlab</RootNamespace>
++    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+   <ImportGroup Label="ExtensionSettings">
+diff --git a/matlab/mex/astra_mex_matrix_vc14.vcxproj b/matlab/mex/astra_mex_matrix_vc14.vcxproj
+index c28b78f..32115e4 100644
+--- a/matlab/mex/astra_mex_matrix_vc14.vcxproj
++++ b/matlab/mex/astra_mex_matrix_vc14.vcxproj
+@@ -1,5 +1,5 @@
+ ﻿<?xml version="1.0" encoding="utf-8"?>
+-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
++<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup Label="ProjectConfigurations">
+     <ProjectConfiguration Include="Debug_CUDA|Win32">
+       <Configuration>Debug_CUDA</Configuration>
+@@ -38,39 +38,40 @@
+     <ProjectName>astra_mex_matrix</ProjectName>
+     <ProjectGuid>{6BFA8857-37EB-4E43-A97C-B860E21599F5}</ProjectGuid>
+     <RootNamespace>astraMatlab</RootNamespace>
++    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+   <ImportGroup Label="ExtensionSettings">
+diff --git a/matlab/mex/astra_mex_projector3d_vc14.vcxproj b/matlab/mex/astra_mex_projector3d_vc14.vcxproj
+index c0b5177..76794ed 100644
+--- a/matlab/mex/astra_mex_projector3d_vc14.vcxproj
++++ b/matlab/mex/astra_mex_projector3d_vc14.vcxproj
+@@ -1,5 +1,5 @@
+ ﻿<?xml version="1.0" encoding="utf-8"?>
+-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
++<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup Label="ProjectConfigurations">
+     <ProjectConfiguration Include="Debug_CUDA|Win32">
+       <Configuration>Debug_CUDA</Configuration>
+@@ -38,39 +38,40 @@
+     <ProjectName>astra_mex_projector3d</ProjectName>
+     <ProjectGuid>{CA85BDA0-9BDD-495E-B200-BFE863EB6318}</ProjectGuid>
+     <RootNamespace>astraMatlab</RootNamespace>
++    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+   <ImportGroup Label="ExtensionSettings">
+diff --git a/matlab/mex/astra_mex_projector_vc14.vcxproj b/matlab/mex/astra_mex_projector_vc14.vcxproj
+index c67fcf3..818c739 100644
+--- a/matlab/mex/astra_mex_projector_vc14.vcxproj
++++ b/matlab/mex/astra_mex_projector_vc14.vcxproj
+@@ -1,5 +1,5 @@
+ ﻿<?xml version="1.0" encoding="utf-8"?>
+-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
++<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup Label="ProjectConfigurations">
+     <ProjectConfiguration Include="Debug_CUDA|Win32">
+       <Configuration>Debug_CUDA</Configuration>
+@@ -38,39 +38,40 @@
+     <ProjectName>astra_mex_projector</ProjectName>
+     <ProjectGuid>{85ECCF1D-C5F6-4E0E-A4F9-0DE7C0B916B2}</ProjectGuid>
+     <RootNamespace>astraMatlab</RootNamespace>
++    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+   <ImportGroup Label="ExtensionSettings">
+diff --git a/matlab/mex/astra_mex_vc14.vcxproj b/matlab/mex/astra_mex_vc14.vcxproj
+index 6482ec3..76a6387 100644
+--- a/matlab/mex/astra_mex_vc14.vcxproj
++++ b/matlab/mex/astra_mex_vc14.vcxproj
+@@ -1,5 +1,5 @@
+ ﻿<?xml version="1.0" encoding="utf-8"?>
+-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
++<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup Label="ProjectConfigurations">
+     <ProjectConfiguration Include="Debug_CUDA|Win32">
+       <Configuration>Debug_CUDA</Configuration>
+@@ -38,39 +38,40 @@
+     <ProjectName>astra_mex</ProjectName>
+     <ProjectGuid>{6FDF72C4-A855-4F1C-A401-6500040B5E28}</ProjectGuid>
+     <RootNamespace>astraMatlab</RootNamespace>
++    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v142</PlatformToolset>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+   <ImportGroup Label="ExtensionSettings">

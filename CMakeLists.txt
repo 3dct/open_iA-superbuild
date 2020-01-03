@@ -10,7 +10,7 @@ option (BUILD_ALL "Enables all optional modules and filters (see also separate B
 option (BUILD_FILTERS "Whether to build image processing filters (smoothing, segmentation, intensity transformations, geometric transformations, ...)" ON)
 option (BUILD_TOOLS "Whether to build common tool modules, e.g. FeatureScout, 4DCT, GEMSe, Dynamic Volume Lines, FIAKER, ..." ON)
 option (BUILD_TESTING "Whether to enable build of tests runners and the capability to submit CDash test runs" OFF)
-#option (BUILD_ASTRA "Whether to build ASTRA reconstruction library and open_iA ASTRA module" OFF)
+option (BUILD_ASTRA "Whether to build ASTRA reconstruction library and open_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time!" OFF)
 option (BUILD_VR "Whether to build VR module" OFF)
 #option (BUILD_HDF5 "Whether to build HDF5 library and use it in open_iA" OFF)
 option (BUILD_EIGEN "Whether to fetch and use eigen" OFF)
@@ -20,7 +20,7 @@ if (BUILD_ALL)
 	SET (BUILD_FILTERS "ON" CACHE BOOL "" FORCE)
 	SET (BUILD_TOOLS "ON" CACHE BOOL "" FORCE)
 	SET (BUILD_TESTING "ON" CACHE BOOL "" FORCE)
-	#SET (BUILD_ASTRA ON)
+	SET (BUILD_ASTRA "ON" CACHE BOOL "" FORCE)
 	SET (BUILD_VR "ON" CACHE BOOL "" FORCE)
 	#SET (BUILD_HDF5 ON)
 	SET (BUILD_EIGEN ON)
@@ -58,6 +58,14 @@ set (ITK_URL "https://github.com/InsightSoftwareConsortium/ITK/releases/download
 set (OPENVR_VERSION "1.9.15")
 set (OPENVR_URL "https://github.com/ValveSoftware/openvr/archive/v${OPENVR_VERSION}.zip")
 set (OPENVR_ARCHIVE_SHA512 "CB047D92C383F5CF761FD5EE262DDA8755BF592AC827A8C7314294DDBA489E4709EB3AA756207382E1C16BB02DAED77EAA6CEBE48411BCE5A4C2957855FA75D9")
+
+set (ASTRA_REPOSITORY "https://github.com/astra-toolbox/astra-toolbox.git")
+set (ASTRA_TAG        "06322245a638e435d29bc8f027aed0bd976139d0") # version "1.9.9dev"
+set (BOOST_VERSION    "1.72.0")
+set (BOOST_ARCHIVE_SHA512 "BEB4D099E9427394D6AD0CE0D526EE2C6E96CC4CAF5DE4747D009B01CD3E517A988E79C0D4522E49217C6A7EFD551075FB18BFAC51F344CEA9978CDCFC57CC56") # for 1.72.0 zip
+set (BOOST_MSVC_TOOLSET "msvc-14.2")
+set (BOOST_LIB_SUFFIX "vc142")
+set (BOOST_SHORTVER "1_72")
 
 set (EIGEN_VERSION "3.3.7")
 set (EIGEN_URL "https://gitlab.com/libeigen/eigen/-/archive/${EIGEN_VERSION}/eigen-${EIGEN_VERSION}.zip")
@@ -168,6 +176,65 @@ else()
 		DEPENDS           VTK)
 endif()
 
+if (BUILD_ASTRA)
+	set (ASTRA_TOOLBOX_DIR "${CMAKE_BINARY_DIR}/astra")
+	# fetch and build boost...
+	# inspired by https://github.com/apache/geode-native/blob/develop/dependencies/boost/CMakeLists.txt
+	string(REPLACE "." "_" BOOST_VERSION_UNDERSCORE ${BOOST_VERSION})
+	SET (BOOST_URL "https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_UNDERSCORE}.zip")
+	SET (B2_FLAGS "-j8 address-model=64 architecture=x86 link=static threading=multi runtime-link=shared --build-type minimal stage")
+	if (WIN32)
+		set ( BOOTSTRAP_COMMAND ${CMAKE_BINARY_DIR}\\boost\\bootstrap.bat )
+		set ( B2_COMMAND ${CMAKE_BINARY_DIR}\\boost\\b2 )
+		set ( B2_FLAGS ${B2_FLAGS} toolset=${BOOST_MSVC_TOOLSET} )
+	else()
+		set ( BOOTSTRAP_COMMAND ${CMAKE_BINARY_DIR}/boost/bootstrap.sh )
+		set ( B2_COMMAND ${CMAKE_BINARY_DIR}/boost/b2 )
+		set ( B2_FLAGS ${B2_FLAGS} )
+	endif()
+	SET (BOOST_BIN_DIR "${CMAKE_BINARY_DIR}/boost")
+	SET (ASTRA_BIN_DIR "${CMAKE_BINARY_DIR}/astra")
+	ExternalProject_Add( boost
+		URL               ${BOOST_URL}
+		URL_HASH          SHA512=${BOOST_ARCHIVE_SHA512}
+		BUILD_IN_SOURCE   1
+		SOURCE_DIR        "${BOOST_BIN_DIR}"
+		CONFIGURE_COMMAND ${BOOTSTRAP_COMMAND}
+		BUILD_COMMAND     ${B2_COMMAND} ${B2_FLAGS}
+		INSTALL_COMMAND   ""  # ${B2_COMMAND} ${B2_FLAGS} install
+	)
+	if (WIN32)
+		set (ASTRA_CONFIGURE_COMMAND "${GIT_EXECUTABLE} apply ${CMAKE_SOURCE_DIR}/vs-2019.patch")  # specific to VS 2019!
+		set (ASTRA_BUILD_DIR "${ASTRA_BIN_DIR}/build/msvc")
+		set (ASTRA_BUILD_COMMAND "devenv ${ASTRA_BUILD_DIR}/astra_vc14.vcxproj /Build")
+	else()
+		set (ASTRA_BUILD_DIR "${ASTRA_BIN_DIR}/build/linux")
+		set (ASTRA_CONFIGURE_COMMAND "${ASTRA_BUILD_DIR}/autogen.sh && ${ASTRA_BIN_DIR}/build/linux/configure")
+		set (ASTRA_BUILD_COMMAND "cd ${ASTRA_BUILD_DIR} && make -j 8")
+	endif()
+	# fetch and build astra:
+	ExternalProject_Add( astra
+		GIT_REPOSITORY    "${ASTRA_REPOSITORY}"
+		GIT_TAG           "${ASTRA_TAG}"
+		SOURCE_DIR        "${ASTRA_BIN_DIR}"
+		BUILD_IN_SOURCE   1
+		CONFIGURE_COMMAND "${ASTRA_CONFIGURE_COMMAND}"
+		BUILD_COMMAND     "${ASTRA_BUILD_COMMAND}"
+		DEPENDS           boost
+	)
+	# find way to only copy if files aren't there / same size etc. yet
+	#add_custom_command(TARGET astra PRE_BUILD
+	#	COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/boost/boost" "${CMAKE_BINARY_DIR}/astra/lib/include/boost"
+	#)
+	add_custom_command(TARGET astra PRE_BUILD
+		COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/astra/lib/x64")
+	set (BOOST_LIB_BASE "${CMAKE_BINARY_DIR}/boost/stage/lib/libboost_")
+	add_custom_command(TARGET astra PRE_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy "${BOOST_LIB_BASE}chrono-${BOOST_LIB_SUFFIX}-mt-gd-x64-${BOOST_SHORTVER}.lib" "${BOOST_LIB_BASE}chrono-${BOOST_LIB_SUFFIX}-mt-x64-${BOOST_SHORTVER}.lib" "${BOOST_LIB_BASE}date_time-${BOOST_LIB_SUFFIX}-mt-gd-x64-${BOOST_SHORTVER}.lib" "${BOOST_LIB_BASE}date_time-${BOOST_LIB_SUFFIX}-mt-x64-${BOOST_SHORTVER}.lib" "${BOOST_LIB_BASE}system-${BOOST_LIB_SUFFIX}-mt-gd-x64-${BOOST_SHORTVER}.lib" "${BOOST_LIB_BASE}system-${BOOST_LIB_SUFFIX}-mt-x64-${BOOST_SHORTVER}.lib" "${BOOST_LIB_BASE}thread-${BOOST_LIB_SUFFIX}-mt-gd-x64-${BOOST_SHORTVER}.lib" "${BOOST_LIB_BASE}thread-${BOOST_LIB_SUFFIX}-mt-x64-${BOOST_SHORTVER}.lib" "${CMAKE_BINARY_DIR}/astra/lib/x64"
+	)
+endif()
+
+
 set (OPEN_IA_CMAKE_ARGS
 	"-DITK_DIR:PATH=${ITK_BIN_DIR}")
 if (BUILD_FILTERS)
@@ -202,10 +269,13 @@ endif()
 if (ENABLE_PRECOMPILE)
 	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DopeniA_PRECOMPILE:BOOL=ON")
 endif()
-#if (BUILD_ASTRA)
-#	SET (OPEN_IA_CMAKE_ARGS ${OPEN_IA_CMAKE_ARGS} "-DModule_AstraReconstruction:BOOL=ON")
-#endif()
 SET (openiA_DEPENDS ITK)
+if (BUILD_ASTRA)
+	LIST (APPEND OPEN_IA_CMAKE_ARGS
+		"-DModule_AstraReconstruction:BOOL=ON"
+		"-DASTRA_TOOLBOX_DIR:PATH=${ASTRA_TOOLBOX_DIR}")
+	LIST (APPEND openiA_DEPENDS astra)
+endif()
 if (BUILD_VR)
 	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_VR:BOOL=ON"
 		"-DOPENVR_ROOT_DIR:PATH=${OPENVR_BIN_DIR}")
@@ -247,4 +317,5 @@ if (MSVC)
 	set (openia_debug_path "${Qt5_LIB_DIR};${VTK_WIN_DIR}\\bin\\$(Configuration);${ITK_WIN_DIR}\\bin\\$(Configuration)${ADDITIONAL_LIB_PATHS}")
 	set_target_properties(open_iA PROPERTIES VS_DEBUGGER_COMMAND "${openia_debug_cmd}")
 	set_target_properties(open_iA PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=${openia_debug_path}")
+	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT open_iA)
 endif()
