@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.13)
+# 3.13 is required because we use VS_DEBUGGER_COMMAND and VS_DEBUGGER_ENVIRONMENT target properties introduced with that version
 project(open_iA_superbuild LANGUAGES CXX)
 
 include(ExternalProject)
@@ -74,6 +75,8 @@ else()
 	set (ITK_ARCHIVE_SHA512 ${ITK_GZIP_SHA512})
 endif()
 
+SET (ADDITIONAL_LIB_PATHS "") # for additional lib paths to be added to MSVC debugger environment path
+
 set (VTK_CMAKE_ARGS
 	"-DBUILD_SHARED_LIBS:BOOL=On"
 	"-DVTK_LEGACY_REMOVE:BOOL=On"
@@ -104,6 +107,8 @@ if (BUILD_VR)
 	LIST(APPEND VTK_CMAKE_ARGS
 		"-DModule_vtkRenderingOpenVR:BOOL=ON"
 		"-DOPENVR_ROOT_DIR:PATH=${OPENVR_BIN_DIR}")
+	STRING(REPLACE "/" "\\" OPENVR_WIN_DIR "${OPENVR_BIN_DIR}")
+	SET (ADDITIONAL_LIB_PATHS "${ADDITIONAL_LIB_PATHS};${OPENVR_WIN_DIR}\\bin\\win64")
 endif()
 if (USE_GIT_REPOS)
 	ExternalProject_Add( VTK
@@ -219,13 +224,25 @@ if (BUILD_EIGEN)
 	LIST(APPEND OPEN_IA_CMAKE_ARGS
 		"-DEIGEN3_INCLUDE_DIR:PATH=${EIGEN_BIN_DIR}")
 endif()
+set (OPEN_IA_BIN_DIR "${CMAKE_BINARY_DIR}/open_iA/bin")
 ExternalProject_Add( open_iA
 	GIT_REPOSITORY    "https://github.com/3dct/open_iA.git"
 	GIT_TAG           "${OPEN_IA_GIT_TAG}"
 	SOURCE_DIR        "${CMAKE_BINARY_DIR}/open_iA/src"
-	BINARY_DIR        "${CMAKE_BINARY_DIR}/open_iA/bin"
+	BINARY_DIR        "${OPEN_IA_BIN_DIR}"
 	CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
 	CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
 	CMAKE_ARGS        "${OPEN_IA_CMAKE_ARGS}"
 	INSTALL_COMMAND   ""
 	DEPENDS           ${openiA_DEPENDS})
+
+
+if (MSVC)
+	string(REPLACE "/" "\\" OPEN_IA_BIN_DIR_WIN "${OPEN_IA_BIN_DIR}")
+	set_target_properties(open_iA PROPERTIES VS_DEBUGGER_COMMAND "${OPEN_IA_BIN_DIR_WIN}\\x64\\$(Configuration)\\open_iA.exe")
+	STRING(REPLACE "/lib/cmake/Qt5" "/bin" Qt5_LIB_DIR ${Qt5_DIR})
+	STRING(REPLACE "/" "\\" Qt5_LIB_DIR ${Qt5_LIB_DIR})
+	STRING(REPLACE "/" "\\" VTK_WIN_DIR ${VTK_BIN_DIR})
+	STRING(REPLACE "/" "\\" ITK_WIN_DIR ${ITK_BIN_DIR})
+	set_target_properties(open_iA PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=${Qt5_LIB_DIR};${VTK_WIN_DIR}\\bin\\$(Configuration);${ITK_WIN_DIR}\\bin\\$(Configuration)${ADDITIONAL_LIB_PATHS}")
+endif()
