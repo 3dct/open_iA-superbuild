@@ -12,7 +12,7 @@ option (BUILD_TESTING "Whether to enable build of tests runners and the capabili
 #option (BUILD_ASTRA "Whether to build ASTRA reconstruction library and open_iA ASTRA module" OFF)
 option (BUILD_VR "Whether to build VR module" OFF)
 #option (BUILD_HDF5 "Whether to build HDF5 library and use it in open_iA" OFF)
-#option (BUILD_EIGEN "Whether to fetch and use eigen" OFF)
+option (BUILD_EIGEN "Whether to fetch and use eigen" OFF)
 option (ENABLE_PRECOMPILE "Whether to build open_iA with precompiled headers enabled" OFF)
 
 if (BUILD_ALL)
@@ -22,7 +22,7 @@ if (BUILD_ALL)
 	#SET (BUILD_ASTRA ON)
 	SET (BUILD_VR "ON" CACHE BOOL "" FORCE)
 	#SET (BUILD_HDF5 ON)
-	#SET (BUILD_EIGEN ON)
+	SET (BUILD_EIGEN ON)
 endif()
 
 set (VTK_SHORT_VERSION "8.2")
@@ -57,6 +57,10 @@ set (ITK_URL "https://github.com/InsightSoftwareConsortium/ITK/releases/download
 set (OPENVR_VERSION "1.9.15")
 set (OPENVR_URL "https://github.com/ValveSoftware/openvr/archive/v${OPENVR_VERSION}.zip")
 set (OPENVR_ARCHIVE_SHA512 "CB047D92C383F5CF761FD5EE262DDA8755BF592AC827A8C7314294DDBA489E4709EB3AA756207382E1C16BB02DAED77EAA6CEBE48411BCE5A4C2957855FA75D9")
+
+set (EIGEN_VERSION "3.3.7")
+set (EIGEN_URL "https://gitlab.com/libeigen/eigen/-/archive/${EIGEN_VERSION}/eigen-${EIGEN_VERSION}.zip")
+set (EIGEN_ARCHIVE_SHA512 "6C19DF0271503DDCE61724729031A3B885D86F35D1F24363A76F9E300234D3257FF56020ACE624B2C011E17CBA6D69A3014508C5E6DC3436BBE331A2129E2175") # for 3.3.7 zip
 
 if (WIN32)
 	SET (VTK_URL "${VTK_URL}.zip")
@@ -185,6 +189,7 @@ if (BUILD_TOOLS)
 	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_PolygonPrimitives:BOOL=ON")
 	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_PorosityAnalyser:BOOL=ON")
 	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_XRF:BOOL=ON")
+	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DQt5Charts_DIR:PATH=${Qt5_DIR}Charts")
 endif()
 if (BUILD_TESTING)
 	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DopeniA_TESTING_ENABLED:BOOL=ON")
@@ -195,8 +200,24 @@ endif()
 #if (BUILD_ASTRA)
 #	SET (OPEN_IA_CMAKE_ARGS ${OPEN_IA_CMAKE_ARGS} "-DModule_AstraReconstruction:BOOL=ON")
 #endif()
+SET (openiA_DEPENDS ITK)
 if (BUILD_VR)
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_VR:BOOL=ON")
+	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_VR:BOOL=ON"
+		"-DOPENVR_ROOT_DIR:PATH=${OPENVR_BIN_DIR}")
+endif()
+if (BUILD_EIGEN)
+	SET (EIGEN_BIN_DIR "${CMAKE_BINARY_DIR}/eigen-${EIGEN_VERSION}")
+	ExternalProject_Add (eigen
+		URL               ${EIGEN_URL}
+		URL_HASH          "SHA512=${EIGEN_ARCHIVE_SHA512}"
+		SOURCE_DIR        "${EIGEN_BIN_DIR}"
+		BUILD_IN_SOURCE   1
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND     ""
+		INSTALL_COMMAND   "")
+	LIST (APPEND openiA_DEPENDS eigen)
+	LIST(APPEND OPEN_IA_CMAKE_ARGS
+		"-DEIGEN3_INCLUDE_DIR:PATH=${EIGEN_BIN_DIR}")
 endif()
 ExternalProject_Add( open_iA
 	GIT_REPOSITORY    "https://github.com/3dct/open_iA.git"
@@ -207,4 +228,4 @@ ExternalProject_Add( open_iA
 	CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
 	CMAKE_ARGS        "${OPEN_IA_CMAKE_ARGS}"
 	INSTALL_COMMAND   ""
-	DEPENDS           ITK)
+	DEPENDS           ${openiA_DEPENDS})
