@@ -25,8 +25,7 @@ option (ENABLE_PRECOMPILE "Whether to build open_iA with precompiled headers ena
 #option (BUILD_ASTRA "Build Astra Toolbox in the superbuild. If disabled, you need to set ASTRA_DIR to an existing Astra Toolkit build" ON)
 #option (FETCH_OPENVR "Fetches release of OpenVR SDK. If disabled, you need to set OPENVR_DIR to an existing OpenVR SDK directory" ON)
 #option (FETCH_EIGEN "Fetches release of eigen. If disabled, you need to set EIGEN3_DIR to an existing Eigen 3.x directory" ON)
-#option (BUILD_OPENCL "Build OpenCL ICD loader. If disabled, you need to set OPENCL_DIR to an existing OpenCL ICD loader build" ON)
-set (BUILD_OPENCL "ON")
+option (BUILD_OPENCL "Build OpenCL ICD loader. If disabled, you need to set OPENCL_DIR to an existing OpenCL ICD loader build" ON)
 #option (BUILD_HDF5 "Build HDF5. If disabled, you need to set HDF5_DIR to an existing HDF5 build" ON)
 
 if (ENABLE_ALL)
@@ -196,11 +195,9 @@ if (BUILD_OPENCL)
 		COMMAND ${CMAKE_COMMAND} -E copy "${OPENCL_DIR}/cppheaders/include/CL/cl.hpp" "${OPENCL_DIR}/cppheaders/include/CL/cl2.hpp" "${OPENCL_DIR}/icdloader/inc/CL/")
 	add_custom_command(TARGET OpenCL_ICD POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icdloader/inc/CL" "${OPENCL_DIR}/include/CL")
-	# Find way to copy any/current configuration!
-	#add_custom_command(TARGET OpenCL_ICD POST_BUILD
-	#	COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icd-bin/Debug" "${OPENCL_DIR}/lib")
+	# Find way to use different configurations properly...?
 	add_custom_command(TARGET OpenCL_ICD POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icd-bin/Release" "${OPENCL_DIR}lib")
+		COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icd-bin/$(Configuration)" "${OPENCL_DIR}/lib")
 	LIST (APPEND ITK_DEPENDS OpenCL_ICD)
 else()
 	set(OPENCL_DIR "${OPENCL_DIR}"
