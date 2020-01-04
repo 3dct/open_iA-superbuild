@@ -23,6 +23,7 @@ option (ENABLE_PRECOMPILE "Whether to build open_iA with precompiled headers ena
 #option (BUILD_VTK "Build VTK in the superbuild. If disabled, you need to set VTK_DIR to an existing VTK build" ON)
 #option (BUILD_ITK "Build ITK in the superbuild. If disabled, you need to set ITK_DIR to an existing ITK build" ON)
 #option (BUILD_ASTRA "Build Astra Toolbox in the superbuild. If disabled, you need to set ASTRA_DIR to an existing Astra Toolkit build" ON)
+#option (BUILD_BOOST "Build Boost in the superbuild. If disabled, you need to set BOOST_DIR to an existing Astra Toolkit build" ON)
 #option (FETCH_OPENVR "Fetches release of OpenVR SDK. If disabled, you need to set OPENVR_DIR to an existing OpenVR SDK directory" ON)
 #option (FETCH_EIGEN "Fetches release of eigen. If disabled, you need to set EIGEN3_DIR to an existing Eigen 3.x directory" ON)
 option (BUILD_OPENCL "Build OpenCL ICD loader. If disabled, you need to set OPENCL_DIR to an existing OpenCL ICD loader build" ON)
