@@ -1,4 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
+if (CMAKE_MAJOR_VERSION GREATER 3 OR (CMAKE_MAJOR_VERSION EQUAL 3 AND CMAKE_MINOR_VERSION GREATER 15))
+	# prevent all submodules to be fetched in ExternalProject_Add if GIT_SUBMODULES is ""
+	CMAKE_POLICY(SET CMP0097 NEW)
+endif()
 # 3.13 is required because we use VS_DEBUGGER_COMMAND and VS_DEBUGGER_ENVIRONMENT target properties introduced with that version
 project(open_iA_superbuild LANGUAGES CXX)
 
@@ -6,24 +10,33 @@ include(ExternalProject)
 
 option (USE_GIT_REPOS "Whether to use git repositories for VTK and ITK libraries. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times significantly." OFF)
 
-option (BUILD_ALL "Enables all optional modules and filters (see also separate BUILD_xyz options)" OFF)
-option (BUILD_FILTERS "Whether to build image processing filters (smoothing, segmentation, intensity transformations, geometric transformations, ...)" ON)
-option (BUILD_TOOLS "Whether to build common tool modules, e.g. FeatureScout, 4DCT, GEMSe, Dynamic Volume Lines, FIAKER, ..." ON)
-option (BUILD_TESTING "Whether to enable build of tests runners and the capability to submit CDash test runs" OFF)
-option (BUILD_ASTRA "Whether to build ASTRA reconstruction library and open_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time!" OFF)
-option (BUILD_VR "Whether to build VR module" OFF)
-#option (BUILD_HDF5 "Whether to build HDF5 library and use it in open_iA" OFF)
-option (BUILD_EIGEN "Whether to fetch and use eigen" OFF)
+option (ENABLE_ALL "Enables all optional modules and filters (see also separate ENABLE_xyz options)" OFF)
+option (ENABLE_FILTERS "Whether to build image processing filters (smoothing, segmentation, intensity transformations, geometric transformations, ...)" ON)
+option (ENABLE_TOOLS "Whether to build common tool modules, e.g. FeatureScout, 4DCT, GEMSe, Dynamic Volume Lines, FIAKER, ..." ON)
+option (ENABLE_TEST "Whether to enable build of tests runners and the capability to submit CDash test runs" OFF)
+option (ENABLE_ASTRA "Whether to build ASTRA reconstruction library and open_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time!" OFF)
+option (ENABLE_VR "Whether to enable VR module" OFF)
+option (ENABLE_EIGEN "Whether to fetch and use eigen" OFF)
+#option (ENABLE_HDF5 "Whether to build HDF5 library and use it in open_iA" OFF)
 option (ENABLE_PRECOMPILE "Whether to build open_iA with precompiled headers enabled" OFF)
 
-if (BUILD_ALL)
-	SET (BUILD_FILTERS "ON" CACHE BOOL "" FORCE)
-	SET (BUILD_TOOLS "ON" CACHE BOOL "" FORCE)
-	SET (BUILD_TESTING "ON" CACHE BOOL "" FORCE)
-	SET (BUILD_ASTRA "ON" CACHE BOOL "" FORCE)
-	SET (BUILD_VR "ON" CACHE BOOL "" FORCE)
-	#SET (BUILD_HDF5 ON)
-	SET (BUILD_EIGEN ON)
+#option (BUILD_VTK "Build VTK in the superbuild. If disabled, you need to set VTK_DIR to an existing VTK build" ON)
+#option (BUILD_ITK "Build ITK in the superbuild. If disabled, you need to set ITK_DIR to an existing ITK build" ON)
+#option (BUILD_ASTRA "Build Astra Toolbox in the superbuild. If disabled, you need to set ASTRA_DIR to an existing Astra Toolkit build" ON)
+#option (FETCH_OPENVR "Fetches release of OpenVR SDK. If disabled, you need to set OPENVR_DIR to an existing OpenVR SDK directory" ON)
+#option (FETCH_EIGEN "Fetches release of eigen. If disabled, you need to set EIGEN3_DIR to an existing Eigen 3.x directory" ON)
+#option (BUILD_OPENCL "Build OpenCL ICD loader. If disabled, you need to set OPENCL_DIR to an existing OpenCL ICD loader build" ON)
+set (BUILD_OPENCL "ON")
+#option (BUILD_HDF5 "Build HDF5. If disabled, you need to set HDF5_DIR to an existing HDF5 build" ON)
+
+if (ENABLE_ALL)
+	SET (ENABLE_FILTERS "ON" CACHE BOOL "" FORCE)
+	SET (ENABLE_TOOLS "ON" CACHE BOOL "" FORCE)
+	SET (ENABLE_TEST "ON" CACHE BOOL "" FORCE)
+	SET (ENABLE_ASTRA "ON" CACHE BOOL "" FORCE)
+	SET (ENABLE_VR "ON" CACHE BOOL "" FORCE)
+	SET (ENABLE_EIGEN "ON" CACHE BOOL "" FORCE)
+	#SET (ENABLE_HDF5 "ON" CACHE BOOL "" FORCE)
 endif()
 
 set (VTK_SHORT_VERSION "8.2")
@@ -101,7 +114,7 @@ ENDIF()
 LIST(APPEND VTK_CMAKE_ARGS "-DVTK_RENDERING_BACKEND:STRING=${VTK_RENDER_BACKEND}")
 set (VTK_BIN_DIR "${CMAKE_BINARY_DIR}/vtk/bin-${VTK_LONG_VERSION}")
 set (VTK_DEPENDS "")
-if (BUILD_VR)
+if (ENABLE_VR)
 	SET (OPENVR_BIN_DIR "${CMAKE_BINARY_DIR}/openvr-${OPENVR_VERSION}")
 	ExternalProject_Add (OpenVR
 		URL               ${OPENVR_URL}
@@ -142,6 +155,63 @@ else()
 		DEPENDS           ${VTK_DEPENDS})
 endif()
 
+set (ITK_DEPENDS VTK)
+if (BUILD_OPENCL)
+	set (OPENCL_DIR "${CMAKE_BINARY_DIR}/OpenCL")
+	set (OPENCL_C_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-Headers.git")
+	set (OPENCL_CPP_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-CLHPP.git")
+	set (OPENCL_ICD_REPO "https://github.com/KhronosGroup/OpenCL-ICD-Loader.git")
+	ExternalProject_Add (OpenCL_C
+		GIT_REPOSITORY    ${OPENCL_C_HEADERS_REPO}
+		GIT_TAG           "master"
+		SOURCE_DIR        "${OPENCL_DIR}/cheaders"
+		BUILD_IN_SOURCE   1
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND     ""
+		INSTALL_COMMAND   "")
+	ExternalProject_Add (OpenCL_CPP
+		GIT_REPOSITORY    ${OPENCL_CPP_HEADERS_REPO}
+		GIT_TAG           "master"
+		GIT_SUBMODULES    ""
+		SOURCE_DIR        "${OPENCL_DIR}/cppheaders"
+		BUILD_IN_SOURCE   1
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND     ""
+		INSTALL_COMMAND   "")
+	# Find way to skip re-build of OpenCL every time!
+	ExternalProject_Add (OpenCL_ICD
+		GIT_REPOSITORY    ${OPENCL_ICD_REPO}
+		GIT_TAG          "master"
+		GIT_SUBMODULES    ""
+		SOURCE_DIR        "${OPENCL_DIR}/icdloader"
+		BINARY_DIR        "${OPENCL_DIR}/icd-bin"
+		CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
+		CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
+		CMAKE_ARGS        "-DOPENCL_ICD_LOADER_REQUIRE_WDK:BOOL=OFF"
+		INSTALL_COMMAND   ""
+		DEPENDS           OpenCL_CPP OpenCL_C)
+	add_custom_command(TARGET OpenCL_ICD PRE_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/cheaders/CL" "${OPENCL_DIR}/icdloader/inc/CL")
+	add_custom_command(TARGET OpenCL_ICD PRE_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy "${OPENCL_DIR}/cppheaders/include/CL/cl.hpp" "${OPENCL_DIR}/cppheaders/include/CL/cl2.hpp" "${OPENCL_DIR}/icdloader/inc/CL/")
+	add_custom_command(TARGET OpenCL_ICD POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icdloader/inc/CL" "${OPENCL_DIR}/include/CL")
+	# Find way to copy any/current configuration!
+	#add_custom_command(TARGET OpenCL_ICD POST_BUILD
+	#	COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icd-bin/Debug" "${OPENCL_DIR}/lib")
+	add_custom_command(TARGET OpenCL_ICD POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icd-bin/Release" "${OPENCL_DIR}lib")
+	LIST (APPEND ITK_DEPENDS OpenCL_ICD)
+else()
+	set(OPENCL_DIR "${OPENCL_DIR}"
+		CACHE PATH
+		"OpenCL ICD loader directory")
+endif()
+
+if (NOT OPENCL_DIR)
+	message(SEND_ERROR "OPENCL_DIR not set! Either enable BUILD_OPENCL or set OPENCL_DIR to a valid OpenCL ICD loader directory!")
+endif()
+
 set (ITK_CMAKE_ARGS 
 	"-DBUILD_SHARED_LIBS:BOOL=On"
 	"-DITK_USE_GPU:BOOL=On"
@@ -150,7 +220,10 @@ set (ITK_CMAKE_ARGS
 	"-DModule_ITKVtkGlue:BOOL=On"
 	"-DModule_HigherOrderAccurateGradient:BOOL=On"
 	"-DVTK_DIR:PATH=${VTK_BIN_DIR}"
-	"-DQt5_DIR:PATH=${Qt5_DIR}")
+	"-DQt5_DIR:PATH=${Qt5_DIR}"
+	"-DOPENCL_ROOT_DIR=${OPENCL_DIR}"
+	"-DOPENCL_INCLUDE_DIRS=${OPENCL_DIR}/include"
+	"-DOPENCL_LIBRARIES=${OPENCL_DIR}/lib/OpenCL.lib")
 set (ITK_BIN_DIR "${CMAKE_BINARY_DIR}/itk/bin-${ITK_VERSION}")
 if (USE_GIT_REPOS)
 	ExternalProject_Add( ITK
@@ -162,7 +235,7 @@ if (USE_GIT_REPOS)
 		CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
 		CMAKE_ARGS        "${ITK_CMAKE_ARGS}"
 		INSTALL_COMMAND   ""
-		DEPENDS           VTK)
+		DEPENDS           ${ITK_DEPENDS})
 else()
 	ExternalProject_Add( ITK
 		URL               "${ITK_URL}"
@@ -173,10 +246,10 @@ else()
 		CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
 		CMAKE_ARGS        "${ITK_CMAKE_ARGS}"
 		INSTALL_COMMAND   ""
-		DEPENDS           VTK)
+		DEPENDS           ${ITK_DEPENDS})
 endif()
 
-if (BUILD_ASTRA)
+if (ENABLE_ASTRA)
 	set (ASTRA_TOOLBOX_DIR "${CMAKE_BINARY_DIR}/astra")
 	# fetch and build boost...
 	# inspired by https://github.com/apache/geode-native/blob/develop/dependencies/boost/CMakeLists.txt
@@ -222,65 +295,69 @@ if (BUILD_ASTRA)
 		BUILD_COMMAND     "${ASTRA_BUILD_COMMAND}"
 		DEPENDS           boost
 	)
-	# find way to only copy if files aren't there / same size etc. yet
-	#add_custom_command(TARGET astra PRE_BUILD
-	#	COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/boost/boost" "${CMAKE_BINARY_DIR}/astra/lib/include/boost"
-	#)
-	add_custom_command(TARGET astra PRE_BUILD
+	add_custom_command(TARGET boost POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/boost/boost" "${CMAKE_BINARY_DIR}/astra/lib/include/boost"
+	)
+	add_custom_command(TARGET boost POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/astra/lib/x64")
 	set (BOOST_LIB_BASE "${CMAKE_BINARY_DIR}/boost/stage/lib/libboost_")
-	add_custom_command(TARGET astra PRE_BUILD
+	add_custom_command(TARGET boost POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy "${BOOST_LIB_BASE}chrono-${BOOST_LIB_SUFFIX}-mt-gd-x64-${BOOST_SHORTVER}.lib" "${BOOST_LIB_BASE}chrono-${BOOST_LIB_SUFFIX}-mt-x64-${BOOST_SHORTVER}.lib" "${BOOST_LIB_BASE}date_time-${BOOST_LIB_SUFFIX}-mt-gd-x64-${BOOST_SHORTVER}.lib" "${BOOST_LIB_BASE}date_time-${BOOST_LIB_SUFFIX}-mt-x64-${BOOST_SHORTVER}.lib" "${BOOST_LIB_BASE}system-${BOOST_LIB_SUFFIX}-mt-gd-x64-${BOOST_SHORTVER}.lib" "${BOOST_LIB_BASE}system-${BOOST_LIB_SUFFIX}-mt-x64-${BOOST_SHORTVER}.lib" "${BOOST_LIB_BASE}thread-${BOOST_LIB_SUFFIX}-mt-gd-x64-${BOOST_SHORTVER}.lib" "${BOOST_LIB_BASE}thread-${BOOST_LIB_SUFFIX}-mt-x64-${BOOST_SHORTVER}.lib" "${CMAKE_BINARY_DIR}/astra/lib/x64"
 	)
 endif()
 
 
 set (OPEN_IA_CMAKE_ARGS
-	"-DITK_DIR:PATH=${ITK_BIN_DIR}")
-if (BUILD_FILTERS)
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_CommonImageFilters:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_ExtractSurface:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_FeatureCharacteristics:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_MetaFilters:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_Metrics:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_Segmentation:BOOL=ON")
+	"-DITK_DIR:PATH=${ITK_BIN_DIR}"
+	"-DOPENCL_ROOT_DIR=${OPENCL_DIR}"
+	"-DOPENCL_INCLUDE_DIRS=${OPENCL_DIR}/include"
+	"-DOPENCL_LIBRARIES=${OPENCL_DIR}/lib/OpenCL.lib")
+if (ENABLE_FILTERS)
+	LIST (APPEND OPEN_IA_CMAKE_ARGS
+		"-DModule_CommonImageFilters:BOOL=ON"
+		"-DModule_ExtractSurface:BOOL=ON"
+		"-DModule_FeatureCharacteristics:BOOL=ON"
+		"-DModule_MetaFilters:BOOL=ON"
+		"-DModule_Metrics:BOOL=ON"
+		"-DModule_Segmentation:BOOL=ON")
 endif()
-if (BUILD_TOOLS)
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_4DCT:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_AdaptiveThreshold:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_BoneThickness:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_DynamicVolumeLines:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_FeatureScout:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_FiAKEr:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_FoamCharacterization:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_FuzzyFeatureTracking:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_GEMSe:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_GPU_DreamcasterTool:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_ModalityExplorer:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_ParameterExplorer:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_PolygonPrimitives:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_PorosityAnalyser:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_XRF:BOOL=ON")
-	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DQt5Charts_DIR:PATH=${Qt5_DIR}Charts")
+if (ENABLE_TOOLS)
+	LIST (APPEND OPEN_IA_CMAKE_ARGS
+		"-DModule_4DCT:BOOL=ON"
+		"-DModule_AdaptiveThreshold:BOOL=ON"
+		"-DModule_BoneThickness:BOOL=ON"
+		"-DModule_DynamicVolumeLines:BOOL=ON"
+		"-DModule_FeatureScout:BOOL=ON"
+		"-DModule_FiAKEr:BOOL=ON"
+		"-DModule_FoamCharacterization:BOOL=ON"
+		"-DModule_FuzzyFeatureTracking:BOOL=ON"
+		"-DModule_GEMSe:BOOL=ON"
+		"-DModule_GPU_DreamcasterTool:BOOL=ON"
+		"-DModule_ModalityExplorer:BOOL=ON"
+		"-DModule_ParameterExplorer:BOOL=ON"
+		"-DModule_PolygonPrimitives:BOOL=ON"
+		"-DModule_PorosityAnalyser:BOOL=ON"
+		"-DModule_XRF:BOOL=ON"
+		"-DQt5Charts_DIR:PATH=${Qt5_DIR}Charts")
 endif()
-if (BUILD_TESTING)
+if (ENABLE_TEST)
 	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DopeniA_TESTING_ENABLED:BOOL=ON")
 endif()
 if (ENABLE_PRECOMPILE)
 	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DopeniA_PRECOMPILE:BOOL=ON")
 endif()
 SET (openiA_DEPENDS ITK)
-if (BUILD_ASTRA)
+if (ENABLE_ASTRA)
 	LIST (APPEND OPEN_IA_CMAKE_ARGS
 		"-DModule_AstraReconstruction:BOOL=ON"
 		"-DASTRA_TOOLBOX_DIR:PATH=${ASTRA_TOOLBOX_DIR}")
 	LIST (APPEND openiA_DEPENDS astra)
 endif()
-if (BUILD_VR)
+if (ENABLE_VR)
 	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_VR:BOOL=ON"
 		"-DOPENVR_ROOT_DIR:PATH=${OPENVR_BIN_DIR}")
 endif()
-if (BUILD_EIGEN)
+if (ENABLE_EIGEN)
 	SET (EIGEN_BIN_DIR "${CMAKE_BINARY_DIR}/eigen-${EIGEN_VERSION}")
 	ExternalProject_Add (eigen
 		URL               ${EIGEN_URL}
