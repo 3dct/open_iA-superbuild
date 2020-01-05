@@ -14,42 +14,42 @@ index 2fca01b..e329864 100644
      <ProjectGuid>{DABD9D82-609E-4C71-B1CA-A41B07495290}</ProjectGuid>
      <RootNamespace>astra_vc14</RootNamespace>
 +    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-+    <CudaToolkitCustomDir>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.2</CudaToolkitCustomDir>
++    <CudaToolkitCustomDir>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v@CUDA_VERSION@</CudaToolkitCustomDir>
    </PropertyGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
      <UseDebugLibraries>true</UseDebugLibraries>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
      <CharacterSet>MultiByte</CharacterSet>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
      <UseDebugLibraries>true</UseDebugLibraries>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
      <CharacterSet>MultiByte</CharacterSet>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
      <UseDebugLibraries>true</UseDebugLibraries>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
      <CharacterSet>MultiByte</CharacterSet>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
      <UseDebugLibraries>true</UseDebugLibraries>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
      <CharacterSet>MultiByte</CharacterSet>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
      <UseDebugLibraries>false</UseDebugLibraries>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
      <WholeProgramOptimization>true</WholeProgramOptimization>
      <CharacterSet>MultiByte</CharacterSet>
    </PropertyGroup>
@@ -57,7 +57,7 @@ index 2fca01b..e329864 100644
      <ConfigurationType>DynamicLibrary</ConfigurationType>
      <UseDebugLibraries>false</UseDebugLibraries>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
      <WholeProgramOptimization>true</WholeProgramOptimization>
      <CharacterSet>MultiByte</CharacterSet>
    </PropertyGroup>
@@ -65,7 +65,7 @@ index 2fca01b..e329864 100644
      <ConfigurationType>DynamicLibrary</ConfigurationType>
      <UseDebugLibraries>false</UseDebugLibraries>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
      <WholeProgramOptimization>true</WholeProgramOptimization>
      <CharacterSet>MultiByte</CharacterSet>
    </PropertyGroup>
@@ -73,27 +73,23 @@ index 2fca01b..e329864 100644
      <ConfigurationType>DynamicLibrary</ConfigurationType>
      <UseDebugLibraries>false</UseDebugLibraries>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
      <WholeProgramOptimization>true</WholeProgramOptimization>
      <CharacterSet>MultiByte</CharacterSet>
    </PropertyGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
    <ImportGroup Label="ExtensionSettings">
 -    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 9.0.props" />
-+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 10.2.props" />
++    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA @CUDA_VERSION@.props" />
    </ImportGroup>
    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'">
      <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-@@ -866,6 +868,6 @@
-   </ItemGroup>
+@@ -867,4 +869,4 @@
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
    <ImportGroup Label="ExtensionTargets">
 -    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 9.0.targets" />
-+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 10.2.targets" />
++    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA @CUDA_VERSION@.targets" />
    </ImportGroup>
--</Project>
-\ No newline at end of file
-+</Project>
 diff --git a/matlab/mex/astra_mex_algorithm_vc14.vcxproj b/matlab/mex/astra_mex_algorithm_vc14.vcxproj
 index 639338b..818734b 100644
 --- a/matlab/mex/astra_mex_algorithm_vc14.vcxproj
@@ -115,42 +111,42 @@ index 639338b..818734b 100644
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
    <ImportGroup Label="ExtensionSettings">
@@ -175,42 +171,42 @@ index d695f4b..f5974ea 100644
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
    <ImportGroup Label="ExtensionSettings">
@@ -235,42 +231,42 @@ index ee6b001..1901e58 100644
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
    <ImportGroup Label="ExtensionSettings">
@@ -295,42 +291,42 @@ index a293699..4b47d7c 100644
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
    <ImportGroup Label="ExtensionSettings">
@@ -355,42 +351,42 @@ index 3e81ae5..03b53cd 100644
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
    <ImportGroup Label="ExtensionSettings">
@@ -415,42 +411,42 @@ index c28b78f..32115e4 100644
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
    <ImportGroup Label="ExtensionSettings">
@@ -475,42 +471,42 @@ index c0b5177..76794ed 100644
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
    <ImportGroup Label="ExtensionSettings">
@@ -535,42 +531,42 @@ index c67fcf3..818c739 100644
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
    <ImportGroup Label="ExtensionSettings">
@@ -595,42 +591,42 @@ index 6482ec3..76a6387 100644
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
      <ConfigurationType>DynamicLibrary</ConfigurationType>
 -    <PlatformToolset>v140</PlatformToolset>
-+    <PlatformToolset>v142</PlatformToolset>
++    <PlatformToolset>@MSVC_TOOLSET@</PlatformToolset>
    </PropertyGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
    <ImportGroup Label="ExtensionSettings">
