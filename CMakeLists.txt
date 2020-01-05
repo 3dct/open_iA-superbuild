@@ -20,8 +20,8 @@ option (ENABLE_EIGEN "Whether to fetch and use eigen" OFF)
 #option (ENABLE_HDF5 "Whether to build HDF5 library and use it in open_iA" OFF)
 option (ENABLE_PRECOMPILE "Whether to build open_iA with precompiled headers enabled" OFF)
 
-#option (BUILD_VTK "Build VTK in the superbuild. If disabled, you need to set VTK_DIR to an existing VTK build" ON)
-#option (BUILD_ITK "Build ITK in the superbuild. If disabled, you need to set ITK_DIR to an existing ITK build" ON)
+option (BUILD_VTK "Build VTK in the superbuild. If disabled, you need to set VTK_DIR to an existing VTK build" ON)
+option (BUILD_ITK "Build ITK in the superbuild. If disabled, you need to set ITK_DIR to an existing ITK build" ON)
 option (BUILD_ASTRA "Build Astra Toolbox in the superbuild. If disabled, you need to set ASTRA_DIR to an existing Astra Toolkit build" ON)
 #option (BUILD_BOOST "Build Boost in the superbuild. If disabled, you need to set BOOST_DIR to an existing Astra Toolkit build" ON)
 #option (FETCH_OPENVR "Fetches release of OpenVR SDK. If disabled, you need to set OPENVR_DIR to an existing OpenVR SDK directory" ON)
@@ -114,65 +114,72 @@ else()
 endif()
 
 SET (ADDITIONAL_LIB_PATHS "") # for additional lib paths to be added to MSVC debugger environment path
+set (ITK_DEPENDS "")
 
-set (VTK_CMAKE_ARGS
-	"-DBUILD_SHARED_LIBS:BOOL=On"
-	"-DVTK_LEGACY_REMOVE:BOOL=On"
-	"-DModule_vtkGUISupportQt:BOOL=On"
-	"-DModule_vtkGUISupportQtOpenGL:BOOL=On"
-	"-DModule_vtkRenderingQt:BOOL=On"
-	"-DModule_vtkViewsQt:BOOL=On"
-	"-DQt5_DIR:PATH=${Qt5_DIR}")
-IF (APPLE)
-	SET (VTK_RENDER_BACKEND "OpenGL")
-ELSE ()
-	SET (VTK_RENDER_BACKEND "OpenGL2")
-ENDIF()
-LIST(APPEND VTK_CMAKE_ARGS "-DVTK_RENDERING_BACKEND:STRING=${VTK_RENDER_BACKEND}")
-set (VTK_BIN_DIR "${CMAKE_BINARY_DIR}/vtk/bin-${VTK_LONG_VERSION}")
-set (VTK_DEPENDS "")
-if (ENABLE_VR)
-	SET (OPENVR_BIN_DIR "${CMAKE_BINARY_DIR}/openvr-${OPENVR_VERSION}")
-	ExternalProject_Add (OpenVR
-		URL               ${OPENVR_URL}
-		URL_HASH          "SHA512=${OPENVR_ARCHIVE_SHA512}"
-		SOURCE_DIR        "${OPENVR_BIN_DIR}"
-		BUILD_IN_SOURCE   1
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND     ""
-		INSTALL_COMMAND   "")
-	SET (VTK_DEPENDS OpenVR)
-	LIST(APPEND VTK_CMAKE_ARGS
-		"-DModule_vtkRenderingOpenVR:BOOL=ON"
-		"-DOPENVR_ROOT_DIR:PATH=${OPENVR_BIN_DIR}")
-	STRING(REPLACE "/" "\\" OPENVR_WIN_DIR "${OPENVR_BIN_DIR}")
-	SET (ADDITIONAL_LIB_PATHS "${ADDITIONAL_LIB_PATHS};${OPENVR_WIN_DIR}\\bin\\win64")
-endif()
-if (USE_GIT_REPOS)
-	ExternalProject_Add( VTK
-		GIT_REPOSITORY    "${VTK_REPOSITORY}"
-		GIT_TAG           "${VTK_LONG_VERSION}"
-		SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src-${VTK_LONG_VERSION}"
-		BINARY_DIR        "${VTK_BIN_DIR}"
-		CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
-		CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
-		CMAKE_ARGS        "${VTK_CMAKE_ARGS}"
-		INSTALL_COMMAND   ""
-		DEPENDS           ${VTK_DEPENDS})
+if (BUILD_VTK)
+	set (VTK_CMAKE_ARGS
+		"-DBUILD_SHARED_LIBS:BOOL=On"
+		"-DVTK_LEGACY_REMOVE:BOOL=On"
+		"-DModule_vtkGUISupportQt:BOOL=On"
+		"-DModule_vtkGUISupportQtOpenGL:BOOL=On"
+		"-DModule_vtkRenderingQt:BOOL=On"
+		"-DModule_vtkViewsQt:BOOL=On"
+		"-DQt5_DIR:PATH=${Qt5_DIR}")
+	IF (APPLE)
+		SET (VTK_RENDER_BACKEND "OpenGL")
+	ELSE ()
+		SET (VTK_RENDER_BACKEND "OpenGL2")
+	ENDIF()
+	LIST(APPEND VTK_CMAKE_ARGS "-DVTK_RENDERING_BACKEND:STRING=${VTK_RENDER_BACKEND}")
+	set (VTK_DIR "${CMAKE_BINARY_DIR}/vtk/bin-${VTK_LONG_VERSION}" CACHE PATH
+		"VTK build folder." FORCE)
+	set (VTK_DEPENDS "")
+	if (ENABLE_VR)
+		SET (OPENVR_BIN_DIR "${CMAKE_BINARY_DIR}/openvr-${OPENVR_VERSION}")
+		ExternalProject_Add (OpenVR
+			URL               ${OPENVR_URL}
+			URL_HASH          "SHA512=${OPENVR_ARCHIVE_SHA512}"
+			SOURCE_DIR        "${OPENVR_BIN_DIR}"
+			BUILD_IN_SOURCE   1
+			CONFIGURE_COMMAND ""
+			BUILD_COMMAND     ""
+			INSTALL_COMMAND   "")
+		SET (VTK_DEPENDS OpenVR)
+		LIST(APPEND VTK_CMAKE_ARGS
+			"-DModule_vtkRenderingOpenVR:BOOL=ON"
+			"-DOPENVR_ROOT_DIR:PATH=${OPENVR_BIN_DIR}")
+		STRING(REPLACE "/" "\\" OPENVR_WIN_DIR "${OPENVR_BIN_DIR}")
+		SET (ADDITIONAL_LIB_PATHS "${ADDITIONAL_LIB_PATHS};${OPENVR_WIN_DIR}\\bin\\win64")
+	endif()
+	if (USE_GIT_REPOS)
+		ExternalProject_Add( VTK
+			GIT_REPOSITORY    "${VTK_REPOSITORY}"
+			GIT_TAG           "${VTK_LONG_VERSION}"
+			SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src-${VTK_LONG_VERSION}"
+			BINARY_DIR        "${VTK_DIR}"
+			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
+			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
+			CMAKE_ARGS        "${VTK_CMAKE_ARGS}"
+			INSTALL_COMMAND   ""
+			DEPENDS           ${VTK_DEPENDS})
+	else()
+		ExternalProject_Add( VTK
+			URL               ${VTK_URL}
+			URL_HASH          "SHA512=${VTK_ARCHIVE_SHA512}"
+			SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src-${VTK_LONG_VERSION}"
+			BINARY_DIR        "${VTK_DIR}"
+			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
+			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
+			CMAKE_ARGS        "${VTK_CMAKE_ARGS}"
+			INSTALL_COMMAND   ""
+			DEPENDS           ${VTK_DEPENDS})
+	endif()
+	set (ITK_DEPENDS VTK)
 else()
-	ExternalProject_Add( VTK
-		URL               ${VTK_URL}
-		URL_HASH          "SHA512=${VTK_ARCHIVE_SHA512}"
-		SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src-${VTK_LONG_VERSION}"
-		BINARY_DIR        "${VTK_BIN_DIR}"
-		CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
-		CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
-		CMAKE_ARGS        "${VTK_CMAKE_ARGS}"
-		INSTALL_COMMAND   ""
-		DEPENDS           ${VTK_DEPENDS})
+	set (VTK_DIR "${VTK_DIR}" CACHE PATH
+		"VTK build folder.")
 endif()
 
-set (ITK_DEPENDS VTK)
 if (BUILD_OPENCL)
 	set (OPENCL_DIR "${CMAKE_BINARY_DIR}/OpenCL" CACHE PATH
 		"OpenCL ICD loader directory" FORCE)
@@ -226,42 +233,48 @@ endif()
 if (NOT OPENCL_DIR)
 	message(SEND_ERROR "OPENCL_DIR not set! Either enable BUILD_OPENCL or set OPENCL_DIR to a valid OpenCL ICD loader directory!")
 endif()
-
-set (ITK_CMAKE_ARGS 
-	"-DBUILD_SHARED_LIBS:BOOL=On"
-	"-DITK_USE_GPU:BOOL=On"
-	"-DITK_USE_64BITS_IDS:BOOL=On"
-	"-DModule_ITKReview:BOOL=On"
-	"-DModule_ITKVtkGlue:BOOL=On"
-	"-DModule_HigherOrderAccurateGradient:BOOL=On"
-	"-DVTK_DIR:PATH=${VTK_BIN_DIR}"
-	"-DQt5_DIR:PATH=${Qt5_DIR}"
-	"-DOPENCL_ROOT_DIR=${OPENCL_DIR}"
-	"-DOPENCL_INCLUDE_DIRS=${OPENCL_DIR}/include"
-	"-DOPENCL_LIBRARIES=${OPENCL_DIR}/lib/OpenCL.lib")
-set (ITK_BIN_DIR "${CMAKE_BINARY_DIR}/itk/bin-${ITK_VERSION}")
-if (USE_GIT_REPOS)
-	ExternalProject_Add( ITK
-		GIT_REPOSITORY    "${ITK_REPOSITORY}"
-		GIT_TAG           "${ITK_VERSION}"
-		SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src-${ITK_VERSION}"
-		BINARY_DIR        "${ITK_BIN_DIR}"
-		CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
-		CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
-		CMAKE_ARGS        "${ITK_CMAKE_ARGS}"
-		INSTALL_COMMAND   ""
-		DEPENDS           ${ITK_DEPENDS})
+SET (openiA_DEPENDS "")
+if (BUILD_ITK)
+	set (ITK_CMAKE_ARGS
+		"-DBUILD_SHARED_LIBS:BOOL=On"
+		"-DITK_USE_GPU:BOOL=On"
+		"-DITK_USE_64BITS_IDS:BOOL=On"
+		"-DModule_ITKReview:BOOL=On"
+		"-DModule_ITKVtkGlue:BOOL=On"
+		"-DModule_HigherOrderAccurateGradient:BOOL=On"
+		"-DVTK_DIR:PATH=${VTK_DIR}"
+		"-DQt5_DIR:PATH=${Qt5_DIR}"
+		"-DOPENCL_ROOT_DIR=${OPENCL_DIR}"
+		"-DOPENCL_INCLUDE_DIRS=${OPENCL_DIR}/include"
+		"-DOPENCL_LIBRARIES=${OPENCL_DIR}/lib/OpenCL.lib")
+	set (ITK_DIR "${CMAKE_BINARY_DIR}/itk/bin-${ITK_VERSION}" CACHE PATH "ITK build folder." FORCE)
+	if (USE_GIT_REPOS)
+		ExternalProject_Add( ITK
+			GIT_REPOSITORY    "${ITK_REPOSITORY}"
+			GIT_TAG           "${ITK_VERSION}"
+			SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src-${ITK_VERSION}"
+			BINARY_DIR        "${ITK_DIR}"
+			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
+			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
+			CMAKE_ARGS        "${ITK_CMAKE_ARGS}"
+			INSTALL_COMMAND   ""
+			DEPENDS           ${ITK_DEPENDS})
+	else()
+		ExternalProject_Add( ITK
+			URL               "${ITK_URL}"
+			URL_HASH          "SHA512=${ITK_ARCHIVE_SHA512}"
+			SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src-${ITK_VERSION}"
+			BINARY_DIR        "${ITK_DIR}"
+			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
+			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
+			CMAKE_ARGS        "${ITK_CMAKE_ARGS}"
+			INSTALL_COMMAND   ""
+			DEPENDS           ${ITK_DEPENDS})
+	endif()
+	SET (openiA_DEPENDS ITK)
 else()
-	ExternalProject_Add( ITK
-		URL               "${ITK_URL}"
-		URL_HASH          "SHA512=${ITK_ARCHIVE_SHA512}"
-		SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src-${ITK_VERSION}"
-		BINARY_DIR        "${ITK_BIN_DIR}"
-		CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
-		CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
-		CMAKE_ARGS        "${ITK_CMAKE_ARGS}"
-		INSTALL_COMMAND   ""
-		DEPENDS           ${ITK_DEPENDS})
+	set (ITK_DIR "${ITK_DIR}" CACHE PATH
+		"ITK build folder.")
 endif()
 
 if (ENABLE_ASTRA)
@@ -341,7 +354,7 @@ endif()
 
 
 set (OPEN_IA_CMAKE_ARGS
-	"-DITK_DIR:PATH=${ITK_BIN_DIR}"
+	"-DITK_DIR:PATH=${ITK_DIR}"
 	"-DOPENCL_ROOT_DIR=${OPENCL_DIR}"
 	"-DOPENCL_INCLUDE_DIRS=${OPENCL_DIR}/include"
 	"-DOPENCL_LIBRARIES=${OPENCL_DIR}/lib/OpenCL.lib")
@@ -379,7 +392,6 @@ endif()
 if (ENABLE_PRECOMPILE)
 	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DopeniA_PRECOMPILE:BOOL=ON")
 endif()
-SET (openiA_DEPENDS ITK)
 if (ENABLE_ASTRA)
 	LIST (APPEND OPEN_IA_CMAKE_ARGS
 		"-DModule_AstraReconstruction:BOOL=ON"
@@ -423,8 +435,8 @@ if (MSVC)
 	string(REPLACE "/" "\\" OPEN_IA_BIN_DIR_WIN "${OPEN_IA_BIN_DIR}")
 	STRING(REPLACE "/lib/cmake/Qt5" "/bin" Qt5_LIB_DIR ${Qt5_DIR})
 	STRING(REPLACE "/" "\\" Qt5_LIB_DIR ${Qt5_LIB_DIR})
-	STRING(REPLACE "/" "\\" VTK_WIN_DIR ${VTK_BIN_DIR})
-	STRING(REPLACE "/" "\\" ITK_WIN_DIR ${ITK_BIN_DIR})
+	STRING(REPLACE "/" "\\" VTK_WIN_DIR ${VTK_DIR})
+	STRING(REPLACE "/" "\\" ITK_WIN_DIR ${ITK_DIR})
 	set (openia_debug_cmd  "${OPEN_IA_BIN_DIR_WIN}\\x64\\$(Configuration)\\open_iA.exe")
 	set (openia_debug_path "${Qt5_LIB_DIR};${VTK_WIN_DIR}\\bin\\$(Configuration);${ITK_WIN_DIR}\\bin\\$(Configuration)${ADDITIONAL_LIB_PATHS}")
 	set_target_properties(open_iA PROPERTIES VS_DEBUGGER_COMMAND "${openia_debug_cmd}")
