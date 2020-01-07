@@ -281,6 +281,9 @@ if (ENABLE_ASTRA)
 	if (BUILD_ASTRA)
 		set (ASTRA_DIR "${CMAKE_BINARY_DIR}/astra" CACHE PATH
 			"Astra toolbox directory" FORCE)
+		if (WIN32)
+			option (ASTRA_PATCH "Whether to patch Astra Toolbox project files. Only required to be set first time sources are fetched, disable later." ON)
+		endif()
 		FIND_PACKAGE(CUDA REQUIRED)
 		if (CUDA_FOUND)
 			MESSAGE(STATUS "CUDA: ${CUDA_VERSION} in ${CUDA_TOOLKIT_ROOT_DIR}.")
@@ -312,8 +315,11 @@ if (ENABLE_ASTRA)
 		if (WIN32)
 			CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/vs.patch.template" "${CMAKE_BINARY_DIR}/vs.patch")
 			# find way to only do this once:
-			set (ASTRA_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_BINARY_DIR}/vs.patch")
-			set (ASTRA_PATCH_COMMAND "")
+			if (ASTRA_PATCH)
+				set (ASTRA_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_BINARY_DIR}/vs.patch")
+			else()
+				set (ASTRA_PATCH_COMMAND "")
+			endif()
 			set (ASTRA_CONFIGURE_COMMAND "")
 			set (ASTRA_BUILD_COMMAND "${CMAKE_MAKE_PROGRAM}" "${ASTRA_DIR}/astra_vc14.sln" -t:astra_vc14 -p:Configuration=Release_CUDA -p:Platform=x64)
 		else()
@@ -335,11 +341,10 @@ if (ENABLE_ASTRA)
 			DEPENDS           boost
 		)
 		#find way to only do this only once
-		#add_custom_command(TARGET boost POST_BUILD
-		#	COMMAND ${CMAKE_COMMAND} -E copy_directory "${BOOST_DIR}/boost" "${ASTRA_DIR}/lib/include/boost"
-		#)
-		#add_custom_command(TARGET boost POST_BUILD
-		#	COMMAND ${CMAKE_COMMAND} -E make_directory "${ASTRA_DIR}/lib/x64")
+		add_custom_command(TARGET boost POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_directory "${BOOST_DIR}/boost" "${ASTRA_DIR}/lib/include/boost")
+		add_custom_command(TARGET boost POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E make_directory "${ASTRA_DIR}/lib/x64")
 		set (BOOST_LIB_BASE "${BOOST_DIR}/stage/lib/libboost_")
 		set (BOOST_SUFF1 "-${BOOST_LIB_SUFFIX}-mt-gd-x64-${BOOST_SHORTVER}.lib")
 		set (BOOST_SUFF2 "-${BOOST_LIB_SUFFIX}-mt-x64-${BOOST_SHORTVER}.lib")
