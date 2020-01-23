@@ -287,6 +287,7 @@ if (BUILD_ITK)
 		"-DModule_ITKReview:BOOL=On"
 		"-DModule_ITKVtkGlue:BOOL=On"
 		"-DModule_HigherOrderAccurateGradient:BOOL=On"
+		"-DModule_SplitComponents:BOOL=On"
 		"-DVTK_DIR:PATH=${VTK_DIR}"
 		"-DQt5_DIR:PATH=${Qt5_DIR}"
 		"-DOPENCL_ROOT_DIR=${OPENCL_DIR}"
