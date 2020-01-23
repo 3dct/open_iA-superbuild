@@ -274,7 +274,12 @@ else()
 		"OpenCL ICD loader directory")
 endif()
 SET (OPENCL_INCLUDE_DIRS "${OPENCL_DIR}/include")
-SET (OPENCL_LIBRARIES "${OPENCL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}OpenCL${CMAKE_SHARED_LIBRARY_SUFFIX}")
+SET (OPENCL_LIBRARIES "${OPENCL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}OpenCL")
+if (WIN32)
+	SET (OPENCL_LIBRARIES "${OPENCL_LIBRARIES}.lib") # only Windows has the peculiarity of requiring to link against the stub .lib file
+else()
+	SET (OPENCL_LIBRARIES "${OPENCL_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUXFIX}")
+endif()
 
 if (NOT OPENCL_DIR)
 	message(SEND_ERROR "OPENCL_DIR not set! Either enable BUILD_OPENCL or set OPENCL_DIR to a valid OpenCL ICD loader directory!")
