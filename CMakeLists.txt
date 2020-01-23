@@ -8,7 +8,8 @@ project(open_iA_superbuild LANGUAGES CXX)
 
 include(ExternalProject)
 
-option (USE_GIT_REPOS "Whether to use git repositories for VTK and ITK libraries. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times significantly." OFF)
+option (VTK_USE_GIT_REPO "Whether to use git repository for VTK library. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times significantly." OFF)
+option (ITK_USE_GIT_REPO "Whether to use git repository for VTK library. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times significantly." OFF)
 
 option (ENABLE_ALL "Enables all optional modules and filters (see also separate ENABLE_xyz options)" OFF)
 option (ENABLE_FILTERS "Whether to build image processing filters (smoothing, segmentation, intensity transformations, geometric transformations, ...)" ON)
@@ -22,7 +23,6 @@ option (ENABLE_PRECOMPILE "Whether to build open_iA with precompiled headers ena
 
 option (BUILD_VTK "Build VTK in the superbuild. If disabled, you need to set VTK_DIR to an existing VTK build" ON)
 option (BUILD_ITK "Build ITK in the superbuild. If disabled, you need to set ITK_DIR to an existing ITK build" ON)
-option (BUILD_ASTRA "Build Astra Toolbox in the superbuild. If disabled, you need to set ASTRA_DIR to an existing Astra Toolkit build" ON)
 #option (BUILD_BOOST "Build Boost in the superbuild. If disabled, you need to set BOOST_DIR to an existing Astra Toolkit build" ON)
 #option (FETCH_OPENVR "Fetches release of OpenVR SDK. If disabled, you need to set OPENVR_DIR to an existing OpenVR SDK directory" ON)
 #option (FETCH_EIGEN "Fetches release of eigen. If disabled, you need to set EIGEN3_DIR to an existing Eigen 3.x directory" ON)
@@ -39,25 +39,74 @@ if (ENABLE_ALL)
 	#SET (ENABLE_HDF5 "ON" CACHE BOOL "" FORCE)
 endif()
 
-set (VTK_SHORT_VERSION "8.2")
-set (VTK_LONG_VERSION  "${VTK_SHORT_VERSION}.0")
-set (VTK_ZIP_SHA512 "FD6582EA20A0B339EC847FEFA18956F9919535C6CBE1C5D443E2B3E302D6F6045C4250B0A89719EC4D4309E25F05449DACF37973615FC59BED33714EC6081BF9")
-set (VTK_GZIP_SHA512 "521BD4DABEDBC24B0E80A314A34ECD7554B04AF28A7973245E3A9CF99A09B995D1B8AC42305C8E53369F226A0A6DA3CDB29105BA2C90B46492736EF717760286")
-
-set (ITK_VERSION  "5.0.1")
-set (ITK_ZIP_SHA512 "f1a871742247e9596b39126ee70b9ab5e6e3dc6fabfc54fc2f84d1f174b51f4f9086eae5769f6bc1a28eaf81183ebe77d66ca0199d65e65ef689ab9344bd81f2")
-set (ITK_GZIP_SHA512 "f36613ff72c513ded3d32504f71308a94fe75555cf9fd22b77485d1375601f6e1f1539cc5ac82a9e1e229bcf514a88ccb55122a7dfc74a6ae1b6604aa70bd814")
-
 #set (OPEN_IA_GIT_TAG "202dfdb3c100babd81b011f280d7663351e28c5a") # = "2019.12"
 set (OPEN_IA_GIT_TAG "develop")
 
 FIND_PACKAGE(Qt5 COMPONENTS Widgets Xml Network Test OpenGL PrintSupport REQUIRED)
 
+
+## VTK
+
+set (VTK_RENDER_BACKEND_OPTIONS "None" "OpenGL" "OpenGL2")
+list (FIND VTK_RENDER_BACKEND_OPTIONS "${VTK_RENDER_BACKEND}" backend_index)
+if (${backend_index} EQUAL -1)
+	set (VTK_RENDER_BACKEND_DEFAULT "OpenGL2")
+	if (DEFINED VTK_RENDER_BACKEND)
+		MESSAGE(WARNING "No valid VTK backend selected (VTK_RENDER_BACKEND), setting back to ${VTK_RENDER_BACKEND_DEFAULT}")
+	endif()
+	set (VTK_RENDER_BACKEND "${VTK_RENDER_BACKEND_DEFAULT}" CACHE STRING "Choose the render backend for VTK." FORCE)
+	set_property(CACHE VTK_RENDER_BACKEND PROPERTY STRINGS ${VTK_RENDER_BACKEND_OPTIONS})
+endif()
+STRING (SUBSTRING "${VTK_VERSION}" 0 3 VTK_SHORT_VERSION)
 set (VTK_REPOSITORY "https://github.com/Kitware/VTK.git")
 # set (VTK_REPOSITORY "https://gitlab.kitware.com/vtk/vtk.git")
+set (VTK_URL "https://www.vtk.org/files/release/${VTK_SHORT_VERSION}/VTK-${VTK_VERSION}")
+
+set (VTK_VERSION_OPTIONS "8.1.2" "8.2.0")
+list (FIND VTK_VERSION_OPTIONS "${VTK_VERSION}" vtk_version_index)
+if (${vtk_version_index} EQUAL -1)
+	set (VTK_VERSION_DEFAULT "8.2.0")
+	if (DEFINED VTK_VERSION)
+		MESSAGE(WARNING "Invalid VTK_VERSION, resetting to default!")
+	endif()
+	set (VTK_VERSION "${VTK_VERSION_DEFAULT}" CACHE STRING "Choose the VTK version." FORCE)
+	set_property(CACHE VTK_VERSION PROPERTY STRINGS ${VTK_VERSION_OPTIONS})
+endif()
+if ("${VTK_VERSION}" STREQUAL "8.2.0")
+	set (VTK_ZIP_SHA512  "FD6582EA20A0B339EC847FEFA18956F9919535C6CBE1C5D443E2B3E302D6F6045C4250B0A89719EC4D4309E25F05449DACF37973615FC59BED33714EC6081BF9")
+	set (VTK_GZIP_SHA512 "521BD4DABEDBC24B0E80A314A34ECD7554B04AF28A7973245E3A9CF99A09B995D1B8AC42305C8E53369F226A0A6DA3CDB29105BA2C90B46492736EF717760286")
+	if ("${VTK_RENDER_BACKEND}" STREQUAL "OpenGL")
+		MESSAGE(SEND_ERROR "OpenGL backend not available in VTK 8.2.0. Please either choose OpenGL2 backend or VTK version 8.1.2!")
+	endif()
+elseif ("${VTK_VERSION}" STREQUAL "8.1.2")
+	set (VTK_ZIP_SHA512  "A6782D29C3E3998A9DAFCE317DD885718E55EC20E368E00C585DE910BA98B1625C6F5F589CAE55CDBC30CE98FEF22C094DA58D4E827485F6E2DBCEE0B96B76DE")
+	set (VTK_GZIP_SHA512 "C9FC498804FF9BB433BF79F4B14D9BB6134B026AEA46ED12AC40434BFDD8063C42E75D3E0CFA88D171FA271001C9444D66A471EDC9B22DF83A9109733ABCDFA0")
+endif()
+
+## ITK
+
+set (ITK_VERSION_OPTIONS "4.13.2" "5.0.1")
+list (FIND ITK_VERSION_OPTIONS "${ITK_VERSION}" itk_version_index)
+if (${itk_version_index} EQUAL -1)
+	set (ITK_VERSION_DEFAULT  "5.0.1")
+	if (DEFINED ITK_VERSION)
+		MESSAGE(WARNING "Invalid ITK_VERSION, resetting to default!")
+	endif()
+	set (ITK_VERSION "${ITK_VERSION_DEFAULT}" CACHE STRING "Choose the ITK version." FORCE)
+	set_property(CACHE ITK_VERSION PROPERTY STRINGS ${ITK_VERSION_OPTIONS})
+endif()
+if ("${ITK_VERSION}" STREQUAL "5.0.1")
+	set (ITK_ZIP_SHA512  "f1a871742247e9596b39126ee70b9ab5e6e3dc6fabfc54fc2f84d1f174b51f4f9086eae5769f6bc1a28eaf81183ebe77d66ca0199d65e65ef689ab9344bd81f2")
+	set (ITK_GZIP_SHA512 "f36613ff72c513ded3d32504f71308a94fe75555cf9fd22b77485d1375601f6e1f1539cc5ac82a9e1e229bcf514a88ccb55122a7dfc74a6ae1b6604aa70bd814")
+elseif ("${ITK_VERSION}" STREQUAL "4.13.2")
+	set (ITK_ZIP_SHA512  "AB4934953E662FE7F039910FE3DA79C83784026970A0779A8148847401308077B672B5107861FBFBCC8F852249F76BB9A8C1615D28813EE375AC1B3371BC27DB")
+	set (ITK_GZIP_SHA512 "053E7109D3BBB0FF9191AF4A3650D58B35BC486D7629E3351D09A67A52379681E9FEC960C8235B56915E2E039503B31439E789A1A2EE306BA7EF67413DAAEA78")
+endif()
 set (ITK_REPOSITORY "https://github.com/InsightSoftwareConsortium/ITK.git")
 # set (ITK_REPOSITORY "https://github.com/Kitware/ITK.git")
 # set (ITK_REPOSITORY "http://itk.org/ITK.git")
+set (ITK_URL "https://github.com/InsightSoftwareConsortium/ITK/releases/download/v${ITK_VERSION}/InsightToolkit-${ITK_VERSION}")
+
 
 # TODO:
 #   - Download/install Qt?
@@ -65,8 +114,6 @@ set (ITK_REPOSITORY "https://github.com/InsightSoftwareConsortium/ITK.git")
 #   - astra
 #   - hdf5
 #   - eigen
-set (VTK_URL "https://www.vtk.org/files/release/${VTK_SHORT_VERSION}/VTK-${VTK_LONG_VERSION}")
-set (ITK_URL "https://github.com/InsightSoftwareConsortium/ITK/releases/download/v${ITK_VERSION}/InsightToolkit-${ITK_VERSION}")
 
 set (OPENVR_VERSION "1.9.15")
 set (OPENVR_URL "https://github.com/ValveSoftware/openvr/archive/v${OPENVR_VERSION}.zip")
@@ -119,19 +166,15 @@ set (ITK_DEPENDS "")
 if (BUILD_VTK)
 	set (VTK_CMAKE_ARGS
 		"-DBUILD_SHARED_LIBS:BOOL=On"
+		"-DBUILD_TESTING:BOOL=Off"
 		"-DVTK_LEGACY_REMOVE:BOOL=On"
 		"-DModule_vtkGUISupportQt:BOOL=On"
 		"-DModule_vtkGUISupportQtOpenGL:BOOL=On"
 		"-DModule_vtkRenderingQt:BOOL=On"
 		"-DModule_vtkViewsQt:BOOL=On"
 		"-DQt5_DIR:PATH=${Qt5_DIR}")
-	IF (APPLE)
-		SET (VTK_RENDER_BACKEND "OpenGL")
-	ELSE ()
-		SET (VTK_RENDER_BACKEND "OpenGL2")
-	ENDIF()
-	LIST(APPEND VTK_CMAKE_ARGS "-DVTK_RENDERING_BACKEND:STRING=${VTK_RENDER_BACKEND}")
-	set (VTK_DIR "${CMAKE_BINARY_DIR}/vtk/bin-${VTK_LONG_VERSION}" CACHE PATH
+	LIST(APPEND VTK_CMAKE_ARGS "-DVTK_RENDER_BACKEND:STRING=${VTK_RENDER_BACKEND}")
+	set (VTK_DIR "${CMAKE_BINARY_DIR}/vtk/bin-${VTK_VERSION}" CACHE PATH
 		"VTK build folder." FORCE)
 	set (VTK_DEPENDS "")
 	if (ENABLE_VR)
@@ -151,11 +194,12 @@ if (BUILD_VTK)
 		STRING(REPLACE "/" "\\" OPENVR_WIN_DIR "${OPENVR_BIN_DIR}")
 		SET (ADDITIONAL_LIB_PATHS "${ADDITIONAL_LIB_PATHS};${OPENVR_WIN_DIR}\\bin\\win64")
 	endif()
-	if (USE_GIT_REPOS)
+	IF (VTK_USE_GIT_REPO)
 		ExternalProject_Add( VTK
 			GIT_REPOSITORY    "${VTK_REPOSITORY}"
-			GIT_TAG           "${VTK_LONG_VERSION}"
-			SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src-${VTK_LONG_VERSION}"
+			GIT_TAG           "v${VTK_VERSION}"
+			#UPDATE_COMMAND    ""  # to force cmake to stick to the tag specified above, otherwise it will always go to latest 'release' branch commit
+			SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src.git"
 			BINARY_DIR        "${VTK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
 			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
@@ -166,7 +210,7 @@ if (BUILD_VTK)
 		ExternalProject_Add( VTK
 			URL               ${VTK_URL}
 			URL_HASH          "SHA512=${VTK_ARCHIVE_SHA512}"
-			SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src-${VTK_LONG_VERSION}"
+			SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src-${VTK_VERSION}"
 			BINARY_DIR        "${VTK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
 			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
@@ -237,6 +281,7 @@ SET (openiA_DEPENDS "")
 if (BUILD_ITK)
 	set (ITK_CMAKE_ARGS
 		"-DBUILD_SHARED_LIBS:BOOL=On"
+		"-DBUILD_TESTING:BOOL=Off"
 		"-DITK_USE_GPU:BOOL=On"
 		"-DITK_USE_64BITS_IDS:BOOL=On"
 		"-DModule_ITKReview:BOOL=On"
@@ -252,7 +297,7 @@ if (BUILD_ITK)
 		ExternalProject_Add( ITK
 			GIT_REPOSITORY    "${ITK_REPOSITORY}"
 			GIT_TAG           "${ITK_VERSION}"
-			SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src-${ITK_VERSION}"
+			SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src.git"
 			BINARY_DIR        "${ITK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
 			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
@@ -278,6 +323,7 @@ else()
 endif()
 
 if (ENABLE_ASTRA)
+	option (BUILD_ASTRA "Build Astra Toolbox in the superbuild. If disabled, you need to set ASTRA_DIR to an existing Astra Toolkit build" ON)
 	if (BUILD_ASTRA)
 		set (ASTRA_DIR "${CMAKE_BINARY_DIR}/astra" CACHE PATH
 			"Astra toolbox directory" FORCE)
