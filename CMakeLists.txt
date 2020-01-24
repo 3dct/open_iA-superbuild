@@ -12,6 +12,7 @@ option (VTK_USE_GIT_REPO "Whether to use git repository for VTK library. If disa
 option (ITK_USE_GIT_REPO "Whether to use git repository for VTK library. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times significantly." OFF)
 
 option (ENABLE_ALL "Enables all optional modules and filters (see also separate ENABLE_xyz options)" OFF)
+option (ENABLE_OPENCL "Enables OpenCL; the DreamCaster tool depends is only enabled if this setting is enabled; enabling this option also enables some GPU-optimized ITK filters" OFF)
 option (ENABLE_FILTERS "Whether to build image processing filters (smoothing, segmentation, intensity transformations, geometric transformations, ...)" ON)
 option (ENABLE_TOOLS "Whether to build common tool modules, e.g. FeatureScout, 4DCT, GEMSe, Dynamic Volume Lines, FIAKER, ..." ON)
 option (ENABLE_TEST "Whether to enable build of tests runners and the capability to submit CDash test runs" OFF)
@@ -26,11 +27,11 @@ option (BUILD_ITK "Build ITK in the superbuild. If disabled, you need to set ITK
 #option (BUILD_BOOST "Build Boost in the superbuild. If disabled, you need to set BOOST_DIR to an existing Astra Toolkit build" ON)
 #option (FETCH_OPENVR "Fetches release of OpenVR SDK. If disabled, you need to set OPENVR_DIR to an existing OpenVR SDK directory" ON)
 #option (FETCH_EIGEN "Fetches release of eigen. If disabled, you need to set EIGEN3_DIR to an existing Eigen 3.x directory" ON)
-option (BUILD_OPENCL "Build OpenCL ICD loader. If disabled, you need to set OPENCL_DIR to an existing OpenCL ICD loader build" ON)
 #option (BUILD_HDF5 "Build HDF5. If disabled, you need to set HDF5_DIR to an existing HDF5 build" ON)
 
 if (ENABLE_ALL)
 	SET (ENABLE_FILTERS "ON" CACHE BOOL "" FORCE)
+	set (ENABLE_OPENCL "ON" CACHE BOOL "" FORCE)
 	SET (ENABLE_TOOLS "ON" CACHE BOOL "" FORCE)
 	SET (ENABLE_TEST "ON" CACHE BOOL "" FORCE)
 	SET (ENABLE_ASTRA "ON" CACHE BOOL "" FORCE)
@@ -221,87 +222,94 @@ else()
 		"VTK build folder.")
 endif()
 
-if (BUILD_OPENCL)
-	set (OPENCL_DIR "${CMAKE_BINARY_DIR}/OpenCL" CACHE PATH
-		"OpenCL ICD loader directory" FORCE)
-	set (OPENCL_C_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-Headers.git")
-	set (OPENCL_CPP_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-CLHPP.git")
-	set (OPENCL_ICD_REPO "https://github.com/KhronosGroup/OpenCL-ICD-Loader.git")
-	ExternalProject_Add (OpenCL_C
-		GIT_REPOSITORY    ${OPENCL_C_HEADERS_REPO}
-		GIT_TAG           "master"
-		SOURCE_DIR        "${OPENCL_DIR}/cheaders"
-		BUILD_IN_SOURCE   1
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND     ""
-		INSTALL_COMMAND   "")
-	ExternalProject_Add (OpenCL_CPP
-		GIT_REPOSITORY    ${OPENCL_CPP_HEADERS_REPO}
-		GIT_TAG           "master"
-		GIT_SUBMODULES    ""
-		SOURCE_DIR        "${OPENCL_DIR}/cppheaders"
-		BUILD_IN_SOURCE   1
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND     ""
-		INSTALL_COMMAND   "")
-	# Find way to skip re-build of OpenCL every time!
-	ExternalProject_Add (OpenCL_ICD
-		GIT_REPOSITORY    ${OPENCL_ICD_REPO}
-		GIT_TAG          "master"
-		GIT_SUBMODULES    ""
-		SOURCE_DIR        "${OPENCL_DIR}/icdloader"
-		BINARY_DIR        "${OPENCL_DIR}/icd-bin"
-		CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
-		CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
-		CMAKE_ARGS        "-DOPENCL_ICD_LOADER_REQUIRE_WDK:BOOL=OFF"
-		INSTALL_COMMAND   ""
-		DEPENDS           OpenCL_CPP OpenCL_C)
-	add_custom_command(TARGET OpenCL_ICD PRE_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/cheaders/CL" "${OPENCL_DIR}/icdloader/inc/CL")
-	add_custom_command(TARGET OpenCL_ICD PRE_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy "${OPENCL_DIR}/cppheaders/include/CL/cl.hpp" "${OPENCL_DIR}/cppheaders/include/CL/cl2.hpp" "${OPENCL_DIR}/icdloader/inc/CL/")
-	add_custom_command(TARGET OpenCL_ICD POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icdloader/inc/CL" "${OPENCL_DIR}/include/CL")
-	# Find way to use different configurations properly...?
-	add_custom_command(TARGET OpenCL_ICD POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icd-bin/$(Configuration)" "${OPENCL_DIR}/lib")
-	LIST (APPEND ITK_DEPENDS OpenCL_ICD)
-else()
-	set(OPENCL_DIR "${OPENCL_DIR}" CACHE PATH
-		"OpenCL ICD loader directory")
-endif()
-SET (OPENCL_INCLUDE_DIRS "${OPENCL_DIR}/include")
-SET (OPENCL_LIBRARIES "${OPENCL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}OpenCL")
-if (WIN32)
-	SET (OPENCL_LIBRARIES "${OPENCL_LIBRARIES}.lib") # only Windows has the peculiarity of requiring to link against the stub .lib file
-else()
-	SET (OPENCL_LIBRARIES "${OPENCL_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUXFIX}")
+if (ENABLE_OPENCL)
+	option (BUILD_OPENCL "Build OpenCL ICD loader. If disabled, you need to set OPENCL_DIR to an existing OpenCL ICD loader build" ON)
+	if (BUILD_OPENCL)
+		set (OPENCL_DIR "${CMAKE_BINARY_DIR}/OpenCL" CACHE PATH
+			"OpenCL ICD loader directory" FORCE)
+		set (OPENCL_C_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-Headers.git")
+		set (OPENCL_CPP_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-CLHPP.git")
+		set (OPENCL_ICD_REPO "https://github.com/KhronosGroup/OpenCL-ICD-Loader.git")
+		ExternalProject_Add (OpenCL_C
+			GIT_REPOSITORY    ${OPENCL_C_HEADERS_REPO}
+			GIT_TAG           "master"
+			SOURCE_DIR        "${OPENCL_DIR}/cheaders"
+			BUILD_IN_SOURCE   1
+			CONFIGURE_COMMAND ""
+			BUILD_COMMAND     ""
+			INSTALL_COMMAND   "")
+		ExternalProject_Add (OpenCL_CPP
+			GIT_REPOSITORY    ${OPENCL_CPP_HEADERS_REPO}
+			GIT_TAG           "master"
+			GIT_SUBMODULES    ""
+			SOURCE_DIR        "${OPENCL_DIR}/cppheaders"
+			BUILD_IN_SOURCE   1
+			CONFIGURE_COMMAND ""
+			BUILD_COMMAND     ""
+			INSTALL_COMMAND   "")
+		# Find way to skip re-build of OpenCL every time!
+		ExternalProject_Add (OpenCL_ICD
+			GIT_REPOSITORY    ${OPENCL_ICD_REPO}
+			GIT_TAG          "master"
+			GIT_SUBMODULES    ""
+			SOURCE_DIR        "${OPENCL_DIR}/icdloader"
+			BINARY_DIR        "${OPENCL_DIR}/icd-bin"
+			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
+			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
+			CMAKE_ARGS        "-DOPENCL_ICD_LOADER_REQUIRE_WDK:BOOL=OFF"
+			INSTALL_COMMAND   ""
+			DEPENDS           OpenCL_CPP OpenCL_C)
+		add_custom_command(TARGET OpenCL_ICD PRE_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/cheaders/CL" "${OPENCL_DIR}/icdloader/inc/CL")
+		add_custom_command(TARGET OpenCL_ICD PRE_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy "${OPENCL_DIR}/cppheaders/include/CL/cl.hpp" "${OPENCL_DIR}/cppheaders/include/CL/cl2.hpp" "${OPENCL_DIR}/icdloader/inc/CL/")
+		add_custom_command(TARGET OpenCL_ICD POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icdloader/inc/CL" "${OPENCL_DIR}/include/CL")
+		# Find way to use different configurations properly...?
+		add_custom_command(TARGET OpenCL_ICD POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icd-bin/$(Configuration)" "${OPENCL_DIR}/lib")
+		LIST (APPEND ITK_DEPENDS OpenCL_ICD)
+	else()
+		set(OPENCL_DIR "${OPENCL_DIR}" CACHE PATH
+			"OpenCL ICD loader directory")
+	endif()
+	SET (OPENCL_INCLUDE_DIRS "${OPENCL_DIR}/include")
+	SET (OPENCL_LIBRARIES "${OPENCL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}OpenCL")
+	if (WIN32)
+		SET (OPENCL_LIBRARIES "${OPENCL_LIBRARIES}.lib") # only Windows has the peculiarity of requiring to link against the stub .lib file
+	else()
+		SET (OPENCL_LIBRARIES "${OPENCL_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUXFIX}")
+	endif()
+
+	if (NOT OPENCL_DIR)
+		message(SEND_ERROR "OPENCL_DIR not set! Either enable BUILD_OPENCL or set OPENCL_DIR to a valid OpenCL ICD loader directory!")
+	endif()
 endif()
 
-if (NOT OPENCL_DIR)
-	message(SEND_ERROR "OPENCL_DIR not set! Either enable BUILD_OPENCL or set OPENCL_DIR to a valid OpenCL ICD loader directory!")
-endif()
 SET (openiA_DEPENDS "")
 if (BUILD_ITK)
 	set (ITK_CMAKE_ARGS
 		"-DBUILD_SHARED_LIBS:BOOL=On"
 		"-DBUILD_TESTING:BOOL=Off"
-		"-DITK_USE_GPU:BOOL=On"
+		"-DITK_USE_GPU:BOOL=${ENABLE_OPENCL}"
 		"-DITK_USE_64BITS_IDS:BOOL=On"
 		"-DModule_ITKReview:BOOL=On"
 		"-DModule_ITKVtkGlue:BOOL=On"
 		"-DModule_HigherOrderAccurateGradient:BOOL=On"
 		"-DModule_SplitComponents:BOOL=On"
 		"-DVTK_DIR:PATH=${VTK_DIR}"
-		"-DQt5_DIR:PATH=${Qt5_DIR}"
+		"-DQt5_DIR:PATH=${Qt5_DIR}")
+	if (ENABLE_OPENCL)
+		LIST (APPEND ITK_CMAKE_ARGS
 		"-DOPENCL_ROOT_DIR=${OPENCL_DIR}"
 		"-DOPENCL_INCLUDE_DIRS=${OPENCL_INCLUDE_DIRS}"
 		"-DOPENCL_LIBRARIES=${OPENCL_LIBRARIES}")
+	endif()
 	set (ITK_DIR "${CMAKE_BINARY_DIR}/itk/bin-${ITK_VERSION}" CACHE PATH "ITK build folder." FORCE)
 	if (ITK_USE_GIT_REPO)
 		ExternalProject_Add( ITK
 			GIT_REPOSITORY    "${ITK_REPOSITORY}"
-			GIT_TAG           "${ITK_VERSION}"
+			GIT_TAG           "v${ITK_VERSION}"
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src.git"
 			BINARY_DIR        "${ITK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
@@ -410,10 +418,13 @@ endif()
 
 
 set (OPEN_IA_CMAKE_ARGS
-	"-DITK_DIR:PATH=${ITK_DIR}"
+	"-DITK_DIR:PATH=${ITK_DIR}")
+if (ENABLE_OPENCL)
+	LIST (APPEND OPEN_IA_CMAKE_ARGS
 	"-DOPENCL_ROOT_DIR=${OPENCL_DIR}"
 	"-DOPENCL_INCLUDE_DIRS=${OPENCL_INCLUDE_DIRS}"
 	"-DOPENCL_LIBRARIES=${OPENCL_LIBRARIES}")
+endif()
 if (ENABLE_FILTERS)
 	LIST (APPEND OPEN_IA_CMAKE_ARGS
 		"-DModule_CommonImageFilters:BOOL=ON"
@@ -428,7 +439,7 @@ if (ENABLE_TOOLS)
 		"-DModule_4DCT:BOOL=ON"
 		"-DModule_AdaptiveThreshold:BOOL=ON"
 		"-DModule_BoneThickness:BOOL=ON"
-		"-DModule_DreamCaster:BOOL=ON"
+		"-DModule_DreamCaster:BOOL=${ENABLE_OPENCL}"
 		"-DModule_DynamicVolumeLines:BOOL=ON"
 		"-DModule_FeatureScout:BOOL=ON"
 		"-DModule_FiAKEr:BOOL=ON"
