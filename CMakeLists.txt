@@ -451,6 +451,8 @@ if (ENABLE_TOOLS)
 		"-DModule_ParameterExplorer:BOOL=ON"
 		"-DModule_PolygonPrimitives:BOOL=ON"
 		"-DModule_PorosityAnalyser:BOOL=ON"
+		"-DModule_TripleHistogramTF:BOOL=ON"
+		"-DModule_Uncertainty:BOOL=ON"
 		"-DModule_XRF:BOOL=ON"
 		"-DQt5Charts_DIR:PATH=${Qt5_DIR}Charts")
 endif()
