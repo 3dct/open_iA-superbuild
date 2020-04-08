@@ -249,17 +249,30 @@ if (ENABLE_OPENCL)
 			BUILD_COMMAND     ""
 			INSTALL_COMMAND   "")
 		# Find way to skip re-build of OpenCL every time!
-		ExternalProject_Add (OpenCL_ICD
+		
+		# _fetch project is there to clone OpenCL repository
+		# after that, headers from C/CPP projects need to be copied into repo;
+		# that's what happens in pre_build step for OpenCL_ICD project below
+		ExternalProject_Add (OpenCL_ICD_fetch
 			GIT_REPOSITORY    ${OPENCL_ICD_REPO}
 			GIT_TAG          "master"
 			GIT_SUBMODULES    ""
+			SOURCE_DIR        "${OPENCL_DIR}/icdloader"
+			BUILD_IN_SOURCE   1
+			CONFIGURE_COMMAND ""
+			BUILD_COMMAND     ""
+			INSTALL_COMMAND   ""
+			DEPENDS           OpenCL_CPP OpenCL_C)
+		ExternalProject_Add (OpenCL_ICD
+			DOWNLOAD_COMMAND  "" # to make CMake ignore not-yet existing SOURCE_DIR
 			SOURCE_DIR        "${OPENCL_DIR}/icdloader"
 			BINARY_DIR        "${OPENCL_DIR}/icd-bin"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
 			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
 			CMAKE_ARGS        "-DOPENCL_ICD_LOADER_REQUIRE_WDK:BOOL=OFF"
 			INSTALL_COMMAND   ""
-			DEPENDS           OpenCL_CPP OpenCL_C)
+			DEPENDS           OpenCL_ICD_fetch)
+			
 		add_custom_command(TARGET OpenCL_ICD PRE_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/cheaders/CL" "${OPENCL_DIR}/icdloader/inc/CL")
 		add_custom_command(TARGET OpenCL_ICD PRE_BUILD
