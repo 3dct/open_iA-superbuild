@@ -231,9 +231,11 @@ if (ENABLE_OPENCL)
 		set (OPENCL_C_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-Headers.git")
 		set (OPENCL_CPP_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-CLHPP.git")
 		set (OPENCL_ICD_REPO "https://github.com/KhronosGroup/OpenCL-ICD-Loader.git")
+		set (OPENCL_TAG "v2020.03.13")
+		set (OPENCL_CPP_TAG "v2.0.11")
 		ExternalProject_Add (OpenCL_C
 			GIT_REPOSITORY    ${OPENCL_C_HEADERS_REPO}
-			GIT_TAG           "master"
+			GIT_TAG           "${OPENCL_TAG}"
 			SOURCE_DIR        "${OPENCL_DIR}/cheaders"
 			BUILD_IN_SOURCE   1
 			CONFIGURE_COMMAND ""
@@ -241,7 +243,7 @@ if (ENABLE_OPENCL)
 			INSTALL_COMMAND   "")
 		ExternalProject_Add (OpenCL_CPP
 			GIT_REPOSITORY    ${OPENCL_CPP_HEADERS_REPO}
-			GIT_TAG           "master"
+			GIT_TAG           "${OPENCL_CPP_TAG}"
 			GIT_SUBMODULES    ""
 			SOURCE_DIR        "${OPENCL_DIR}/cppheaders"
 			BUILD_IN_SOURCE   1
@@ -255,7 +257,7 @@ if (ENABLE_OPENCL)
 		# that's what happens in pre_build step for OpenCL_ICD project below
 		ExternalProject_Add (OpenCL_ICD_fetch
 			GIT_REPOSITORY    ${OPENCL_ICD_REPO}
-			GIT_TAG          "master"
+			GIT_TAG          "${OPENCL_TAG}"
 			GIT_SUBMODULES    ""
 			SOURCE_DIR        "${OPENCL_DIR}/icdloader"
 			BUILD_IN_SOURCE   1
