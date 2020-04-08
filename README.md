@@ -21,7 +21,7 @@ First, you need to install the following applications:
 - A build toolchain (compiler + build tool, e.g. make + g++ / ninja + clang / Visual Studio)
 open\_iA also requires some headers and libraries:
 - OpenGL
-- OpenCL
+- optional: OpenCL
 - Qt
 
 On Linux, those packages should be available from the distribution repository. For example, on Ubuntu, execute:
@@ -38,7 +38,7 @@ On Windows, download and install:
 - [git](https://git-scm.com/download/win)
 - Visual Studio (e.g. the free [Community Edition](https://visualstudio.microsoft.com/de/vs/older-downloads) of VS 2015 or newer)
 - OpenGL headers are included in the Windows SDK installed along with Visual Studio
-- An OpenCL SDK best fitting your build system, e.g. the AMD OpenCL SDK for an AMD graphics card, the NVidia CUDA SDK for an NVidia graphics card, or the Intel OpenCL SDK for an onboard graphics card
+- optional: an OpenCL SDK; if available, some GPU operations will be available; some modules require it. The generic OpenCL-ICD loader can be built from within the superbuild (via ENABLE_OPENCL). Or you can use an SDK best fitting your build system, e.g. the AMD OpenCL SDK for an AMD graphics card, the NVidia CUDA SDK for an NVidia graphics card, or the Intel OpenCL SDK for an onboard graphics card (but note that this ties your build to machines having similar compute capabilities)
 - Open Source version of Qt 5 >= 5.9 (install 64 bit binaries for the respective Visual Studio version, recommended is e.g. 5.11.x or 5.12.x) 
 
 ### 2. Clone Repository
@@ -78,11 +78,15 @@ When the build finished successfully, open\_iA executables will be built in the 
 
 - The `$` sign in the code above indicates the shell prompt, do not enter this sign.
 
--The command to install packages as well as the names of the packages to install will differ on other Linux distributions, please consult the manual or community of your distribution.
+- For the prerequisites installation on Linux: the command to install packages as well as the names of the packages will differ on other distributions other than Ubuntu, please consult the manual or community of your distribution.
 
-- The method described here currently only sets up VTK and ITK libraries
-  - It will only enable the build of the core executables, but none of the advanced analysis modules. To enable these, after the build has finished, you will have to open another CMake, switch to the `open_iA/bin` folder under "Where to build the binaries" and enable the required modules.
-  -  If you require other prerequisites, such as for the Astra reconstruction module or the HDF5 integration, you have to continue on the [detailed build instructions page](https://github.com/3dct/open_iA/wiki/Linux-Build) in the section of the respective library after setup here is finished.
+- The method described above sets up a basic build environment.
+  - It will only build VTK and ITK libraries.
+  - It builds the core executables as well as some of the advanced analysis modules.
+  - If you require more modules or other library support, e.g. Eigen, OpenCL or HDF5 support, see the ENABLE_... flags
+  - Support for the Astra reconstruction module is implemented (ENABLE_ASTRA), but still very much experimental, it works only under very specific circumstances.
+
+- The superbuild is intended for setting up a build environment. For development of open_iA modules, it is recommended to switch to using the `open_iA/bin` subfolder of the superbuild binary folder as build / CMake base once the first superbuild has finished successfully.
 
 - If CMake encounters an error, it probably will tell you that some library is missing which you still need to install.
 
