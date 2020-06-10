@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.14)
+# Required CMake version: as high as open_iA!
 if (CMAKE_MAJOR_VERSION GREATER 3 OR (CMAKE_MAJOR_VERSION EQUAL 3 AND CMAKE_MINOR_VERSION GREATER 15))
 	# prevent all submodules to be fetched in ExternalProject_Add if GIT_SUBMODULES is ""
 	CMAKE_POLICY(SET CMP0097 NEW)
