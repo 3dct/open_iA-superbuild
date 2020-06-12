@@ -25,10 +25,10 @@ option (ENABLE_PRECOMPILE "Whether to build open_iA with precompiled headers ena
 
 option (BUILD_VTK "Build VTK in the superbuild. If disabled, you need to set VTK_DIR to an existing VTK build" ON)
 option (BUILD_ITK "Build ITK in the superbuild. If disabled, you need to set ITK_DIR to an existing ITK build" ON)
-#option (BUILD_BOOST "Build Boost in the superbuild. If disabled, you need to set BOOST_DIR to an existing Astra Toolkit build" ON)
-#option (FETCH_OPENVR "Fetches release of OpenVR SDK. If disabled, you need to set OPENVR_DIR to an existing OpenVR SDK directory" ON)
-#option (FETCH_EIGEN "Fetches release of eigen. If disabled, you need to set EIGEN3_DIR to an existing Eigen 3.x directory" ON)
-#option (BUILD_HDF5 "Build HDF5. If disabled, you need to set HDF5_DIR to an existing HDF5 build" ON)
+#option (FETCH_BOOST "Fetch and build Boost in the superbuild. If disabled, you need to set BOOST_DIR to an existing boost build" ON)
+#option (FETCH_OPENVR "Fetch release of OpenVR SDK. If disabled, you need to set OPENVR_DIR to an existing OpenVR SDK directory" ON)
+#option (FETCH_EIGEN "Fetch release of eigen. If disabled, you need to set EIGEN3_DIR to an existing Eigen 3.x directory" ON)
+#option (FETCH_HDF5 "Fetch and build HDF5. If disabled, you need to set HDF5_DIR to an existing HDF5 build" ON)
 
 if (ENABLE_ALL)
 	SET (ENABLE_FILTERS "ON" CACHE BOOL "" FORCE)
@@ -462,6 +462,15 @@ if (ENABLE_ASTRA)
 			set (ASTRA_CONFIGURE_COMMAND "${ASTRA_BUILD_DIR}/autogen.sh && ${ASTRA_BUILD_DIR}/configure")
 			set (ASTRA_BUILD_COMMAND "cd ${ASTRA_BUILD_DIR} && make -j 8")
 		endif()
+
+		# prepare the commands required to copy over boost stuff into astra build tree:
+		SET (CMD_COPY_BOOST_HEADERS ${CMAKE_COMMAND} -E copy_directory "${BOOST_DIR}/boost" "${ASTRA_DIR}/lib/include/boost")
+		SET (CMD_CREATE_LIBX64_DIR ${CMAKE_COMMAND} -E make_directory "${ASTRA_DIR}/lib/x64")
+		set (BOOST_LIB_BASE "${BOOST_DIR}/stage/lib/libboost_")
+		set (BOOST_SUFF1 "-${BOOST_LIB_SUFFIX}-mt-gd-x64-${BOOST_SHORTVER}.lib")
+		set (BOOST_SUFF2 "-${BOOST_LIB_SUFFIX}-mt-x64-${BOOST_SHORTVER}.lib")
+		SET (CMD_COPY_BOOST_LIBS ${CMAKE_COMMAND} -E copy "${BOOST_LIB_BASE}chrono${BOOST_SUFF1}" "${BOOST_LIB_BASE}chrono${BOOST_SUFF2}" "${BOOST_LIB_BASE}date_time${BOOST_SUFF1}" "${BOOST_LIB_BASE}date_time${BOOST_SUFF2}" "${BOOST_LIB_BASE}system${BOOST_SUFF1}" "${BOOST_LIB_BASE}system${BOOST_SUFF2}" "${BOOST_LIB_BASE}thread${BOOST_SUFF1}" "${BOOST_LIB_BASE}thread${BOOST_SUFF2}" "${ASTRA_DIR}/lib/x64")
+
 		# fetch and build astra:
 		ExternalProject_Add( astra
 			GIT_REPOSITORY    "${ASTRA_REPOSITORY}"
@@ -469,21 +478,13 @@ if (ENABLE_ASTRA)
 			SOURCE_DIR        "${ASTRA_DIR}"
 			BUILD_IN_SOURCE   1
 			PATCH_COMMAND     "${ASTRA_PATCH_COMMAND}"
+				COMMAND ${CMD_COPY_BOOST_HEADERS}
+				COMMAND ${CMD_CREATE_LIBX64_DIR}
+				COMMAND ${CMD_COPY_BOOST_LIBS}
 			CONFIGURE_COMMAND "${ASTRA_CONFIGURE_COMMAND}"
 			BUILD_COMMAND     "${ASTRA_BUILD_COMMAND}"
 			INSTALL_COMMAND   ""
 			DEPENDS           boost
-		)
-		#find way to only do this only once
-		add_custom_command(TARGET boost POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy_directory "${BOOST_DIR}/boost" "${ASTRA_DIR}/lib/include/boost")
-		add_custom_command(TARGET boost POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E make_directory "${ASTRA_DIR}/lib/x64")
-		set (BOOST_LIB_BASE "${BOOST_DIR}/stage/lib/libboost_")
-		set (BOOST_SUFF1 "-${BOOST_LIB_SUFFIX}-mt-gd-x64-${BOOST_SHORTVER}.lib")
-		set (BOOST_SUFF2 "-${BOOST_LIB_SUFFIX}-mt-x64-${BOOST_SHORTVER}.lib")
-		add_custom_command(TARGET boost POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy "${BOOST_LIB_BASE}chrono${BOOST_SUFF1}" "${BOOST_LIB_BASE}chrono${BOOST_SUFF2}" "${BOOST_LIB_BASE}date_time${BOOST_SUFF1}" "${BOOST_LIB_BASE}date_time${BOOST_SUFF2}" "${BOOST_LIB_BASE}system${BOOST_SUFF1}" "${BOOST_LIB_BASE}system${BOOST_SUFF2}" "${BOOST_LIB_BASE}thread${BOOST_SUFF1}" "${BOOST_LIB_BASE}thread${BOOST_SUFF2}" "${ASTRA_DIR}/lib/x64"
 		)
 	else()
 		set(ASTRA_DIR "${ASTRA_DIR}" CACHE PATH
