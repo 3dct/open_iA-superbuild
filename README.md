@@ -30,7 +30,7 @@ On Linux, those packages should be available from the distribution repository. F
     libgl1-mesa-dev libxt-dev \
     ocl-icd-opencl-dev opencl-headers opencl-clhpp-headers \
     qtbase5-dev libqt5x11extras5-dev qttools5-dev qt5-default \
-    libxt-dev libqt5opengl5-dev
+    libxt-dev libqt5opengl5-dev libqt5svg5-dev libqt5svg5-dev
 ```
 
 On Windows, download and install:
