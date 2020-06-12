@@ -1,0 +1,22 @@
+diff -u a/Rendering/Qt/vtkQtLabelRenderStrategy.cxx b/Rendering/Qt/vtkQtLabelRenderStrategy.cxx
+--- a/Rendering/Qt/vtkQtLabelRenderStrategy.cxx	2020-05-01 21:29:00.000000000 +0200
++++ b/Rendering/Qt/vtkQtLabelRenderStrategy.cxx	2020-05-27 22:39:41.710560500 +0200
+@@ -41,6 +41,7 @@
+ #include <QImage>
+ #include <QMap>
+ #include <QPainter>
++#include <QPainterPath>
+ #include <QPair>
+ #include <QPixmap>
+ #include <QTextDocument>
+diff -u a/Rendering/Qt/vtkQtStringToImage.cxx b/Rendering/Qt/vtkQtStringToImage.cxx
+--- a/Rendering/Qt/vtkQtStringToImage.cxx	2020-05-01 21:29:00.000000000 +0200
++++ b/Rendering/Qt/vtkQtStringToImage.cxx	2020-05-27 22:39:26.840679300 +0200
+@@ -30,6 +30,7 @@
+ #include <QFontMetrics>
+ #include <QImage>
+ #include <QPainter>
++#include <QPainterPath>
+ #include <QPixmap>
+ #include <QString>
+ #include <QTextDocument>

@@ -251,10 +251,17 @@ if (BUILD_VTK)
 			SET (ADDITIONAL_LIB_PATHS "${ADDITIONAL_LIB_PATHS};${OPENVR_WIN_DIR}\\bin\\win64")
 		endif()
 	endif()
+	if (Qt5_VERSION VERSION_GREATER "5.14.99") # Qt 5.15 requires minor patch for VTK up to 9.0.0:
+		MESSAGE(STATUS "Qt >= 5.15, applying patch to VTK...")
+		set (VTK_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_SOURCE_DIR}/vtk-qt-5.15.patch")
+	else()
+		set (VTK_PATCH_COMMAND "")
+	endif()
 	IF (VTK_USE_GIT_REPO)
 		ExternalProject_Add( VTK
 			GIT_REPOSITORY    "${VTK_REPOSITORY}"
 			GIT_TAG           "v${VTK_VERSION}"
+			PATCH_COMMAND     ${VTK_PATCH_COMMAND}
 			#UPDATE_COMMAND    ""  # to force cmake to stick to the tag specified above, otherwise it will always go to latest 'release' branch commit
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src.git"
 			BINARY_DIR        "${VTK_DIR}"
@@ -267,6 +274,7 @@ if (BUILD_VTK)
 		ExternalProject_Add( VTK
 			URL               ${VTK_URL}
 			URL_HASH          "SHA512=${VTK_ARCHIVE_SHA512}"
+			PATCH_COMMAND     ${VTK_PATCH_COMMAND}
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src-${VTK_VERSION}"
 			BINARY_DIR        "${VTK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
