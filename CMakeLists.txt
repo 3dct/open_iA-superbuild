@@ -318,33 +318,22 @@ if (ENABLE_OPENCL)
 			INSTALL_COMMAND   "")
 		# Find way to skip re-build of OpenCL every time!
 
-		# _fetch project is there to clone OpenCL repository
-		# after that, headers from C/CPP projects need to be copied into repo;
-		# that's what happens in pre_build step for OpenCL_ICD project below
-		ExternalProject_Add (OpenCL_ICD_fetch
+		SET (CMD_COPY_OPENCL_C_HEADERS ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/cheaders/CL" "${OPENCL_DIR}/icdloader/inc/CL")
+		SET (CMD_COPY_OPENCL_CPP_HEADERS ${CMAKE_COMMAND} -E copy "${OPENCL_DIR}/cppheaders/include/CL/cl.hpp" "${OPENCL_DIR}/cppheaders/include/CL/cl2.hpp" "${OPENCL_DIR}/icdloader/inc/CL/")
+		ExternalProject_Add (OpenCL_ICD
 			GIT_REPOSITORY    ${OPENCL_ICD_REPO}
 			GIT_TAG          "${OPENCL_TAG}"
 			GIT_SUBMODULES    ""
-			SOURCE_DIR        "${OPENCL_DIR}/icdloader"
-			BUILD_IN_SOURCE   1
-			CONFIGURE_COMMAND ""
-			BUILD_COMMAND     ""
-			INSTALL_COMMAND   ""
-			DEPENDS           OpenCL_CPP OpenCL_C)
-		ExternalProject_Add (OpenCL_ICD
-			DOWNLOAD_COMMAND  "" # to make CMake ignore not-yet existing SOURCE_DIR
+			PATCH_COMMAND     ${CMD_COPY_OPENCL_C_HEADERS}
+				COMMAND       ${CMD_COPY_OPENCL_CPP_HEADERS}
 			SOURCE_DIR        "${OPENCL_DIR}/icdloader"
 			BINARY_DIR        "${OPENCL_DIR}/icd-bin"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
 			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
 			CMAKE_ARGS        "-DOPENCL_ICD_LOADER_REQUIRE_WDK:BOOL=OFF"
 			INSTALL_COMMAND   ""
-			DEPENDS           OpenCL_ICD_fetch)
+			DEPENDS           OpenCL_CPP OpenCL_C)
 
-		add_custom_command(TARGET OpenCL_ICD PRE_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/cheaders/CL" "${OPENCL_DIR}/icdloader/inc/CL")
-		add_custom_command(TARGET OpenCL_ICD PRE_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy "${OPENCL_DIR}/cppheaders/include/CL/cl.hpp" "${OPENCL_DIR}/cppheaders/include/CL/cl2.hpp" "${OPENCL_DIR}/icdloader/inc/CL/")
 		add_custom_command(TARGET OpenCL_ICD POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icdloader/inc/CL" "${OPENCL_DIR}/include/CL")
 		# Find way to use different configurations properly...?
