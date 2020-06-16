@@ -418,9 +418,11 @@ if (ENABLE_ASTRA)
 		if (WIN32)
 			option (ASTRA_PATCH "Whether to patch Astra Toolbox project files. Only required to be set first time sources are fetched, disable later." ON)
 		endif()
-		FIND_PACKAGE(CUDA REQUIRED)
+		FIND_PACKAGE(CUDA)
 		if (CUDA_FOUND)
 			MESSAGE(STATUS "CUDA: ${CUDA_VERSION} in ${CUDA_TOOLKIT_ROOT_DIR}.")
+		else()
+			MESSAGE(SEND_ERROR "CUDA, required for ASTRA, not found! Specify CUDA_TOOLKIT_ROOT_DIR, or uncheck ENABLE_ASTRA!")
 		endif()
 		# fetch and build boost...
 		# inspired by https://github.com/apache/geode-native/blob/develop/dependencies/boost/CMakeLists.txt
