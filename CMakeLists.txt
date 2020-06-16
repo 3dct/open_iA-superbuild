@@ -12,19 +12,19 @@ include(ExternalProject)
 option (VTK_USE_GIT_REPO "Whether to use git repository for VTK library. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times significantly." OFF)
 option (ITK_USE_GIT_REPO "Whether to use git repository for VTK library. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times significantly." OFF)
 
-option (ENABLE_ALL "Enables all optional modules and filters (see also separate ENABLE_xyz options)" OFF)
-option (ENABLE_OPENCL "Enables OpenCL; the DreamCaster tool depends is only enabled if this setting is enabled; enabling this option also enables some GPU-optimized ITK filters" OFF)
-option (ENABLE_FILTERS "Whether to build image processing filters (smoothing, segmentation, intensity transformations, geometric transformations, ...)" ON)
-option (ENABLE_TOOLS "Whether to build common tool modules, e.g. FeatureScout, 4DCT, GEMSe, Dynamic Volume Lines, FIAKER, ..." ON)
-option (ENABLE_TEST "Whether to enable build of tests runners and the capability to submit CDash test runs" OFF)
-option (ENABLE_ASTRA "Whether to build ASTRA reconstruction library and open_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time!" OFF)
-option (ENABLE_VR "Whether to enable VR module" OFF)
-option (ENABLE_EIGEN "Whether to fetch and use eigen" OFF)
+option (ENABLE_ALL "Enables all optional modules and filters (see also separate ENABLE_xyz options; all except for ENABLE_PRECOMPILE are enabled if this is set to on. Note that unchecking this box again does NOT have any direct effect; it will not automatically set these options to unchecked or their state before. But you will have to uncheck the option if you want to disable any of the single ENABLE_xyz options affected by this setting, otherwise they will be re-enabled on next 'Configure' run) (default: disabled)" OFF)
+option (ENABLE_OPENCL "Enables OpenCL; the DreamCaster tool depends is only enabled if this setting is enabled; enabling this option also enables some GPU-optimized ITK filters (default: disabled)" OFF)
+option (ENABLE_FILTERS "Whether to build image processing filters (smoothing, segmentation, intensity transformations, geometric transformations, ...) (default: enabled)" ON)
+option (ENABLE_TOOLS "Whether to build common tool modules, e.g. FeatureScout, 4DCT, GEMSe, Dynamic Volume Lines, FIAKER, ... (default: enabled)" ON)
+option (ENABLE_TEST "Whether to enable build of tests runners and the capability to submit CDash test runs (default: disabled)" OFF)
+option (ENABLE_ASTRA "Whether to build ASTRA reconstruction library and open_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time! (default: disabled)" OFF)
+option (ENABLE_VR "Whether to enable VR module (default: disabled)" OFF)
+option (ENABLE_EIGEN "Whether to fetch and use eigen (default: disabled)" OFF)
 #option (ENABLE_HDF5 "Whether to build HDF5 library and use it in open_iA" OFF)
-option (ENABLE_PRECOMPILE "Whether to build open_iA with precompiled headers enabled" OFF)
+option (ENABLE_PRECOMPILE "Whether to build open_iA with precompiled headers enabled (default: disabled; NOT included in \"ENABLE_ALL\")" OFF)
 
-option (BUILD_VTK "Build VTK in the superbuild. If disabled, you need to set VTK_DIR to an existing VTK build" ON)
-option (BUILD_ITK "Build ITK in the superbuild. If disabled, you need to set ITK_DIR to an existing ITK build" ON)
+option (BUILD_VTK "Build VTK in the superbuild. If disabled, you need to set VTK_DIR to an existing VTK build (default: enabled)" ON)
+option (BUILD_ITK "Build ITK in the superbuild. If disabled, you need to set ITK_DIR to an existing ITK build (default: enabled)" ON)
 #option (FETCH_BOOST "Fetch and build Boost in the superbuild. If disabled, you need to set BOOST_DIR to an existing boost build" ON)
 #option (FETCH_OPENVR "Fetch release of OpenVR SDK. If disabled, you need to set OPENVR_DIR to an existing OpenVR SDK directory" ON)
 #option (FETCH_EIGEN "Fetch release of eigen. If disabled, you need to set EIGEN3_DIR to an existing Eigen 3.x directory" ON)
@@ -102,7 +102,7 @@ endif()
 set (ITK_VERSION_OPTIONS "4.13.2" "5.0.1" "5.1.0")
 list (FIND ITK_VERSION_OPTIONS "${ITK_VERSION}" itk_version_index)
 if (${itk_version_index} EQUAL -1)
-	set (ITK_VERSION_DEFAULT  "5.1.0")
+	set (ITK_VERSION_DEFAULT  "5.0.1")
 	if (DEFINED ITK_VERSION)
 		MESSAGE(WARNING "Invalid ITK_VERSION, resetting to default ${ITK_VERSION_DEFAULT}!")
 	endif()
@@ -252,7 +252,6 @@ if (BUILD_VTK)
 		endif()
 	endif()
 	if (Qt5_VERSION VERSION_GREATER "5.14.99") # Qt 5.15 requires minor patch for VTK up to 9.0.0:
-		MESSAGE(STATUS "Qt >= 5.15, applying patch to VTK...")
 		set (VTK_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_SOURCE_DIR}/vtk-qt-5.15.patch")
 	else()
 		set (VTK_PATCH_COMMAND "")
@@ -359,10 +358,15 @@ endif()
 
 SET (openiA_DEPENDS "")
 if (BUILD_ITK)
+	set (ENABLE_ITK_GPU ${ENABLE_OPENCL})
+	if (ENABLE_ITK_GPU AND ITK_VERSION STREQUAL "5.1.0")
+		set (ENABLE_ITK_GPU OFF)
+		MESSAGE(WARNING "Disabling ITK's GPU accelerated filters, as they don't work in ITK 5.1.0. If you want to use these, you need to choose version 5.0.1 or version 4.13.2 of ITK! Technical details: In ITK 5.1.0, enabling ITK_USE_GPU flag results in compilation errors when enabled together with shared libraries, see https://github.com/InsightSoftwareConsortium/ITK/issues/1381.")
+	endif()
 	set (ITK_CMAKE_ARGS
 		"-DBUILD_SHARED_LIBS:BOOL=On"
 		"-DBUILD_TESTING:BOOL=Off"
-		"-DITK_USE_GPU:BOOL=${ENABLE_OPENCL}"
+		"-DITK_USE_GPU:BOOL=${ENABLE_ITK_GPU}"
 		"-DITK_USE_64BITS_IDS:BOOL=On"
 		"-DModule_ITKReview:BOOL=On"
 		"-DModule_ITKVtkGlue:BOOL=On"
@@ -370,7 +374,7 @@ if (BUILD_ITK)
 		"-DModule_SplitComponents:BOOL=On"
 		"-DVTK_DIR:PATH=${VTK_DIR}"
 		"-DQt5_DIR:PATH=${Qt5_DIR}")
-	if (ENABLE_OPENCL)
+	if (ENABLE_ITK_GPU)
 		LIST (APPEND ITK_CMAKE_ARGS
 			"-DOPENCL_ROOT_DIR=${OPENCL_DIR}"
 			"-DOPENCL_INCLUDE_DIRS=${OPENCL_INCLUDE_DIRS}"
