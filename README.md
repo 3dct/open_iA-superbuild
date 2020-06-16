@@ -18,7 +18,7 @@ Additional information can also be found in the [Windows build instructions](htt
 First, you need to install the following applications:
 - CMake
 - Git
-- A build toolchain (compiler + build tool, e.g. make + g++ / ninja + clang / Visual Studio)
+- A build toolchain (build tool and compiler, e.g. make and g++ / clang on Linux; or Visual Studio on Windows)
 open\_iA also requires some headers and libraries:
 - OpenGL
 - optional: OpenCL
@@ -38,7 +38,7 @@ On Windows, download and install:
 - [git](https://git-scm.com/download/win)
 - Visual Studio (e.g. the free [Community Edition](https://visualstudio.microsoft.com/de/vs/older-downloads) of VS 2015 or newer)
 - OpenGL headers are included in the Windows SDK installed along with Visual Studio
-- optional: an OpenCL SDK; if available, some GPU operations will be available; some modules require it. The generic OpenCL-ICD loader can be built from within the superbuild (via ENABLE_OPENCL). Or you can use an SDK best fitting your build system, e.g. the AMD OpenCL SDK for an AMD graphics card, the NVidia CUDA SDK for an NVidia graphics card, or the Intel OpenCL SDK for an onboard graphics card (but note that this ties your build to machines having similar compute capabilities)
+- optional: an OpenCL SDK; if available, some GPU operations will be available; some modules require it. The generic OpenCL-ICD loader can be built from within the superbuild (via `ENABLE_OPENCL`). Or you can use an SDK best fitting your build system, e.g. the AMD OpenCL SDK for an AMD graphics card, the NVidia CUDA SDK for an NVidia graphics card, or the Intel OpenCL SDK for an onboard graphics card (but note that this ties your build to machines having similar compute capabilities)
 - Open Source version of Qt 5 >= 5.9 (install 64 bit binaries for the respective Visual Studio version, recommended is e.g. 5.11.x or 5.12.x) 
 
 ### 2. Clone Repository
@@ -62,19 +62,21 @@ Run CMake; you have two options:
   - When asked for a build environment:
     - On Linux, use the usually pre-selected "Unix Makefiles"
     - On Windows, use the 64 bit version of the respective Visual Studio toolchain, e.g. "Visual Studio 14 2015 Win64" for Visual Studio 2015 ("Visual Studio 14 2015" as generator and "x64" as platform on CMake versions >= 3.14)
-  - If Qt is installed in a non-standard folder, you will see a corresponding error. You will have to adapt the Qt5\_DIR to point to the "lib/cmake/Qt5" subdirectory of the respective version/build directdory in the Qt installation folder (e.g. 5.11.2/msvc2015\_64).
+  - If Qt is installed in a non-standard folder, you will see a corresponding error. You will have to adapt the `Qt5_DIR` to point to the "lib/cmake/Qt5" subdirectory of the respective version/build directdory in the Qt installation folder (e.g. `5.11.2/msvc2015_64`).
 
 ### 4. Build Everything
 
 Build everything. The specific steps required here differ for the build environment you configured in CMake:
 - On Linux, enter the folder configured in CMake as "Where to build the binaries" in a shell, then run: `$ make -j 4`
-- Under Windows, open the generated "open\_iA-superbuild.sln in Visual Studio, then build the solution.
+- Under Windows, open the generated `open_iA-superbuild.sln` in Visual Studio, then build the solution.
 
 ### 5. Done!
 
 When the build finished successfully, open\_iA executables will be built in the `open_iA/bin/bin` subfolder of the folder configured in CMake as "Where to build the binaries".
 
 ## Troubleshooting / Adaptations:
+
+- Ninja generator is known to not work at the moment; it produces error messages such as `ninja: error: 'OpenCL\_ICD', needed by 'ITK-prefix/src/ITK-stamp/ITK-mkdir', missing and no known rule to make it`. Workaround: Use "Unix Makefiles" generator instead of "Ninja".
 
 - The `$` sign in the code above indicates the shell prompt, do not enter this sign.
 
@@ -83,10 +85,10 @@ When the build finished successfully, open\_iA executables will be built in the 
 - The method described above sets up a basic build environment.
   - It will only build VTK and ITK libraries.
   - It builds the core executables as well as some of the advanced analysis modules.
-  - If you require more modules or other library support, e.g. Eigen, OpenCL or HDF5 support, see the ENABLE_... flags
-  - Support for the Astra reconstruction module is implemented (ENABLE_ASTRA), but still very much experimental, it works only under very specific circumstances.
+  - If you require more modules or other library support, e.g. Eigen, OpenCL or HDF5 support, see the `ENABLE_...` flags
+  - Support for the Astra reconstruction module is implemented (`ENABLE_ASTRA`), but still very much experimental, it works only under very specific circumstances.
 
-- The superbuild is intended for setting up a build environment. For development of open_iA modules, it is recommended to switch to using the `open_iA/bin` subfolder of the superbuild binary folder as build / CMake base once the first superbuild has finished successfully.
+- The superbuild is intended for setting up a build environment. For development of open\_iA modules, it is recommended to switch to using the `open_iA/bin` subfolder of the superbuild binary folder as build / CMake base once the first superbuild has finished successfully.
 
 - If CMake encounters an error, it probably will tell you that some library is missing which you still need to install.
 
