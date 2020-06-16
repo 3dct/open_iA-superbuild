@@ -19,6 +19,7 @@ First, you need to install the following applications:
 - CMake
 - Git
 - A build toolchain (build tool and compiler, e.g. make and g++ / clang on Linux; or Visual Studio on Windows)
+
 open\_iA also requires some headers and libraries:
 - OpenGL
 - optional: OpenCL
@@ -43,11 +44,10 @@ On Windows, download and install:
 
 ### 2. Clone Repository
 
-Through git executed on the shell:
-- Open a shell in the folder where you want to place open\_iA.
-- Clone this repository: `$ git clone https://github.com/3dct/open_iA-superbuild.git`
+- Open a shell (terminal) in the folder where you want to place the open\_iA superbuild.
+- Clone the superbuild repository: `$ git clone https://github.com/3dct/open_iA-superbuild.git`
 
-Alternatively, use a git GUI tool of your choice.
+Alternatively, use a git GUI tool of your choice for checking out the superbuild repository.
 
 **Note:** On Windows, take care that the full path string of the folder where you place open\_iA is very short; ideally something like `C:\open_iA`. The exact possible maximum length is currently untested, but you should be on the safe side with paths shorter than 20 characters. For example `C:\open_iA\build` (16 characters) should be fine, while `C:\open_iA\superbuild-bin` (25 characters) is definitely too long (for someone interested in technical details: the path will be incorporated into command lines created by CMake; and on Windows, there is a limit of 32.768 characters on the length of a command; and in some created command lines, the chosen path appears many times).
 
@@ -76,11 +76,11 @@ When the build finished successfully, open\_iA executables will be built in the 
 
 ## Troubleshooting / Adaptations:
 
-- Ninja generator is known to not work at the moment; it produces error messages such as `ninja: error: 'OpenCL\_ICD', needed by 'ITK-prefix/src/ITK-stamp/ITK-mkdir', missing and no known rule to make it`. Workaround: Use "Unix Makefiles" generator instead of "Ninja".
+- Ninja as build tool is known to cause problems at the moment with the superbuild; it produces error messages such as `ninja: error: 'OpenCL\_ICD', needed by 'ITK-prefix/src/ITK-stamp/ITK-mkdir', missing and no known rule to make it`. Workaround: Use "Unix Makefiles" generator instead of "Ninja".
 
 - The `$` sign in the code above indicates the shell prompt, do not enter this sign.
 
-- For the prerequisites installation on Linux: the command to install packages as well as the names of the packages will differ on other distributions other than Ubuntu, please consult the manual or community of your distribution.
+- For the prerequisites installation on Linux: the command to install packages as well as the names of the packages will differ on distributions other than Ubuntu, please consult the manual or community of your distribution.
 
 - The method described above sets up a basic build environment.
   - It will only build VTK and ITK libraries.
@@ -90,10 +90,11 @@ When the build finished successfully, open\_iA executables will be built in the 
 
 - The superbuild is intended for setting up a build environment. For development of open\_iA modules, it is recommended to switch to using the `open_iA/bin` subfolder of the superbuild binary folder as build / CMake base once the first superbuild has finished successfully.
 
-- If CMake encounters an error, it probably will tell you that some library is missing which you still need to install.
+	- If CMake encounters an error, it probably will tell you that some library is missing which you still need to install. If that happens, please let us know [via the superbuild issue tracker](https://github.com/3dct/open_iA-superbuild/issues).
 
-- If you have more than 4 cores in your system, you will probably want to increase the number of parallel builds if you use the mmake system (is set to 4 above) To e.g. run a make build with 8 parallel threads, run
+- If you use the Unix Makefile generator and have more than 4 cores in your system, you will probably want to increase the number of parallel builds (it is set to 4 in step 4 above). To e.g. run a make build with 8 parallel threads, run
   `$ make -j 8`
+  It is recommended to choose here the number of processor cores available on your system (or twice that number if you processor supports Hyper-Threading).
 
 - If taking the first option under "CMake Configure+Generate", and you want to put the build environment for open\_iA somewhere else as where you checked out the superbuild,
   or if you want to keep the root folder of the superbuild clear (i.e. if you want to do a so-called out-of-source build),
