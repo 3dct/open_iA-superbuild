@@ -348,7 +348,7 @@ if (ENABLE_OPENCL)
 	if (WIN32)
 		SET (OPENCL_LIBRARIES "${OPENCL_LIBRARIES}.lib") # only Windows has the peculiarity of requiring to link against the stub .lib file
 	else()
-		SET (OPENCL_LIBRARIES "${OPENCL_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUXFIX}")
+		SET (OPENCL_LIBRARIES "${OPENCL_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUFFIX}")
 	endif()
 
 	if (NOT OPENCL_DIR)
