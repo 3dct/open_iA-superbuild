@@ -384,11 +384,16 @@ if (BUILD_ITK)
 		LIST (APPEND ITK_CMAKE_ARGS
 			${OPENVR_LIB_AND_INCLUDE})
 	endif()
+	set (ITK_PATCH_COMMAND "")
+	if (ITK_VERSION VERSION_LESS "5.1.0")
+		set (ITK_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_SOURCE_DIR}/itk-vtkGlue.patch")
+	endif()
 	set (ITK_DIR "${CMAKE_BINARY_DIR}/itk/bin-${ITK_VERSION}" CACHE PATH "ITK build folder." FORCE)
 	if (ITK_USE_GIT_REPO)
 		ExternalProject_Add( ITK
 			GIT_REPOSITORY    "${ITK_REPOSITORY}"
 			GIT_TAG           "v${ITK_VERSION}"
+			PATCH_COMMAND     ${ITK_PATCH_COMMAND}
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src.git"
 			BINARY_DIR        "${ITK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
@@ -400,6 +405,7 @@ if (BUILD_ITK)
 		ExternalProject_Add( ITK
 			URL               "${ITK_URL}"
 			URL_HASH          "SHA512=${ITK_ARCHIVE_SHA512}"
+			PATCH_COMMAND     ${ITK_PATCH_COMMAND}
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src-${ITK_VERSION}"
 			BINARY_DIR        "${ITK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
