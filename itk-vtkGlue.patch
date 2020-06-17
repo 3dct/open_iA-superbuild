@@ -1,5 +1,5 @@
---- Modules/Bridge/VtkGlue/include/vtkCaptureScreen.h.old	2020-06-17 09:38:17.473860162 +0200
-+++ Modules/Bridge/VtkGlue/include/vtkCaptureScreen.h	2020-06-17 09:33:05.970728723 +0200
+--- a/Modules/Bridge/VtkGlue/include/vtkCaptureScreen.h
++++ b/Modules/Bridge/VtkGlue/include/vtkCaptureScreen.h
 @@ -55,7 +55,7 @@
      vtkCaptureScreen ( const vtkCaptureScreen& );
      void operator = ( const vtkCaptureScreen& );
