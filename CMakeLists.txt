@@ -43,6 +43,12 @@ endif()
 
 FIND_PACKAGE(Qt5 COMPONENTS Widgets Xml Network Test OpenGL PrintSupport REQUIRED)
 
+find_package(Git)
+if(GIT_FOUND)
+	MESSAGE(STATUS "git found: ${GIT_EXECUTABLE}")
+else()
+	MESSAGE(SEND_ERROR "git not found, required for some patches!")
+endif()
 
 ## VTK
 
@@ -159,7 +165,7 @@ set (BOOST_SHORTVER "1_73")
 set (BOOST_ARCHIVE_SHA512 "6D80E3E0A9D1B3114B3660A099306A88CE911300EB29F160D6283AAE547AAC9AF84803DB723D9C603DA16061DF409538FFF43A66AC4A58418F2421EF63AA0CE1")
 if (MSVC)
 	if (MSVC_VERSION LESS 1900)
-		message(SEND_ERROR "Visual Studio < 2015 is not supported, please use a newer version!")
+		MESSAGE(SEND_ERROR "Visual Studio < 2015 is not supported, please use a newer version!")
 	elseif (MSVC_VERSION LESS 1910)
 		set (MSVC_TOOLSET "v140")
 		set (BOOST_MSVC_TOOLSET "msvc-14.0")
@@ -173,7 +179,7 @@ if (MSVC)
 		set (BOOST_MSVC_TOOLSET "msvc-14.2")
 		set (BOOST_LIB_SUFFIX "vc142")
 	else()
-		message(SEND_ERROR "Visual Studio > 2019 (more precisely, MSVC_VERSION >= 1930) is not supported (yet), please use an older version!")
+		MESSAGE(SEND_ERROR "Visual Studio > 2019 (more precisely, MSVC_VERSION >= 1930) is not supported (yet), please use an older version!")
 	endif()
 endif()
 
@@ -324,7 +330,7 @@ if (ENABLE_OPENCL)
 			GIT_TAG          "${OPENCL_TAG}"
 			GIT_SUBMODULES    ""
 			PATCH_COMMAND     ${CMD_COPY_OPENCL_C_HEADERS}
-				COMMAND       ${CMD_COPY_OPENCL_CPP_HEADERS}
+			    COMMAND       ${CMD_COPY_OPENCL_CPP_HEADERS}
 			SOURCE_DIR        "${OPENCL_DIR}/icdloader"
 			BINARY_DIR        "${OPENCL_DIR}/icd-bin"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
@@ -352,7 +358,7 @@ if (ENABLE_OPENCL)
 	endif()
 
 	if (NOT OPENCL_DIR)
-		message(SEND_ERROR "OPENCL_DIR not set! Either enable BUILD_OPENCL or set OPENCL_DIR to a valid OpenCL ICD loader directory!")
+		MESSAGE(SEND_ERROR "OPENCL_DIR not set! Either enable BUILD_OPENCL or set OPENCL_DIR to a valid OpenCL ICD loader directory!")
 	endif()
 endif()
 
