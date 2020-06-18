@@ -216,6 +216,7 @@ if (BUILD_VTK)
 		"VTK build folder." FORCE)
 
 	set (VTK_DEPENDS "")
+	SET (VTK_VR_PATCH_COMMAND "")
 	if (ENABLE_VR)
 		SET (OPENVR_ROOT_DIR "${CMAKE_BINARY_DIR}/openvr-${OPENVR_VERSION}")
 		SET (OPENVR_INCLUDE_DIR "${OPENVR_ROOT_DIR}/headers")
@@ -249,6 +250,8 @@ if (BUILD_VTK)
 			LIST(APPEND VTK_CMAKE_ARGS
 				"-DVTK_MODULE_ENABLE_VTK_RenderingOpenVR=YES"
 				${OPENVR_LIB_AND_INCLUDE})
+			# In VTK 9, some code was changed in Rendering/OpenVR module that produces an error on clang 10, let's patch it:
+			SET (VTK_VR_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_SOURCE_DIR}/vtk9-openvr.patch")
 		endif()
 		if (MSVC)
 			STRING(REPLACE "/" "\\" OPENVR_WIN_DIR "${OPENVR_ROOT_DIR}")
@@ -256,7 +259,7 @@ if (BUILD_VTK)
 		endif()
 	endif()
 	if (Qt5_VERSION VERSION_GREATER "5.14.99") # Qt 5.15 requires minor patch for VTK up to 9.0.0:
-		set (VTK_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_SOURCE_DIR}/vtk-qt-5.15.patch")
+		set (VTK_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_SOURCE_DIR}/vtk9-qt5.15.patch")
 	else()
 		set (VTK_PATCH_COMMAND "")
 	endif()
@@ -265,6 +268,7 @@ if (BUILD_VTK)
 			GIT_REPOSITORY    "${VTK_REPOSITORY}"
 			GIT_TAG           "v${VTK_VERSION}"
 			PATCH_COMMAND     ${VTK_PATCH_COMMAND}
+			      COMMAND     ${VTK_VR_PATCH_COMMAND}
 			#UPDATE_COMMAND    ""  # to force cmake to stick to the tag specified above, otherwise it will always go to latest 'release' branch commit
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src.git"
 			BINARY_DIR        "${VTK_DIR}"
@@ -278,6 +282,7 @@ if (BUILD_VTK)
 			URL               ${VTK_URL}
 			URL_HASH          "SHA512=${VTK_ARCHIVE_SHA512}"
 			PATCH_COMMAND     ${VTK_PATCH_COMMAND}
+			      COMMAND     ${VTK_VR_PATCH_COMMAND}
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src-${VTK_VERSION}"
 			BINARY_DIR        "${VTK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
@@ -328,7 +333,7 @@ if (ENABLE_OPENCL)
 			GIT_TAG          "${OPENCL_TAG}"
 			GIT_SUBMODULES    ""
 			PATCH_COMMAND     ${CMD_COPY_OPENCL_C_HEADERS}
-			    COMMAND       ${CMD_COPY_OPENCL_CPP_HEADERS}
+			      COMMAND     ${CMD_COPY_OPENCL_CPP_HEADERS}
 			SOURCE_DIR        "${OPENCL_DIR}/icdloader"
 			BINARY_DIR        "${OPENCL_DIR}/icd-bin"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
@@ -494,9 +499,9 @@ if (ENABLE_ASTRA)
 			SOURCE_DIR        "${ASTRA_DIR}"
 			BUILD_IN_SOURCE   1
 			PATCH_COMMAND     "${ASTRA_PATCH_COMMAND}"
-				COMMAND ${CMD_COPY_BOOST_HEADERS}
-				COMMAND ${CMD_CREATE_LIBX64_DIR}
-				COMMAND ${CMD_COPY_BOOST_LIBS}
+			      COMMAND     ${CMD_COPY_BOOST_HEADERS}
+			      COMMAND     ${CMD_CREATE_LIBX64_DIR}
+			      COMMAND     ${CMD_COPY_BOOST_LIBS}
 			CONFIGURE_COMMAND "${ASTRA_CONFIGURE_COMMAND}"
 			BUILD_COMMAND     "${ASTRA_BUILD_COMMAND}"
 			INSTALL_COMMAND   ""
