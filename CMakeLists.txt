@@ -44,10 +44,8 @@ endif()
 FIND_PACKAGE(Qt5 COMPONENTS Widgets Xml Network Test OpenGL PrintSupport REQUIRED)
 
 find_package(Git)
-if(GIT_FOUND)
-	MESSAGE(STATUS "git found: ${GIT_EXECUTABLE}")
-else()
-	MESSAGE(SEND_ERROR "git not found, required for some patches!")
+if(NOT GIT_FOUND)
+	MESSAGE(SEND_ERROR "Git not found, but it is required for some patches!")
 endif()
 
 ## VTK
