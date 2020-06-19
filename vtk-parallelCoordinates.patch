@@ -1,0 +1,11 @@
+--- a/Charts/Core/vtkChartParallelCoordinates.cxx
++++ b/Charts/Core/vtkChartParallelCoordinates.cxx
+@@ -510,6 +510,8 @@
+   }
+   else if (mouse.GetButton() == this->Actions.Pan())
+   {
++    if (this->Storage->CurrentAxis == -1)
++      return true;
+     vtkAxis* axis = this->Storage->Axes[this->Storage->CurrentAxis];
+     if (this->Storage->AxisResize == 0)
+     {

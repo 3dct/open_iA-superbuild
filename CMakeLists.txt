@@ -4,7 +4,6 @@ if (CMAKE_MAJOR_VERSION GREATER 3 OR (CMAKE_MAJOR_VERSION EQUAL 3 AND CMAKE_MINO
 	# prevent all submodules to be fetched in ExternalProject_Add if GIT_SUBMODULES is ""
 	CMAKE_POLICY(SET CMP0097 NEW)
 endif()
-# 3.13 is required because we use VS_DEBUGGER_COMMAND and VS_DEBUGGER_ENVIRONMENT target properties introduced with that version
 project(open_iA_superbuild LANGUAGES CXX)
 
 include(ExternalProject)
@@ -140,9 +139,7 @@ endif()
 # TODO:
 #   - Download/install Qt?
 #   - check behavior when there are changes in git (and tag not the one referenced in ExternalProject_Add) / offline
-#   - astra
 #   - hdf5
-#   - eigen
 
 set (OPENVR_VERSION "1.12.5")
 set (OPENVR_ARCHIVE_SHA512 "F54B275140D8E91723ECF0A0402B6E9E09B34DE0F2A59C72877CAC1F3AB0CD532D93877782A842D97B4D4AF603FB7DBB111CCC358450E23CA8C644814C82A7AD")
@@ -216,10 +213,10 @@ if (BUILD_VTK)
 		"VTK build folder." FORCE)
 
 	set (VTK_DEPENDS "")
-	SET (VTK_VR_PATCH_COMMAND "")
+	set (VTK_VR_PATCH_COMMAND "")
 	if (ENABLE_VR)
-		SET (OPENVR_ROOT_DIR "${CMAKE_BINARY_DIR}/openvr-${OPENVR_VERSION}")
-		SET (OPENVR_INCLUDE_DIR "${OPENVR_ROOT_DIR}/headers")
+		set (OPENVR_ROOT_DIR "${CMAKE_BINARY_DIR}/openvr-${OPENVR_VERSION}")
+		set (OPENVR_INCLUDE_DIR "${OPENVR_ROOT_DIR}/headers")
 		if (WIN32)
 			set (OPENVR_LIB_FILES "${OPENVR_ROOT_DIR}/lib/win64/openvr_api.lib")
 		elseif(UNIX)
@@ -229,7 +226,7 @@ if (BUILD_VTK)
 		else()
 			MESSAGE(WARNING "Unknown operating system, probably no VR support!")
 		endif()
-		SET (OPENVR_LIB_AND_INCLUDE
+		set (OPENVR_LIB_AND_INCLUDE
 			"-DOpenVR_INCLUDE_DIR:PATH=${OPENVR_INCLUDE_DIR}"
 			"-DOpenVR_LIBRARY:FILEPATH=${OPENVR_LIB_FILES}")
 
@@ -241,7 +238,7 @@ if (BUILD_VTK)
 			CONFIGURE_COMMAND ""
 			BUILD_COMMAND     ""
 			INSTALL_COMMAND   "")
-		SET (VTK_DEPENDS OpenVR)
+		set (VTK_DEPENDS OpenVR)
 		if (VTK_VERSION VERSION_LESS "9.0.0")
 			LIST(APPEND VTK_CMAKE_ARGS
 				"-DModule_vtkRenderingOpenVR:BOOL=ON"
@@ -251,23 +248,27 @@ if (BUILD_VTK)
 				"-DVTK_MODULE_ENABLE_VTK_RenderingOpenVR=YES"
 				${OPENVR_LIB_AND_INCLUDE})
 			# In VTK 9, some code was changed in Rendering/OpenVR module that produces an error on clang 10, let's patch it:
-			SET (VTK_VR_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_SOURCE_DIR}/vtk9-openvr.patch")
+			set (VTK_VR_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_SOURCE_DIR}/vtk-9.0.0-openvr.patch")
 		endif()
 		if (MSVC)
 			STRING(REPLACE "/" "\\" OPENVR_WIN_DIR "${OPENVR_ROOT_DIR}")
-			SET (ADDITIONAL_LIB_PATHS "${ADDITIONAL_LIB_PATHS};${OPENVR_WIN_DIR}\\bin\\win64")
+			set (ADDITIONAL_LIB_PATHS "${ADDITIONAL_LIB_PATHS};${OPENVR_WIN_DIR}\\bin\\win64")
 		endif()
 	endif()
-	if (Qt5_VERSION VERSION_GREATER "5.14.99") # Qt 5.15 requires minor patch for VTK up to 9.0.0:
-		set (VTK_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_SOURCE_DIR}/vtk9-qt5.15.patch")
+	# let's apply the fix for parallel coordinate charts potentially causing a crash
+	# on mouse move (see https://gitlab.kitware.com/vtk/vtk/-/issues/17441):
+	set (VTK_PC_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_SOURCE_DIR}/vtk-parallelCoordinates.patch")
+	set (VTK_QT_PATCH_COMMAND "")
+	if (Qt5_VERSION VERSION_GREATER "5.14.99") # when using >= Qt 5.15, VTK up to (and including) 9.0.0 requires a minor patch:
+		set (VTK_QT_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_SOURCE_DIR}/vtk-${VTK_VERSION}-qt-5.15.patch")
 	else()
-		set (VTK_PATCH_COMMAND "")
 	endif()
 	IF (VTK_USE_GIT_REPO)
 		ExternalProject_Add( VTK
 			GIT_REPOSITORY    "${VTK_REPOSITORY}"
 			GIT_TAG           "v${VTK_VERSION}"
-			PATCH_COMMAND     ${VTK_PATCH_COMMAND}
+			PATCH_COMMAND     ${VTK_PC_PATCH_COMMAND}
+			      COMMAND     ${VTK_QT_PATCH_COMMAND}
 			      COMMAND     ${VTK_VR_PATCH_COMMAND}
 			#UPDATE_COMMAND    ""  # to force cmake to stick to the tag specified above, otherwise it will always go to latest 'release' branch commit
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src.git"
@@ -281,7 +282,8 @@ if (BUILD_VTK)
 		ExternalProject_Add( VTK
 			URL               ${VTK_URL}
 			URL_HASH          "SHA512=${VTK_ARCHIVE_SHA512}"
-			PATCH_COMMAND     ${VTK_PATCH_COMMAND}
+			PATCH_COMMAND     ${VTK_PC_PATCH_COMMAND}
+			      COMMAND     ${VTK_QT_PATCH_COMMAND}
 			      COMMAND     ${VTK_VR_PATCH_COMMAND}
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src-${VTK_VERSION}"
 			BINARY_DIR        "${VTK_DIR}"
