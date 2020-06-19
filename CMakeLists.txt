@@ -19,7 +19,7 @@ option (ENABLE_TEST "Whether to enable build of tests runners and the capability
 option (ENABLE_ASTRA "Whether to build ASTRA reconstruction library and open_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time! (default: disabled)" OFF)
 option (ENABLE_VR "Whether to enable VR module (default: disabled)" OFF)
 option (ENABLE_EIGEN "Whether to fetch and use eigen (default: disabled)" OFF)
-#option (ENABLE_HDF5 "Whether to build HDF5 library and use it in open_iA" OFF)
+option (ENABLE_HDF5 "Whether to fetch and build HDF5 library and use it in open_iA (default: disabled)" OFF)
 option (ENABLE_PRECOMPILE "Whether to build open_iA with precompiled headers enabled (default: disabled; NOT included in \"ENABLE_ALL\")" OFF)
 
 option (BUILD_VTK "Build VTK in the superbuild. If disabled, you need to set VTK_DIR to an existing VTK build (default: enabled)" ON)
@@ -30,15 +30,19 @@ option (BUILD_ITK "Build ITK in the superbuild. If disabled, you need to set ITK
 #option (FETCH_HDF5 "Fetch and build HDF5. If disabled, you need to set HDF5_DIR to an existing HDF5 build" ON)
 
 if (ENABLE_ALL)
-	SET (ENABLE_FILTERS "ON" CACHE BOOL "" FORCE)
+	set (ENABLE_FILTERS "ON" CACHE BOOL "" FORCE)
 	set (ENABLE_OPENCL "ON" CACHE BOOL "" FORCE)
-	SET (ENABLE_TOOLS "ON" CACHE BOOL "" FORCE)
-	SET (ENABLE_TEST "ON" CACHE BOOL "" FORCE)
-	SET (ENABLE_ASTRA "ON" CACHE BOOL "" FORCE)
-	SET (ENABLE_VR "ON" CACHE BOOL "" FORCE)
-	SET (ENABLE_EIGEN "ON" CACHE BOOL "" FORCE)
-	#SET (ENABLE_HDF5 "ON" CACHE BOOL "" FORCE)
+	set (ENABLE_TOOLS "ON" CACHE BOOL "" FORCE)
+	set (ENABLE_TEST "ON" CACHE BOOL "" FORCE)
+	set (ENABLE_ASTRA "ON" CACHE BOOL "" FORCE)
+	set (ENABLE_VR "ON" CACHE BOOL "" FORCE)
+	set (ENABLE_EIGEN "ON" CACHE BOOL "" FORCE)
+	set (ENABLE_HDF5 "ON" CACHE BOOL "" FORCE)
 endif()
+
+if (WIN32 AND NOT MSVC)
+	MESSAGE(WARNING "Building under windows with non-VS generator/compiler is currently not tested, expect errors! Please report any findings under https://github.com/3dct/open_iA-superbuild/issues!")
+endif ()
 
 FIND_PACKAGE(Qt5 COMPONENTS Widgets Xml Network Test OpenGL PrintSupport REQUIRED)
 
@@ -181,6 +185,19 @@ endif()
 set (EIGEN_VERSION "3.3.7")
 set (EIGEN_URL "https://gitlab.com/libeigen/eigen/-/archive/${EIGEN_VERSION}/eigen-${EIGEN_VERSION}.zip")
 set (EIGEN_ARCHIVE_SHA512 "6C19DF0271503DDCE61724729031A3B885D86F35D1F24363A76F9E300234D3257FF56020ACE624B2C011E17CBA6D69A3014508C5E6DC3436BBE331A2129E2175") # for 3.3.7 zip
+
+set (HDF5_VERSION "1.12.0")
+STRING (SUBSTRING "${HDF5_VERSION}" 0 4 HDF5_SHORT_VERSION)
+set (HDF5_URL "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-${HDF5_SHORT_VERSION}/hdf5-${HDF5_VERSION}/src/CMake-hdf5-${HDF5_VERSION}")
+set (HDF5_ZIP_SHA512   "82C37F19E9907DF3722C44F8423DD9408EB0646A600AD59A727E91D2B1AA9DADFD56EDC5E2A8AA272F9AC84B188B9EE7FD2B0145C5380C511E3B132A638366BA")
+set (HDF5_TARGZ_SHA512 "67B415D2125010D587003C76FFDBD8B9B27EA79BF3309C1A916F57F9FE008B83B08067325961307D16ADC03B7D8B90FBFCD6CD30EB2B49619112614AFC8AE6EF")
+if (WIN32)
+	set (HDF5_URL "${HDF5_URL}.zip")
+	set (HDF5_ARCHIVE_SHA512 ${HDF5_ZIP_SHA512})
+else()
+	set (HDF5_URL "${HDF5_URL}.tar.gz")
+	set (HDF5_ARCHIVE_SHA512 ${HDF5_TARGZ_SHA512})
+endif()
 
 if (MSVC)
 	SET (ADDITIONAL_LIB_PATHS "") # for additional lib paths to be added to MSVC debugger environment path
@@ -516,6 +533,43 @@ if (ENABLE_ASTRA)
 endif()
 
 
+if (ENABLE_HDF5)
+	set (HDF5_SRC_DIR "${CMAKE_BINARY_DIR}/hdf5-${HDF5_VERSION}-src")
+	set (HDF5_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_SOURCE_DIR}/hdf5-options.patch")
+	if (WIN32)
+		if (MSVC_VERSION LESS 1900)
+			MESSAGE(SEND_ERROR "Visual Studio < 2015 is not supported, please use a newer version!")
+		elseif (MSVC_VERSION LESS 1910)
+			set (HDF5_GENERATOR "VS201564")
+		elseif (MSVC_VERSION LESS 1920)
+			set (HDF5_GENERATOR "VS201764")
+		elseif (MSVC_VERSION LESS 1930)
+			set (HDF5_GENERATOR "VS201964")
+		else()
+			MESSAGE(SEND_ERROR "Visual Studio > 2019 (more precisely, MSVC_VERSION >= 1930) is not supported (yet), please use an older version!")
+		endif()
+		configure_file("${CMAKE_SOURCE_DIR}/hdf5-build.bat.in" "${CMAKE_BINARY_DIR}/hdf5-build.bat")
+		set (HDF5_BUILD_COMMAND "${CMAKE_BINARY_DIR}/hdf5-build.bat")
+		set (HDF5_PLATFORM_SUFFIX "win64")
+	else()
+		set (HDF5_BUILD_COMMAND "${HDF5_SRC_DIR}/build-unix.sh")
+		set (HDF5_PLATFORM_SUFFIX "linux")
+	endif()
+	set (HDF5_FULL_NAME "HDF5-${HDF5_VERSION}-${HDF5_PLATFORM_SUFFIX}")
+	set (HDF5_INSTALL_COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_BINARY_DIR}" "${CMAKE_COMMAND}" -E tar x "${HDF5_SRC_DIR}/${HDF5_FULL_NAME}.zip")
+	set (HDF5_INSTALL_DIR "${CMAKE_BINARY_DIR}/${HDF5_FULL_NAME}")
+	ExternalProject_Add (hdf5
+		URL               ${HDF5_URL}
+		URL_HASH          "SHA512=${HDF5_ARCHIVE_SHA512}"
+		PATCH_COMMAND     ${HDF5_PATCH_COMMAND}
+		SOURCE_DIR        "${HDF5_SRC_DIR}"
+		BUILD_IN_SOURCE   1
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND     ${HDF5_BUILD_COMMAND}
+		INSTALL_COMMAND   "${HDF5_INSTALL_COMMAND}")
+endif()
+
+
 set (OPEN_IA_CMAKE_ARGS
 	"-DITK_DIR:PATH=${ITK_DIR}")
 if (ENABLE_OPENCL)
@@ -592,7 +646,11 @@ if (ENABLE_EIGEN)
 	LIST(APPEND OPEN_IA_CMAKE_ARGS
 		"-DEIGEN3_INCLUDE_DIR:PATH=${EIGEN_BIN_DIR}")
 endif()
-
+if (ENABLE_HDF5)
+	LIST (APPEND openiA_DEPENDS hdf5)
+	LIST (APPEND OPEN_IA_CMAKE_ARGS
+		"-DHDF5_DIR:PATH=${HDF5_INSTALL_DIR}/cmake/hdf5")
+endif()
 
 set (OPEN_IA_GIT_TAG_OPTIONS "develop" "master" "2019.12" "2019.07")
 list (FIND OPEN_IA_GIT_TAG_OPTIONS "${OPEN_IA_GIT_TAG}" open_ia_tag_index)
