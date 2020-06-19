@@ -97,7 +97,7 @@ set (VTK_REPOSITORY "https://github.com/Kitware/VTK.git")
 # set (VTK_REPOSITORY "https://gitlab.kitware.com/vtk/vtk.git")
 set (VTK_URL "https://www.vtk.org/files/release/${VTK_SHORT_VERSION}/VTK-${VTK_VERSION}")
 if (WIN32 AND VTK_ZIP_SHA512)
-	SET (VTK_URL "${VTK_URL}.zip")
+	set (VTK_URL "${VTK_URL}.zip")
 	set (VTK_ARCHIVE_SHA512 ${VTK_ZIP_SHA512})
 else()
 	set (VTK_URL "${VTK_URL}.tar.gz")
@@ -200,7 +200,7 @@ else()
 endif()
 
 if (MSVC)
-	SET (ADDITIONAL_LIB_PATHS "") # for additional lib paths to be added to MSVC debugger environment path
+	set (ADDITIONAL_LIB_PATHS "") # for additional lib paths to be added to MSVC debugger environment path
 endif()
 
 set (ITK_DEPENDS "")
@@ -211,7 +211,7 @@ if (BUILD_VTK)
 		"-DVTK_LEGACY_REMOVE:BOOL=On"
 		"-DQt5_DIR:PATH=${Qt5_DIR}")
 	if (VTK_VERSION VERSION_LESS "9.0.0")
-		LIST(APPEND VTK_CMAKE_ARGS
+		LIST (APPEND VTK_CMAKE_ARGS
 			"-DBUILD_TESTING:BOOL=Off"
 			"-DModule_vtkGUISupportQt:BOOL=On"
 			"-DModule_vtkGUISupportQtOpenGL:BOOL=On"
@@ -219,7 +219,7 @@ if (BUILD_VTK)
 			"-DModule_vtkViewsQt:BOOL=On"
 			"-DVTK_RENDER_BACKEND:STRING=${VTK_RENDER_BACKEND}")
 	else()
-		LIST(APPEND VTK_CMAKE_ARGS
+		LIST (APPEND VTK_CMAKE_ARGS
 			"-DVTK_BUILD_TESTING=OFF"
 			"-DVTK_MODULE_ENABLE_VTK_GUISupportQt=YES"
 			"-DVTK_MODULE_ENABLE_VTK_GUISupportQtSQL=NO"
@@ -257,11 +257,11 @@ if (BUILD_VTK)
 			INSTALL_COMMAND   "")
 		set (VTK_DEPENDS OpenVR)
 		if (VTK_VERSION VERSION_LESS "9.0.0")
-			LIST(APPEND VTK_CMAKE_ARGS
+			LIST (APPEND VTK_CMAKE_ARGS
 				"-DModule_vtkRenderingOpenVR:BOOL=ON"
 				"-DOPENVR_ROOT_DIR:PATH=${OPENVR_ROOT_DIR}")
 		else()
-			LIST(APPEND VTK_CMAKE_ARGS
+			LIST (APPEND VTK_CMAKE_ARGS
 				"-DVTK_MODULE_ENABLE_VTK_RenderingOpenVR=YES"
 				${OPENVR_LIB_AND_INCLUDE})
 			# In VTK 9, some code was changed in Rendering/OpenVR module that produces an error on clang 10, let's patch it:
@@ -345,8 +345,8 @@ if (ENABLE_OPENCL)
 			INSTALL_COMMAND   "")
 		# Find way to skip re-build of OpenCL every time!
 
-		SET (CMD_COPY_OPENCL_C_HEADERS ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/cheaders/CL" "${OPENCL_DIR}/icdloader/inc/CL")
-		SET (CMD_COPY_OPENCL_CPP_HEADERS ${CMAKE_COMMAND} -E copy "${OPENCL_DIR}/cppheaders/include/CL/cl.hpp" "${OPENCL_DIR}/cppheaders/include/CL/cl2.hpp" "${OPENCL_DIR}/icdloader/inc/CL/")
+		set (CMD_COPY_OPENCL_C_HEADERS ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/cheaders/CL" "${OPENCL_DIR}/icdloader/inc/CL")
+		set (CMD_COPY_OPENCL_CPP_HEADERS ${CMAKE_COMMAND} -E copy "${OPENCL_DIR}/cppheaders/include/CL/cl.hpp" "${OPENCL_DIR}/cppheaders/include/CL/cl2.hpp" "${OPENCL_DIR}/icdloader/inc/CL/")
 		ExternalProject_Add (OpenCL_ICD
 			GIT_REPOSITORY    ${OPENCL_ICD_REPO}
 			GIT_TAG          "${OPENCL_TAG}"
@@ -371,12 +371,12 @@ if (ENABLE_OPENCL)
 		set(OPENCL_DIR "${OPENCL_DIR}" CACHE PATH
 			"OpenCL ICD loader directory")
 	endif()
-	SET (OPENCL_INCLUDE_DIRS "${OPENCL_DIR}/include")
-	SET (OPENCL_LIBRARIES "${OPENCL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}OpenCL")
+	set (OPENCL_INCLUDE_DIRS "${OPENCL_DIR}/include")
+	set (OPENCL_LIBRARIES "${OPENCL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}OpenCL")
 	if (WIN32)
-		SET (OPENCL_LIBRARIES "${OPENCL_LIBRARIES}.lib") # only Windows has the peculiarity of requiring to link against the stub .lib file
+		set (OPENCL_LIBRARIES "${OPENCL_LIBRARIES}.lib") # only Windows has the peculiarity of requiring to link against the stub .lib file
 	else()
-		SET (OPENCL_LIBRARIES "${OPENCL_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+		set (OPENCL_LIBRARIES "${OPENCL_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUFFIX}")
 	endif()
 
 	if (NOT OPENCL_DIR)
@@ -384,7 +384,7 @@ if (ENABLE_OPENCL)
 	endif()
 endif()
 
-SET (openiA_DEPENDS "")
+set (openiA_DEPENDS "")
 if (BUILD_ITK)
 	set (ENABLE_ITK_GPU ${ENABLE_OPENCL})
 	if (ENABLE_ITK_GPU AND ITK_VERSION STREQUAL "5.1.0")
@@ -442,7 +442,7 @@ if (BUILD_ITK)
 			INSTALL_COMMAND   ""
 			DEPENDS           ${ITK_DEPENDS})
 	endif()
-	SET (openiA_DEPENDS ITK)
+	set (openiA_DEPENDS ITK)
 else()
 	set (ITK_DIR "${ITK_DIR}" CACHE PATH
 		"ITK build folder.")
@@ -465,8 +465,8 @@ if (ENABLE_ASTRA)
 		# fetch and build boost...
 		# inspired by https://github.com/apache/geode-native/blob/develop/dependencies/boost/CMakeLists.txt
 		string(REPLACE "." "_" BOOST_VERSION_UNDERSCORE ${BOOST_VERSION})
-		SET (BOOST_URL "https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_UNDERSCORE}.zip")
-		SET (B2_FLAGS "-j8 address-model=64 architecture=x86 link=static threading=multi runtime-link=shared --build-type minimal stage")
+		set (BOOST_URL "https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_UNDERSCORE}.zip")
+		set (B2_FLAGS "-j8 address-model=64 architecture=x86 link=static threading=multi runtime-link=shared --build-type minimal stage")
 		if (WIN32)
 			set ( BOOTSTRAP_COMMAND ${CMAKE_BINARY_DIR}\\boost\\bootstrap.bat )
 			set ( B2_COMMAND ${CMAKE_BINARY_DIR}\\boost\\b2 )
@@ -476,7 +476,7 @@ if (ENABLE_ASTRA)
 			set ( B2_COMMAND ${CMAKE_BINARY_DIR}/boost/b2 )
 			set ( B2_FLAGS ${B2_FLAGS} )
 		endif()
-		SET (BOOST_DIR "${CMAKE_BINARY_DIR}/boost")
+		set (BOOST_DIR "${CMAKE_BINARY_DIR}/boost")
 		ExternalProject_Add( boost
 			URL               ${BOOST_URL}
 			URL_HASH          SHA512=${BOOST_ARCHIVE_SHA512}
@@ -504,12 +504,12 @@ if (ENABLE_ASTRA)
 		endif()
 
 		# prepare the commands required to copy over boost stuff into astra build tree:
-		SET (CMD_COPY_BOOST_HEADERS ${CMAKE_COMMAND} -E copy_directory "${BOOST_DIR}/boost" "${ASTRA_DIR}/lib/include/boost")
-		SET (CMD_CREATE_LIBX64_DIR ${CMAKE_COMMAND} -E make_directory "${ASTRA_DIR}/lib/x64")
+		set (CMD_COPY_BOOST_HEADERS ${CMAKE_COMMAND} -E copy_directory "${BOOST_DIR}/boost" "${ASTRA_DIR}/lib/include/boost")
+		set (CMD_CREATE_LIBX64_DIR ${CMAKE_COMMAND} -E make_directory "${ASTRA_DIR}/lib/x64")
 		set (BOOST_LIB_BASE "${BOOST_DIR}/stage/lib/libboost_")
 		set (BOOST_SUFF1 "-${BOOST_LIB_SUFFIX}-mt-gd-x64-${BOOST_SHORTVER}.lib")
 		set (BOOST_SUFF2 "-${BOOST_LIB_SUFFIX}-mt-x64-${BOOST_SHORTVER}.lib")
-		SET (CMD_COPY_BOOST_LIBS ${CMAKE_COMMAND} -E copy "${BOOST_LIB_BASE}chrono${BOOST_SUFF1}" "${BOOST_LIB_BASE}chrono${BOOST_SUFF2}" "${BOOST_LIB_BASE}date_time${BOOST_SUFF1}" "${BOOST_LIB_BASE}date_time${BOOST_SUFF2}" "${BOOST_LIB_BASE}system${BOOST_SUFF1}" "${BOOST_LIB_BASE}system${BOOST_SUFF2}" "${BOOST_LIB_BASE}thread${BOOST_SUFF1}" "${BOOST_LIB_BASE}thread${BOOST_SUFF2}" "${ASTRA_DIR}/lib/x64")
+		set (CMD_COPY_BOOST_LIBS ${CMAKE_COMMAND} -E copy "${BOOST_LIB_BASE}chrono${BOOST_SUFF1}" "${BOOST_LIB_BASE}chrono${BOOST_SUFF2}" "${BOOST_LIB_BASE}date_time${BOOST_SUFF1}" "${BOOST_LIB_BASE}date_time${BOOST_SUFF2}" "${BOOST_LIB_BASE}system${BOOST_SUFF1}" "${BOOST_LIB_BASE}system${BOOST_SUFF2}" "${BOOST_LIB_BASE}thread${BOOST_SUFF1}" "${BOOST_LIB_BASE}thread${BOOST_SUFF2}" "${ASTRA_DIR}/lib/x64")
 
 		# fetch and build astra:
 		ExternalProject_Add( astra
@@ -517,7 +517,7 @@ if (ENABLE_ASTRA)
 			GIT_TAG           "${ASTRA_TAG}"
 			SOURCE_DIR        "${ASTRA_DIR}"
 			BUILD_IN_SOURCE   1
-			PATCH_COMMAND     "${ASTRA_PATCH_COMMAND}"
+			PATCH_COMMAND     ${ASTRA_PATCH_COMMAND}
 			      COMMAND     ${CMD_COPY_BOOST_HEADERS}
 			      COMMAND     ${CMD_CREATE_LIBX64_DIR}
 			      COMMAND     ${CMD_COPY_BOOST_LIBS}
@@ -625,15 +625,15 @@ endif()
 if (ENABLE_VR)
 	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DModule_VR:BOOL=ON")
 	if (VTK_VERSION VERSION_LESS "9.0.0")
-		LIST(APPEND OPEN_IA_CMAKE_ARGS
+		LIST (APPEND OPEN_IA_CMAKE_ARGS
 			"-DOPENVR_ROOT_DIR:PATH=${OPENVR_ROOT_DIR}")
 	else()
-		LIST(APPEND OPEN_IA_CMAKE_ARGS
+		LIST (APPEND OPEN_IA_CMAKE_ARGS
 			${OPENVR_LIB_AND_INCLUDE})
 	endif()
 endif()
 if (ENABLE_EIGEN)
-	SET (EIGEN_BIN_DIR "${CMAKE_BINARY_DIR}/eigen-${EIGEN_VERSION}")
+	set (EIGEN_BIN_DIR "${CMAKE_BINARY_DIR}/eigen-${EIGEN_VERSION}")
 	ExternalProject_Add (eigen
 		URL               ${EIGEN_URL}
 		URL_HASH          "SHA512=${EIGEN_ARCHIVE_SHA512}"
@@ -643,7 +643,7 @@ if (ENABLE_EIGEN)
         BUILD_COMMAND     ""
 		INSTALL_COMMAND   "")
 	LIST (APPEND openiA_DEPENDS eigen)
-	LIST(APPEND OPEN_IA_CMAKE_ARGS
+	LIST (APPEND OPEN_IA_CMAKE_ARGS
 		"-DEIGEN3_INCLUDE_DIR:PATH=${EIGEN_BIN_DIR}")
 endif()
 if (ENABLE_HDF5)
