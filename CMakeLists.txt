@@ -281,7 +281,7 @@ if (BUILD_VTK)
 	else()
 	endif()
 	IF (VTK_USE_GIT_REPO)
-		ExternalProject_Add( VTK
+		ExternalProject_Add (VTK
 			GIT_REPOSITORY    "${VTK_REPOSITORY}"
 			GIT_TAG           "v${VTK_VERSION}"
 			PATCH_COMMAND     ${VTK_PC_PATCH_COMMAND}
@@ -296,7 +296,7 @@ if (BUILD_VTK)
 			INSTALL_COMMAND   ""
 			DEPENDS           ${VTK_DEPENDS})
 	else()
-		ExternalProject_Add( VTK
+		ExternalProject_Add (VTK
 			URL               ${VTK_URL}
 			URL_HASH          "SHA512=${VTK_ARCHIVE_SHA512}"
 			PATCH_COMMAND     ${VTK_PC_PATCH_COMMAND}
@@ -352,7 +352,7 @@ if (ENABLE_OPENCL)
 		set (OPENCL_ICD_INSTALL_LIBS_COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icd-bin/$(Configuration)" "${OPENCL_DIR}/lib")
 		ExternalProject_Add (OpenCL_ICD
 			GIT_REPOSITORY    ${OPENCL_ICD_REPO}
-			GIT_TAG          "${OPENCL_TAG}"
+			GIT_TAG           "${OPENCL_TAG}"
 			GIT_SUBMODULES    ""
 			PATCH_COMMAND     ${CMD_COPY_OPENCL_C_HEADERS}
 			      COMMAND     ${CMD_COPY_OPENCL_CPP_HEADERS}
@@ -417,7 +417,7 @@ if (BUILD_ITK)
 	endif()
 	set (ITK_DIR "${CMAKE_BINARY_DIR}/itk/bin-${ITK_VERSION}" CACHE PATH "ITK build folder." FORCE)
 	if (ITK_USE_GIT_REPO)
-		ExternalProject_Add( ITK
+		ExternalProject_Add (ITK
 			GIT_REPOSITORY    "${ITK_REPOSITORY}"
 			GIT_TAG           "v${ITK_VERSION}"
 			PATCH_COMMAND     ${ITK_PATCH_COMMAND}
@@ -429,7 +429,7 @@ if (BUILD_ITK)
 			INSTALL_COMMAND   ""
 			DEPENDS           ${ITK_DEPENDS})
 	else()
-		ExternalProject_Add( ITK
+		ExternalProject_Add (ITK
 			URL               "${ITK_URL}"
 			URL_HASH          "SHA512=${ITK_ARCHIVE_SHA512}"
 			PATCH_COMMAND     ${ITK_PATCH_COMMAND}
@@ -476,7 +476,7 @@ if (ENABLE_ASTRA)
 			set ( B2_FLAGS ${B2_FLAGS} )
 		endif()
 		set (BOOST_DIR "${CMAKE_BINARY_DIR}/boost")
-		ExternalProject_Add( boost
+		ExternalProject_Add (boost
 			URL               ${BOOST_URL}
 			URL_HASH          SHA512=${BOOST_ARCHIVE_SHA512}
 			BUILD_IN_SOURCE   1
@@ -511,7 +511,7 @@ if (ENABLE_ASTRA)
 		set (CMD_COPY_BOOST_LIBS ${CMAKE_COMMAND} -E copy "${BOOST_LIB_BASE}chrono${BOOST_SUFF1}" "${BOOST_LIB_BASE}chrono${BOOST_SUFF2}" "${BOOST_LIB_BASE}date_time${BOOST_SUFF1}" "${BOOST_LIB_BASE}date_time${BOOST_SUFF2}" "${BOOST_LIB_BASE}system${BOOST_SUFF1}" "${BOOST_LIB_BASE}system${BOOST_SUFF2}" "${BOOST_LIB_BASE}thread${BOOST_SUFF1}" "${BOOST_LIB_BASE}thread${BOOST_SUFF2}" "${ASTRA_DIR}/lib/x64")
 
 		# fetch and build astra:
-		ExternalProject_Add( astra
+		ExternalProject_Add (astra
 			GIT_REPOSITORY    "${ASTRA_REPOSITORY}"
 			GIT_TAG           "${ASTRA_TAG}"
 			SOURCE_DIR        "${ASTRA_DIR}"
@@ -665,7 +665,7 @@ if ("${OPEN_IA_GIT_TAG}" STREQUAL "2019.07" AND "${ITK_VERSION}" STREQUAL "5.0.1
 	MESSAGE(SEND_ERROR "open_iA version ${OPEN_IA_GIT_TAG} is not compatible with ITK version ${ITK_VERSION}!")
 endif()
 set (OPEN_IA_BIN_DIR "${CMAKE_BINARY_DIR}/open_iA/bin")
-ExternalProject_Add( open_iA
+ExternalProject_Add (open_iA
 	GIT_REPOSITORY    "https://github.com/3dct/open_iA.git"
 	GIT_TAG           "${OPEN_IA_GIT_TAG}"
 	SOURCE_DIR        "${CMAKE_BINARY_DIR}/open_iA/src"
