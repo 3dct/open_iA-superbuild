@@ -347,6 +347,9 @@ if (ENABLE_OPENCL)
 
 		set (CMD_COPY_OPENCL_C_HEADERS ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/cheaders/CL" "${OPENCL_DIR}/icdloader/inc/CL")
 		set (CMD_COPY_OPENCL_CPP_HEADERS ${CMAKE_COMMAND} -E copy "${OPENCL_DIR}/cppheaders/include/CL/cl.hpp" "${OPENCL_DIR}/cppheaders/include/CL/cl2.hpp" "${OPENCL_DIR}/icdloader/inc/CL/")
+		set (OPENCL_ICD_INSTALL_HEADERS_COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icdloader/inc/CL" "${OPENCL_DIR}/include/CL")
+		# Find way to use different configurations properly...?
+		set (OPENCL_ICD_INSTALL_LIBS_COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icd-bin/$(Configuration)" "${OPENCL_DIR}/lib")
 		ExternalProject_Add (OpenCL_ICD
 			GIT_REPOSITORY    ${OPENCL_ICD_REPO}
 			GIT_TAG          "${OPENCL_TAG}"
@@ -358,14 +361,10 @@ if (ENABLE_OPENCL)
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
 			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
 			CMAKE_ARGS        "-DOPENCL_ICD_LOADER_REQUIRE_WDK:BOOL=OFF"
-			INSTALL_COMMAND   ""
+			INSTALL_COMMAND   ${OPENCL_ICD_INSTALL_HEADERS_COMMAND}
+			        COMMAND   ${OPENCL_ICD_INSTALL_LIBS_COMMAND}
 			DEPENDS           OpenCL_CPP OpenCL_C)
 
-		add_custom_command(TARGET OpenCL_ICD POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icdloader/inc/CL" "${OPENCL_DIR}/include/CL")
-		# Find way to use different configurations properly...?
-		add_custom_command(TARGET OpenCL_ICD POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icd-bin/$(Configuration)" "${OPENCL_DIR}/lib")
 		LIST (APPEND ITK_DEPENDS OpenCL_ICD)
 	else()
 		set(OPENCL_DIR "${OPENCL_DIR}" CACHE PATH
