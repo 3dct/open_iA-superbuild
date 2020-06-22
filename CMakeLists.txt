@@ -548,13 +548,14 @@ if (ENABLE_HDF5)
 			MESSAGE(SEND_ERROR "Visual Studio > 2019 (more precisely, MSVC_VERSION >= 1930) is not supported (yet), please use an older version!")
 		endif()
 		set (HDF5_BUILD_COMMAND "${CMAKE_CTEST_COMMAND}" -S HDF5config.cmake,BUILD_GENERATOR=${HDF5_GENERATOR} -C Release -V -O hdf5.log)
-		set (HDF5_PLATFORM_SUFFIX "win64")
+		set (HDF5_PLATFORM_SUFFIX "win64.zip")
 	else()
 		set (HDF5_BUILD_COMMAND "${HDF5_SRC_DIR}/build-unix.sh")
-		set (HDF5_PLATFORM_SUFFIX "linux")
+		set (HDF5_PLATFORM_SUFFIX "Linux.tar.gz")
+	# Apple?
 	endif()
 	set (HDF5_FULL_NAME "HDF5-${HDF5_VERSION}-${HDF5_PLATFORM_SUFFIX}")
-	set (HDF5_INSTALL_COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_BINARY_DIR}" "${CMAKE_COMMAND}" -E tar x "${HDF5_SRC_DIR}/${HDF5_FULL_NAME}.zip")
+	set (HDF5_INSTALL_COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_BINARY_DIR}" "${CMAKE_COMMAND}" -E tar x "${HDF5_SRC_DIR}/${HDF5_FULL_NAME}")
 	set (HDF5_INSTALL_DIR "${CMAKE_BINARY_DIR}/${HDF5_FULL_NAME}")
 	ExternalProject_Add (hdf5
 		URL               ${HDF5_URL}
