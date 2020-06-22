@@ -1,3 +1,0 @@
-"@CMAKE_CTEST_COMMAND@" -S HDF5config.cmake,BUILD_GENERATOR=@HDF5_GENERATOR@ -C Release -V -O hdf5.log
-:: return 0, hiding non-zero return code from ctest above (as it doesn't find tests, because we don't want to run them)
-exit /b 0
