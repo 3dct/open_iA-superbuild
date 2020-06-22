@@ -45,6 +45,9 @@ if (ENABLE_ALL)
 	set (ENABLE_HDF5 "ON" CACHE BOOL "" FORCE)
 endif()
 
+MESSAGE(STATUS "Compilers: C++: ${CMAKE_CXX_COMPILER}")
+
+
 if (WIN32 AND NOT MSVC)
 	MESSAGE(WARNING "Building under windows with non-VS generator/compiler is currently not tested, expect errors! Please report any findings under https://github.com/3dct/open_iA-superbuild/issues!")
 endif ()
@@ -214,7 +217,9 @@ if (BUILD_VTK)
 	set (VTK_CMAKE_ARGS
 		"-DBUILD_SHARED_LIBS:BOOL=On"
 		"-DVTK_LEGACY_REMOVE:BOOL=On"
-		"-DQt5_DIR:PATH=${Qt5_DIR}")
+		"-DQt5_DIR:PATH=${Qt5_DIR}"
+		"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
+	)
 	if (VTK_VERSION VERSION_LESS "9.0.0")
 		LIST (APPEND VTK_CMAKE_ARGS
 			"-DBUILD_TESTING:BOOL=Off"
@@ -355,6 +360,14 @@ if (ENABLE_OPENCL)
 		set (OPENCL_ICD_INSTALL_HEADERS_COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icdloader/inc/CL" "${OPENCL_DIR}/include/CL")
 		# Find way to use different configurations properly...?
 		set (OPENCL_ICD_INSTALL_LIBS_COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icd-bin/$(Configuration)" "${OPENCL_DIR}/lib")
+		set (OPENCL_ICD_CMAKE_ARGS
+			"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
+		)
+		if (WIN32)
+			LIST(APPEND OPENCL_ICD_CMAKE_ARGS
+				"-DOPENCL_ICD_LOADER_REQUIRE_WDK:BOOL=OFF"
+			)
+		endif()
 		ExternalProject_Add (OpenCL_ICD
 			GIT_REPOSITORY    ${OPENCL_ICD_REPO}
 			GIT_TAG           "${OPENCL_TAG}"
@@ -365,7 +378,7 @@ if (ENABLE_OPENCL)
 			BINARY_DIR        "${OPENCL_DIR}/icd-bin"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
 			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
-			CMAKE_ARGS        "-DOPENCL_ICD_LOADER_REQUIRE_WDK:BOOL=OFF"
+			CMAKE_ARGS        ${OPENCL_ICD_CMAKE_ARGS}
 			INSTALL_COMMAND   ${OPENCL_ICD_INSTALL_HEADERS_COMMAND}
 			        COMMAND   ${OPENCL_ICD_INSTALL_LIBS_COMMAND}
 			DEPENDS           OpenCL_CPP OpenCL_C)
@@ -405,7 +418,9 @@ if (BUILD_ITK)
 		"-DModule_HigherOrderAccurateGradient:BOOL=On"
 		"-DModule_SplitComponents:BOOL=On"
 		"-DVTK_DIR:PATH=${VTK_DIR}"
-		"-DQt5_DIR:PATH=${Qt5_DIR}")
+		"-DQt5_DIR:PATH=${Qt5_DIR}"
+		"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
+	)
 	if (ENABLE_ITK_GPU)
 		LIST (APPEND ITK_CMAKE_ARGS
 			"-DOPENCL_ROOT_DIR=${OPENCL_DIR}"
@@ -608,7 +623,9 @@ endif()
 
 
 set (OPEN_IA_CMAKE_ARGS
-	"-DITK_DIR:PATH=${ITK_DIR}")
+	"-DITK_DIR:PATH=${ITK_DIR}"
+	"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
+)
 if (ENABLE_OPENCL)
 	LIST (APPEND OPEN_IA_CMAKE_ARGS
 	"-DOPENCL_ROOT_DIR=${OPENCL_DIR}"
