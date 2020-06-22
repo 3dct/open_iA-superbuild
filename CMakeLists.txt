@@ -516,23 +516,6 @@ if (ENABLE_ASTRA)
 				BUILD_COMMAND     ${B2_COMMAND} ${B2_FLAGS}
 				INSTALL_COMMAND   ""  # ${B2_COMMAND} ${B2_FLAGS} install
 			)
-			if (WIN32)
-				CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/astra-vs.patch.template" "${CMAKE_BINARY_DIR}/astra-vs.patch")
-				# find way to only do this once:
-				if (ASTRA_PATCH)
-					set (ASTRA_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_BINARY_DIR}/astra-vs.patch")
-				else()
-					set (ASTRA_PATCH_COMMAND "")
-				endif()
-				set (ASTRA_CONFIGURE_COMMAND "")
-				set (ASTRA_BUILD_COMMAND "${CMAKE_MAKE_PROGRAM}" "${ASTRA_DIR}/astra_vc14.sln" -t:astra_vc14 -p:Configuration=Release_CUDA -p:Platform=x64)
-			else()
-				set (ASTRA_PATCH_COMMAND "")
-				set (ASTRA_BUILD_DIR "${ASTRA_DIR}/build/linux")
-				set (ASTRA_CONFIGURE_COMMAND "${ASTRA_BUILD_DIR}/autogen.sh && ${ASTRA_BUILD_DIR}/configure")
-				set (ASTRA_BUILD_COMMAND "cd ${ASTRA_BUILD_DIR} && make -j 8")
-			endif()
-
 			# prepare the commands required to copy over boost stuff into astra build tree:
 			set (CMD_COPY_BOOST_HEADERS ${CMAKE_COMMAND} -E copy_directory "${BOOST_DIR}/boost" "${ASTRA_DIR}/lib/include/boost")
 			set (CMD_CREATE_LIBX64_DIR ${CMAKE_COMMAND} -E make_directory "${ASTRA_DIR}/lib/x64")
@@ -559,6 +542,26 @@ if (ENABLE_ASTRA)
 		else()
 			message(STATUS "Note: Make sure to install boost via package manager, e.g. on Ubuntu via `sudo apt install libboost-dev`")
 		endif()
+		if (WIN32)
+			CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/astra-vs.patch.template" "${CMAKE_BINARY_DIR}/astra-vs.patch")
+			# find way to only do this once:
+			if (ASTRA_PATCH)
+				set (ASTRA_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_BINARY_DIR}/astra-vs.patch")
+			else()
+				set (ASTRA_PATCH_COMMAND "")
+			endif()
+			set (ASTRA_CONFIGURE_COMMAND "")
+			set (ASTRA_BUILD_COMMAND1 "${CMAKE_MAKE_PROGRAM}" "${ASTRA_DIR}/astra_vc14.sln" -t:astra_vc14 -p:Configuration=Release_CUDA -p:Platform=x64)
+			set (ASTRA_BUILD_COMMAND2 "")
+		else()
+			set (ASTRA_PATCH_COMMAND "")
+			set (ASTRA_BUILD_DIR "${ASTRA_DIR}/build/linux")
+			set (ASTRA_CONFIGURE_COMMAND1 "${CMAKE_COMMAND}" -E chdir "${ASTRA_BUILD_DIR}" "${ASTRA_BUILD_DIR}/autogen.sh")
+			set (ASTRA_CONFIGURE_COMMAND2 "${CMAKE_COMMAND}" -E chdir "${ASTRA_BUILD_DIR}" "${ASTRA_BUILD_DIR}/configure")
+			set (ASTRA_BUILD_COMMAND "${CMAKE_COMMAND}" -E chdir "${ASTRA_BUILD_DIR}" "${CMAKE_MAKE_PROGRAM}" -j 8)
+			message(STATUS "cfg: ${ASTRA_CONFIGURE_COMMAND1}")
+		endif()
+
 		if (UNIX)
 			message(STATUS "Note: Make sure to install autoconf/automake/libtool for astra, e.g. on Ubuntu via `sudo apt install automake libtool`")
 		endif()
@@ -573,8 +576,9 @@ if (ENABLE_ASTRA)
 			      COMMAND     ${CMD_COPY_BOOST_HEADERS}
 			      COMMAND     ${CMD_CREATE_LIBX64_DIR}
 			      COMMAND     ${CMD_COPY_BOOST_LIBS}
-			CONFIGURE_COMMAND "${ASTRA_CONFIGURE_COMMAND}"
-			BUILD_COMMAND     "${ASTRA_BUILD_COMMAND}"
+			CONFIGURE_COMMAND ${ASTRA_CONFIGURE_COMMAND1}
+			      COMMAND     ${ASTRA_CONFIGURE_COMMAND2}
+			BUILD_COMMAND     ${ASTRA_BUILD_COMMAND}
 			INSTALL_COMMAND   ""
 			DEPENDS           ${ASTRA_DEPENDS}
 		)
