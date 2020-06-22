@@ -24,7 +24,12 @@ option (ENABLE_PRECOMPILE "Whether to build open_iA with precompiled headers ena
 
 option (BUILD_VTK "Build VTK in the superbuild. If disabled, you need to set VTK_DIR to an existing VTK build (default: enabled)" ON)
 option (BUILD_ITK "Build ITK in the superbuild. If disabled, you need to set ITK_DIR to an existing ITK build (default: enabled)" ON)
-#option (FETCH_BOOST "Fetch and build Boost in the superbuild. If disabled, you need to set BOOST_DIR to an existing boost build" ON)
+if (WIN32)
+	set (BUILD_BOOST_DEFAULT_VAL ON)
+else()
+	set (BUILD_BOOST_DEFAULT_VAL OFF)
+endif()
+option (BUILD_BOOST "Fetch and build Boost in the superbuild, if astra is enabled. If disabled, you need to set BOOST_DIR to an existing boost build (default: enabled)" ${BUILD_BOOST_DEFAULT_VAL})
 #option (FETCH_OPENVR "Fetch release of OpenVR SDK. If disabled, you need to set OPENVR_DIR to an existing OpenVR SDK directory" ON)
 #option (FETCH_EIGEN "Fetch release of eigen. If disabled, you need to set EIGEN3_DIR to an existing Eigen 3.x directory" ON)
 #option (FETCH_HDF5 "Fetch and build HDF5. If disabled, you need to set HDF5_DIR to an existing HDF5 build" ON)
@@ -461,54 +466,87 @@ if (ENABLE_ASTRA)
 		else()
 			MESSAGE(SEND_ERROR "CUDA, required for ASTRA, not found! Specify CUDA_TOOLKIT_ROOT_DIR, or uncheck ENABLE_ASTRA!")
 		endif()
-		# fetch and build boost...
-		# inspired by https://github.com/apache/geode-native/blob/develop/dependencies/boost/CMakeLists.txt
-		string(REPLACE "." "_" BOOST_VERSION_UNDERSCORE ${BOOST_VERSION})
-		set (BOOST_URL "https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_UNDERSCORE}.zip")
-		set (B2_FLAGS "-j8 address-model=64 architecture=x86 link=static threading=multi runtime-link=shared --build-type minimal stage")
-		if (WIN32)
-			set ( BOOTSTRAP_COMMAND ${CMAKE_BINARY_DIR}\\boost\\bootstrap.bat )
-			set ( B2_COMMAND ${CMAKE_BINARY_DIR}\\boost\\b2 )
-			set ( B2_FLAGS ${B2_FLAGS} toolset=${BOOST_MSVC_TOOLSET} )
-		else()
-			set ( BOOTSTRAP_COMMAND ${CMAKE_BINARY_DIR}/boost/bootstrap.sh )
-			set ( B2_COMMAND ${CMAKE_BINARY_DIR}/boost/b2 )
-			set ( B2_FLAGS ${B2_FLAGS} )
-		endif()
-		set (BOOST_DIR "${CMAKE_BINARY_DIR}/boost")
-		ExternalProject_Add (boost
-			URL               ${BOOST_URL}
-			URL_HASH          SHA512=${BOOST_ARCHIVE_SHA512}
-			BUILD_IN_SOURCE   1
-			SOURCE_DIR        "${BOOST_DIR}"
-			CONFIGURE_COMMAND ${BOOTSTRAP_COMMAND}
-			BUILD_COMMAND     ${B2_COMMAND} ${B2_FLAGS}
-			INSTALL_COMMAND   ""  # ${B2_COMMAND} ${B2_FLAGS} install
-		)
-		if (WIN32)
-			CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/astra-vs.patch.template" "${CMAKE_BINARY_DIR}/astra-vs.patch")
-			# find way to only do this once:
-			if (ASTRA_PATCH)
-				set (ASTRA_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_BINARY_DIR}/astra-vs.patch")
+
+		set (ASTRA_DEPENDS "")
+		set (CMD_COPY_BOOST_HEADERS "")
+		set (CMD_CREATE_LIBX64_DIR "")
+		set (CMD_COPY_BOOST_LIBS "")
+
+		if (BUILD_BOOST)
+			# fetch and build boost...
+			# inspired by https://github.com/apache/geode-native/blob/develop/dependencies/boost/CMakeLists.txt
+			string(REPLACE "." "_" BOOST_VERSION_UNDERSCORE ${BOOST_VERSION})
+			set (BOOST_URL "https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_UNDERSCORE}.zip")
+			set (BOOST_BOOTSTRAP_OPTS "")
+			if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+				set (BOOST_BOOTSTRAP_OPTS "--with-toolset=clang")
+			endif()
+			set (B2_FLAGS "-j8 address-model=64 architecture=x86 link=static threading=multi runtime-link=shared --build-type minimal stage")
+			if (WIN32)
+				set ( BOOST_BOOTSTRAP_COMMAND ${CMAKE_BINARY_DIR}\\boost\\bootstrap.bat )
+				set ( B2_COMMAND ${CMAKE_BINARY_DIR}\\boost\\b2 )
+				set ( B2_FLAGS ${B2_FLAGS} toolset=${BOOST_MSVC_TOOLSET} )
+			else()
+				set ( BOOST_BOOTSTRAP_COMMAND ${CMAKE_BINARY_DIR}/boost/bootstrap.sh )
+				set ( B2_COMMAND ${CMAKE_BINARY_DIR}/boost/b2 )
+				set ( B2_FLAGS ${B2_FLAGS} )
+			endif()
+			set (BOOST_DIR "${CMAKE_BINARY_DIR}/boost")
+			ExternalProject_Add (boost
+				URL               ${BOOST_URL}
+				URL_HASH          SHA512=${BOOST_ARCHIVE_SHA512}
+				BUILD_IN_SOURCE   1
+				SOURCE_DIR        "${BOOST_DIR}"
+				CONFIGURE_COMMAND ${BOOST_BOOTSTRAP_COMMAND} ${BOOST_BOOTSTRAP_OPTS}
+				BUILD_COMMAND     ${B2_COMMAND} ${B2_FLAGS}
+				INSTALL_COMMAND   ""  # ${B2_COMMAND} ${B2_FLAGS} install
+			)
+			if (WIN32)
+				CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/astra-vs.patch.template" "${CMAKE_BINARY_DIR}/astra-vs.patch")
+				# find way to only do this once:
+				if (ASTRA_PATCH)
+					set (ASTRA_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_BINARY_DIR}/astra-vs.patch")
+				else()
+					set (ASTRA_PATCH_COMMAND "")
+				endif()
+				set (ASTRA_CONFIGURE_COMMAND "")
+				set (ASTRA_BUILD_COMMAND "${CMAKE_MAKE_PROGRAM}" "${ASTRA_DIR}/astra_vc14.sln" -t:astra_vc14 -p:Configuration=Release_CUDA -p:Platform=x64)
 			else()
 				set (ASTRA_PATCH_COMMAND "")
+				set (ASTRA_BUILD_DIR "${ASTRA_DIR}/build/linux")
+				set (ASTRA_CONFIGURE_COMMAND "${ASTRA_BUILD_DIR}/autogen.sh && ${ASTRA_BUILD_DIR}/configure")
+				set (ASTRA_BUILD_COMMAND "cd ${ASTRA_BUILD_DIR} && make -j 8")
 			endif()
-			set (ASTRA_CONFIGURE_COMMAND "")
-			set (ASTRA_BUILD_COMMAND "${CMAKE_MAKE_PROGRAM}" "${ASTRA_DIR}/astra_vc14.sln" -t:astra_vc14 -p:Configuration=Release_CUDA -p:Platform=x64)
-		else()
-			set (ASTRA_PATCH_COMMAND "")
-			set (ASTRA_BUILD_DIR "${ASTRA_DIR}/build/linux")
-			set (ASTRA_CONFIGURE_COMMAND "${ASTRA_BUILD_DIR}/autogen.sh && ${ASTRA_BUILD_DIR}/configure")
-			set (ASTRA_BUILD_COMMAND "cd ${ASTRA_BUILD_DIR} && make -j 8")
-		endif()
 
-		# prepare the commands required to copy over boost stuff into astra build tree:
-		set (CMD_COPY_BOOST_HEADERS ${CMAKE_COMMAND} -E copy_directory "${BOOST_DIR}/boost" "${ASTRA_DIR}/lib/include/boost")
-		set (CMD_CREATE_LIBX64_DIR ${CMAKE_COMMAND} -E make_directory "${ASTRA_DIR}/lib/x64")
-		set (BOOST_LIB_BASE "${BOOST_DIR}/stage/lib/libboost_")
-		set (BOOST_SUFF1 "-${BOOST_LIB_SUFFIX}-mt-gd-x64-${BOOST_SHORTVER}.lib")
-		set (BOOST_SUFF2 "-${BOOST_LIB_SUFFIX}-mt-x64-${BOOST_SHORTVER}.lib")
-		set (CMD_COPY_BOOST_LIBS ${CMAKE_COMMAND} -E copy "${BOOST_LIB_BASE}chrono${BOOST_SUFF1}" "${BOOST_LIB_BASE}chrono${BOOST_SUFF2}" "${BOOST_LIB_BASE}date_time${BOOST_SUFF1}" "${BOOST_LIB_BASE}date_time${BOOST_SUFF2}" "${BOOST_LIB_BASE}system${BOOST_SUFF1}" "${BOOST_LIB_BASE}system${BOOST_SUFF2}" "${BOOST_LIB_BASE}thread${BOOST_SUFF1}" "${BOOST_LIB_BASE}thread${BOOST_SUFF2}" "${ASTRA_DIR}/lib/x64")
+			# prepare the commands required to copy over boost stuff into astra build tree:
+			set (CMD_COPY_BOOST_HEADERS ${CMAKE_COMMAND} -E copy_directory "${BOOST_DIR}/boost" "${ASTRA_DIR}/lib/include/boost")
+			set (CMD_CREATE_LIBX64_DIR ${CMAKE_COMMAND} -E make_directory "${ASTRA_DIR}/lib/x64")
+			set (BOOST_LIB_BASE "${BOOST_DIR}/stage/lib/libboost_")
+			set (BOOST_LIB_LIST "chrono" "date_time" "system" "thread")
+			if (WIN32)
+				set (BOOST_LIB_LIST1 ${BOOST_LIB_LIST})
+				set (BOOST_LIB_LIST2 ${BOOST_LIB_LIST})
+				list(TRANSFORM BOOST_LIB_LIST1 PREPEND ${BOOST_LIB_BASE})
+				list(TRANSFORM BOOST_LIB_LIST2 PREPEND ${BOOST_LIB_BASE})
+				set (BOOST_LIB_SUFF1 "-${BOOST_LIB_SUFFIX}-mt-gd-x64-${BOOST_SHORTVER}.lib")
+				set (BOOST_LIB_SUFF2 "-${BOOST_LIB_SUFFIX}-mt-x64-${BOOST_SHORTVER}.lib")
+				list(TRANSFORM BOOST_LIB_LIST1 APPEND ${BOOST_LIB_SUFF1})
+				list(TRANSFORM BOOST_LIB_LIST2 APPEND ${BOOST_LIB_SUFF2})
+				set (BOOST_COPY_LIBS ${BOOST_LIB_LIST1} ${BOOST_LIB_LIST2})
+			else()
+				set (BOOST_COPY_LIBS ${BOOST_LIB_LIST})
+				list(TRANSFORM BOOST_COPY_LIBS PREPEND ${BOOST_LIB_BASE})
+				list(TRANSFORM BOOST_COPY_LIBS APPEND ${CMAKE_STATIC_LIBRARY_SUFFIX})
+			endif()
+			message(STATUS "BOOST Copy libs: ${BOOST_COPY_LIBS}")
+			set (CMD_COPY_BOOST_LIBS ${CMAKE_COMMAND} -E copy ${BOOST_COPY_LIBS} "${ASTRA_DIR}/lib/x64")
+			set (ASTRA_DEPENDS boost)
+		else()
+			message(STATUS "Note: Make sure to install boost via package manager, e.g. on Ubuntu via `sudo apt install libboost-dev`")
+		endif()
+		if (UNIX)
+			message(STATUS "Note: Make sure to install autoconf/automake/libtool for astra, e.g. on Ubuntu via `sudo apt install automake libtool`")
+		endif()
 
 		# fetch and build astra:
 		ExternalProject_Add (astra
@@ -523,7 +561,7 @@ if (ENABLE_ASTRA)
 			CONFIGURE_COMMAND "${ASTRA_CONFIGURE_COMMAND}"
 			BUILD_COMMAND     "${ASTRA_BUILD_COMMAND}"
 			INSTALL_COMMAND   ""
-			DEPENDS           boost
+			DEPENDS           ${ASTRA_DEPENDS}
 		)
 	else()
 		set(ASTRA_DIR "${ASTRA_DIR}" CACHE PATH
