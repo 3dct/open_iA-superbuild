@@ -76,6 +76,8 @@ When the build finished successfully, open\_iA executables will be built in the 
 
 ## Troubleshooting / Adaptations:
 
+- If you don't find your problem mentioned here, please check the troubleshooting sections of our detailed [Windows](https://github.com/3dct/open_iA/wiki/Windows-Build#troubleshooting) and [Linux](https://github.com/3dct/open_iA/wiki/Linux-Build#troubleshooting) build instructions.
+
 - Ninja as build tool is known to cause problems at the moment with the superbuild; it produces error messages such as `ninja: error: 'OpenCL\_ICD', needed by 'ITK-prefix/src/ITK-stamp/ITK-mkdir', missing and no known rule to make it`. Workaround: Use "Unix Makefiles" generator instead of "Ninja".
 
 - The `$` sign in the code above indicates the shell prompt, do not enter this sign.
