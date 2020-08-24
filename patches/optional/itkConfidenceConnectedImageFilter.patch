@@ -1,0 +1,11 @@
+--- /tools/itkConfidenceConnectedImageFilter.hxx	2020-08-24 09:44:32.971734505 +0200
++++ /tools/sb/itk/src-5.1.0/Modules/Segmentation/RegionGrowing/include/itkConfidenceConnectedImageFilter.hxx	2020-08-24 09:45:51.060937765 +0200
+@@ -233,7 +233,7 @@
+   upper = m_Mean + m_Multiplier * std::sqrt(m_Variance);
+ 
+   // Find the highest and lowest seed intensity.
+-  InputRealType lowestSeedIntensity = itk::NumericTraits<InputImagePixelType>::max();
++  InputRealType lowestSeedIntensity = static_cast<InputRealType>(itk::NumericTraits<InputImagePixelType>::max());
+   InputRealType highestSeedIntensity = itk::NumericTraits<InputImagePixelType>::NonpositiveMin();
+   typename SeedsContainerType::const_iterator si = m_Seeds.begin();
+   typename SeedsContainerType::const_iterator li = m_Seeds.end();

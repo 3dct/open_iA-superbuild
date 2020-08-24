@@ -1,0 +1,29 @@
+--- /tools/itkImageHistogramFilter.hxx	2020-08-24 09:49:45.035856066 +0200
++++ /tools/sb/itk/src-5.1.0/Modules/Numerics/Statistics/include/itkImageToHistogramFilter.hxx	2020-08-24 10:16:38.723470525 +0200
+@@ -119,7 +119,7 @@
+   m_Minimum = HistogramMeasurementVectorType(nbOfComponents);
+   m_Maximum = HistogramMeasurementVectorType(nbOfComponents);
+ 
+-  m_Minimum.Fill(NumericTraits<ValueType>::max());
++  m_Minimum.Fill(static_cast<ValueRealType>(NumericTraits<ValueType>::max()));
+   m_Maximum.Fill(NumericTraits<ValueType>::NonpositiveMin());
+ 
+   m_MergeHistogram = nullptr;
+@@ -172,7 +172,7 @@
+     }
+     else
+     {
+-      m_Maximum.Fill(NumericTraits<ValueType>::max() + 0.5);
++      m_Maximum.Fill(static_cast<ValueRealType>(NumericTraits<ValueType>::max()) + 0.5);
+     }
+     // No marginal scaling is applied in this case
+   }
+@@ -206,7 +206,7 @@
+   inputIt.GoToBegin();
+   HistogramMeasurementVectorType m(nbOfComponents);
+ 
+-  min.Fill(NumericTraits<ValueType>::max());
++  min.Fill(static_cast<ValueRealType>(NumericTraits<ValueType>::max()));
+   max.Fill(NumericTraits<ValueType>::NonpositiveMin());
+   while (!inputIt.IsAtEnd())
+   {

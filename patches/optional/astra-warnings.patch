@@ -1,0 +1,47 @@
+diff --git a/include/astra/CudaProjector3D.h b/include/astra/CudaProjector3D.h
+index 9b4ff1f..c9ef2eb 100644
+--- a/include/astra/CudaProjector3D.h
++++ b/include/astra/CudaProjector3D.h
+@@ -84,19 +84,19 @@ public:
+ 	 */
+ 	virtual bool initialize(const Config& _cfg);
+ 
+-	virtual void computeSingleRayWeights(int _iProjectionIndex, 
+-										 int _iSliceIndex,
+-										 int _iDetectorIndex, 
+-										 SPixelWeight* _pWeightedPixels,
+-		                                 int _iMaxPixelCount, 
+-										 int& _iStoredPixelCount) {}
+-	virtual int getProjectionWeightsCount(int _iProjectionIndex) { return 0; }
++	virtual void computeSingleRayWeights(int /*_iProjectionIndex*/, 
++										 int /*_iSliceIndex*/,
++										 int /*_iDetectorIndex*/, 
++										 SPixelWeight* /*_pWeightedPixels*/,
++		                                 int /*_iMaxPixelCount*/, 
++										 int& /*_iStoredPixelCount*/) {}
++	virtual int getProjectionWeightsCount(int /*_iProjectionIndex*/) { return 0; }
+ 	template <typename Policy>
+-	void project(Policy& _policy) {}
++	void project(Policy& /*_policy*/) {}
+ 	template <typename Policy>
+-	void projectSingleProjection(int _iProjection, Policy& _policy) {}
++	void projectSingleProjection(int /*_iProjection*/, Policy& /*_policy*/) {}
+ 	template <typename Policy>
+-	void projectSingleRay(int _iProjection, int _iSlice, int _iDetector, Policy& _policy) {}
++	void projectSingleRay(int /*_iProjection*/, int /*_iSlice*/, int /*_iDetector*/, Policy& /*_policy*/) {}
+ 
+ 
+ 
+diff --git a/include/astra/ReconstructionAlgorithm3D.h b/include/astra/ReconstructionAlgorithm3D.h
+index 1c63c88..db4080c 100644
+--- a/include/astra/ReconstructionAlgorithm3D.h
++++ b/include/astra/ReconstructionAlgorithm3D.h
+@@ -168,7 +168,7 @@ public:
+ 	 * @param _fNorm if supported, the norm is returned here
+ 	 * @return true if this operation is supported
+ 	 */
+-	virtual bool getResidualNorm(float32& _fNorm) { return false; }
++	virtual bool getResidualNorm(float32& /*_fNorm*/) { return false; }
+ 
+ protected:
+ 	
