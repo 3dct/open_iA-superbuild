@@ -1,0 +1,13 @@
+--- /tools/rtkCudaLaplacianImageFilter.h	2020-08-25 10:00:56.896974381 +0200
++++ /tools/sb/itk/src-5.1.0/Modules/Remote/RTK/include/rtkCudaLaplacianImageFilter.h	2020-08-25 10:03:33.002560149 +0200
+@@ -65,8 +65,8 @@
+   CudaLaplacianImageFilter();
+   ~CudaLaplacianImageFilter() {}
+ 
+-  virtual void
+-  GPUGenerateData();
++  void
++  GPUGenerateData() override;
+ 
+ }; // end of class
+ 

@@ -1,0 +1,13 @@
+--- /tools/rtkCudaFDKBackProjectionImageFilter.h	2020-08-25 10:10:46.909176366 +0200
++++ /tools/sb/itk/src-5.1.0/Modules/Remote/RTK/include/rtkCudaFDKBackProjectionImageFilter.h	2020-08-25 10:11:08.061297779 +0200
+@@ -73,8 +73,8 @@
+   CudaFDKBackProjectionImageFilter();
+   virtual ~CudaFDKBackProjectionImageFilter(){};
+ 
+-  virtual void
+-  GPUGenerateData();
++  void
++  GPUGenerateData() override;
+ };
+ 
+ } // end namespace rtk

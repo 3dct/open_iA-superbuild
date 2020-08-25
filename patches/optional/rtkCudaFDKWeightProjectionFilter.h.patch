@@ -1,0 +1,13 @@
+--- /tools/rtkCudaFDKWeightProjectionFilter.h	2020-08-25 10:05:46.907439668 +0200
++++ /tools/sb/itk/src-5.1.0/Modules/Remote/RTK/include/rtkCudaFDKWeightProjectionFilter.h	2020-08-25 10:06:08.539568228 +0200
+@@ -77,8 +77,8 @@
+   /** Destructor **/
+   virtual ~CudaFDKWeightProjectionFilter();
+ 
+-  virtual void
+-  GPUGenerateData();
++  void
++  GPUGenerateData() override;
+ 
+ }; // end of class
+ 

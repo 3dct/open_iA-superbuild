@@ -1,0 +1,18 @@
+--- /tools/rtkCudaFFTProjectionsConvolutionImageFilter.h	2020-08-25 10:09:19.756675868 +0200
++++ /tools/sb/itk/src-5.1.0/Modules/Remote/RTK/include/rtkCudaFFTProjectionsConvolutionImageFilter.h	2020-08-25 10:09:50.904854808 +0200
+@@ -72,11 +72,11 @@
+   CudaFFTProjectionsConvolutionImageFilter();
+   ~CudaFFTProjectionsConvolutionImageFilter() {}
+ 
+-  virtual void
+-  GPUGenerateData();
++  void
++  GPUGenerateData() override;
+ 
+-  virtual FFTInputImagePointer
+-  PadInputImageRegion(const RegionType & inputRegion);
++  FFTInputImagePointer
++  PadInputImageRegion(const RegionType & inputRegion) override;
+ 
+ private:
+   CudaFFTOutputImagePointer m_KernelFFTCUDA;
