@@ -1,5 +1,5 @@
---- /tools/rtkCudaCropImageFilter.h	2020-08-25 10:07:46.800140673 +0200
-+++ /tools/sb/itk/src-5.1.0/Modules/Remote/RTK/include/rtkCudaCropImageFilter.h	2020-08-25 10:08:03.100234732 +0200
+--- a/Modules/Remote/RTK/include/rtkCudaCropImageFilter.h
++++ b/Modules/Remote/RTK/include/rtkCudaCropImageFilter.h
 @@ -71,8 +71,8 @@
    CudaCropImageFilter();
    virtual ~CudaCropImageFilter(){};

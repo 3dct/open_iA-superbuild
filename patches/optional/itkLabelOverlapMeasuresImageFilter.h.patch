@@ -1,5 +1,5 @@
---- /tools/itkLabelOverlapMeasuresImageFilter.h	2020-08-24 10:55:30.964082965 +0200
-+++ /tools/sb/itk/src-5.1.0/Modules/Filtering/ImageStatistics/include/itkLabelOverlapMeasuresImageFilter.h	2020-08-24 10:57:54.784496474 +0200
+--- a/Modules/Filtering/ImageStatistics/include/itkLabelOverlapMeasuresImageFilter.h
++++ b/Modules/Filtering/ImageStatistics/include/itkLabelOverlapMeasuresImageFilter.h
 @@ -82,30 +82,14 @@
    {
    public:

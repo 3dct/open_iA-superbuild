@@ -1,5 +1,5 @@
---- /tools/rtkCudaFDKWeightProjectionFilter.h	2020-08-25 10:05:46.907439668 +0200
-+++ /tools/sb/itk/src-5.1.0/Modules/Remote/RTK/include/rtkCudaFDKWeightProjectionFilter.h	2020-08-25 10:06:08.539568228 +0200
+--- a/Modules/Remote/RTK/include/rtkCudaFDKWeightProjectionFilter.h
++++ b/Modules/Remote/RTK/include/rtkCudaFDKWeightProjectionFilter.h
 @@ -77,8 +77,8 @@
    /** Destructor **/
    virtual ~CudaFDKWeightProjectionFilter();

@@ -1,5 +1,5 @@
---- /tools/itkConfidenceConnectedImageFilter.hxx	2020-08-24 09:44:32.971734505 +0200
-+++ /tools/sb/itk/src-5.1.0/Modules/Segmentation/RegionGrowing/include/itkConfidenceConnectedImageFilter.hxx	2020-08-24 09:45:51.060937765 +0200
+--- a/Modules/Segmentation/RegionGrowing/include/itkConfidenceConnectedImageFilter.hxx
++++ b/Modules/Segmentation/RegionGrowing/include/itkConfidenceConnectedImageFilter.hxx
 @@ -233,7 +233,7 @@
    upper = m_Mean + m_Multiplier * std::sqrt(m_Variance);
  

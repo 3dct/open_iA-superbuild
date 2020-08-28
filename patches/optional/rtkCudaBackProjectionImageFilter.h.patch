@@ -1,5 +1,5 @@
---- /tools/rtkCudaBackProjectionImageFilter.h	2020-08-25 10:01:51.113472734 +0200
-+++ /tools/sb/itk/src-5.1.0/Modules/Remote/RTK/include/rtkCudaBackProjectionImageFilter.h	2020-08-25 10:00:02.168486130 +0200
+--- a/Modules/Remote/RTK/include/rtkCudaBackProjectionImageFilter.h
++++ b/Modules/Remote/RTK/include/rtkCudaBackProjectionImageFilter.h
 @@ -74,8 +74,8 @@
    CudaBackProjectionImageFilter();
    virtual ~CudaBackProjectionImageFilter(){};

@@ -1,0 +1,16 @@
+--- a/Modules/Filtering/MathematicalMorphology/include/itkReconstructionImageFilter.hxx
++++ b/Modules/Filtering/MathematicalMorphology/include/itkReconstructionImageFilter.hxx
+@@ -124,12 +124,12 @@
+   MaskImageConstPointer   maskImageP;
+ 
+   ISizeType padSize;
++  padSize.Fill(1);
+ 
+   if (m_UseInternalCopy)
+   {
+     typename PadType::Pointer MaskPad = PadType::New();
+     typename PadType::Pointer MarkerPad = PadType::New();
+-    padSize.Fill(1);
+ 
+     MaskPad->SetConstant(m_MarkerValue);
+     MarkerPad->SetConstant(m_MarkerValue);

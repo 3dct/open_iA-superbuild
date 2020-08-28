@@ -1,5 +1,5 @@
---- /tools/rtkCudaDisplacedDetectorImageFilter.h	2020-08-25 10:04:45.527062427 +0200
-+++ /tools/sb/itk/src-5.1.0/Modules/Remote/RTK/include/rtkCudaDisplacedDetectorImageFilter.h	2020-08-25 10:04:58.843146478 +0200
+--- a/Modules/Remote/RTK/include/rtkCudaDisplacedDetectorImageFilter.h
++++ b/Modules/Remote/RTK/include/rtkCudaDisplacedDetectorImageFilter.h
 @@ -76,8 +76,8 @@
    /** Destructor **/
    virtual ~CudaDisplacedDetectorImageFilter();

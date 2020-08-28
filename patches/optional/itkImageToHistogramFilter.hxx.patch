@@ -1,5 +1,5 @@
---- /tools/itkImageHistogramFilter.hxx	2020-08-24 09:49:45.035856066 +0200
-+++ /tools/sb/itk/src-5.1.0/Modules/Numerics/Statistics/include/itkImageToHistogramFilter.hxx	2020-08-24 10:16:38.723470525 +0200
+--- a/Modules/Numerics/Statistics/include/itkImageToHistogramFilter.hxx
++++ b/Modules/Numerics/Statistics/include/itkImageToHistogramFilter.hxx
 @@ -119,7 +119,7 @@
    m_Minimum = HistogramMeasurementVectorType(nbOfComponents);
    m_Maximum = HistogramMeasurementVectorType(nbOfComponents);
