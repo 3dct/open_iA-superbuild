@@ -18,6 +18,7 @@ option (ENABLE_TOOLS "Whether to build common tool modules, e.g. FeatureScout, 4
 option (ENABLE_TEST "Whether to enable build of tests runners and the capability to submit CDash test runs (default: disabled)" OFF)
 option (ENABLE_ASTRA "Whether to build ASTRA reconstruction library and open_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time! (default: disabled)" OFF)
 option (ENABLE_VR "Whether to enable VR module (default: disabled)" OFF)
+option (ENABLE_AI "Whether to enable AI module (default: disabled)" OFF)
 option (ENABLE_EIGEN "Whether to fetch and use eigen (default: disabled)" OFF)
 option (ENABLE_HDF5 "Whether to fetch and build HDF5 library and use it in open_iA (default: disabled)" OFF)
 option (ENABLE_PRECOMPILE "Whether to build open_iA with precompiled headers enabled (default: disabled; NOT included in \"ENABLE_ALL\")" OFF)
@@ -41,6 +42,7 @@ if (ENABLE_ALL)
 	set (ENABLE_TEST "ON" CACHE BOOL "" FORCE)
 	set (ENABLE_ASTRA "ON" CACHE BOOL "" FORCE)
 	set (ENABLE_VR "ON" CACHE BOOL "" FORCE)
+	set (ENABLE_AI "ON" CACHE BOOL "" FORCE)
 	set (ENABLE_EIGEN "ON" CACHE BOOL "" FORCE)
 	set (ENABLE_HDF5 "ON" CACHE BOOL "" FORCE)
 endif()
@@ -658,6 +660,38 @@ if (ENABLE_HDF5)
 		INSTALL_COMMAND   "${HDF5_INSTALL_COMMAND}")
 endif()
 
+if (ENABLE_AI)
+	set (ONNX_VERSION "1.4.0")
+	set (ONNX_SRC_DIR "${CMAKE_BINARY_DIR}/onnx-${ONNX_VERSION}")
+	if (WIN32)
+		set (ONNX_ARCHIVE "https://github.com/microsoft/onnxruntime/releases/download/v${ONNX_VERSION}/Microsoft.ML.OnnxRuntime.DirectML.${ONNX_VERSION}.zip")
+		set (ONNX_HASH "DDD6961B9A6F9CC044F10BD45AEF64CFC79E091D45957AFFF68BA372A7C4D7EF2ACEC9E2679C786F72FAEF3986390B0D3F3051060994E3D6439AF828DC53BA7C")
+		# for cuda, use:
+		# set (ONNX_ARCHIVE "https://github.com/microsoft/onnxruntime/releases/download/v${ONNX_VERSION}/onnxruntime-win-x64-gpu-${ONNX_VERSION}.zip")
+		set (ONNX_INCLUDE_DIR "${ONNX_SRC_DIR}/build/native/include")
+		set (ONNX_LIBRARIES "${ONNX_SRC_DIR}/runtimes/win-x64/native/onnxruntime.lib")
+	elseif (UNIX)
+		set (ONNX_ARCHIVE "https://github.com/microsoft/onnxruntime/releases/download/v${ONNX_VERSION}/onnxruntime-linux-x64-gpu-${ONNX_VERSION}.tgz")
+		set (ONNX_HASH "e9803f467e2d9dc9cd2c708b2ef58ba0844f039ee54544fc5a127ae9812fae1426dbcc47b0531ca41a75d02f4cda462055e2c9d27086b7af14da3a3643d3c43c")
+		set (ONNX_INCLUDE_DIR "${ONNX_SRC_DIR}/include")
+		set (ONNX_LIBRARIES "${ONNX_SRC_DIR}/lib/libonnxruntime.so.${ONNX_VERSION}")
+	elseif(APPLE)
+		set (ONNX_ARCHIVE "https://github.com/microsoft/onnxruntime/releases/download/v${ONNX_VERSION}/onnxruntime-osx-x64-${ONNX_VERSION}.tgz")
+		set (ONNX_HASH "91EC06DA8EA381ED6FA9089D6570A8DE9C38178323B4FF6AB0BF014A4A314FDECD617DB32864364F81DC5A9665FC66A060E17349FC058686CD451DA35943909D")
+		set (ONNX_INCLUDE_DIR "${ONNX_SRC_DIR}/include")
+		set (ONNX_LIBRARIES "${ONNX_SRC_DIR}/lib/libonnxruntime.${ONNX_VERSION}.dylib")
+	else()
+		MESSAGE(WARNING "Unknown operating system, probably no AI support!")
+	endif()
+	ExternalProject_Add (onnx
+		URL               ${ONNX_ARCHIVE}
+		URL_HASH          "SHA512=${ONNX_HASH}"
+		SOURCE_DIR        "${ONNX_SRC_DIR}"
+		BUILD_IN_SOURCE   1
+		CONFIGURE_COMMAND ""
+		BUILD_COMMAND     ""
+		INSTALL_COMMAND   "")
+endif()
 
 set (OPEN_IA_CMAKE_ARGS
 	"-DITK_DIR:PATH=${ITK_DIR}"
@@ -726,6 +760,14 @@ if (ENABLE_VR)
 		LIST (APPEND OPEN_IA_CMAKE_ARGS
 			${OPENVR_LIB_AND_INCLUDE})
 	endif()
+endif()
+if (ENABLE_AI)
+	LIST(APPEND OPEN_IA_CMAKE_ARGS
+		"-DModule_AI:BOOL=ON"
+		"-DONNX_RUNTIME_DIR:PATH=${ONNX_SRC_DIR}"
+		"-DONNX_RUNTIME_INCLUDE_DIR:PATH=${ONNX_INCLUDE_DIR}"
+		"-DONNX_RUNTIME_LIBRARIES:FILEPATH=${ONNX_LIBRARIES}")
+	LIST (APPEND openiA_DEPENDS onnx)
 endif()
 if (ENABLE_EIGEN)
 	set (EIGEN_BIN_DIR "${CMAKE_BINARY_DIR}/eigen-${EIGEN_VERSION}")
