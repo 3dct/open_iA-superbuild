@@ -312,7 +312,13 @@ if (BUILD_VTK)
 	endif()
 	# let's apply the fix for parallel coordinate charts potentially causing a crash
 	# on mouse move (see https://gitlab.kitware.com/vtk/vtk/-/issues/17441):
-	set (VTK_PC_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_SOURCE_DIR}/patches/vtk-parallelCoordinates.patch")
+	if (VTK_VERSION VERSION_LESS "9.0.0")
+		set (VTK_PARALLEL_COORDINATE_PATCH_LINE 510)
+	else()
+		set (VTK_PARALLEL_COORDINATE_PATCH_LINE 492)
+	endif()
+	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/patches/vtk-parallelCoordinates.patch.template" "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch")
+	set (VTK_PC_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch")
 	set (VTK_QT_PATCH_COMMAND "")
 	if (Qt5_VERSION VERSION_GREATER "5.14.99" AND VTK_VERSION VERSION_LESS "9.0.1") # when using >= Qt 5.15, VTK up to (and including) 9.0.0 requires a minor patch:
 		set (VTK_QT_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_SOURCE_DIR}/patches/vtk-${VTK_VERSION}-qt-5.15.patch")
