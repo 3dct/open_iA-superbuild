@@ -314,10 +314,13 @@ if (BUILD_VTK)
 	# on mouse move (see https://gitlab.kitware.com/vtk/vtk/-/issues/17441):
 	if (VTK_VERSION VERSION_LESS "9.0.0")
 		set (VTK_PARALLEL_COORDINATE_PATCH_LINE 510)
+		# for vtk < 9, the line endings _should_ adapt by operating system:
+		CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/patches/vtk-parallelCoordinates.patch.template" "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch")
 	else()
 		set (VTK_PARALLEL_COORDINATE_PATCH_LINE 492)
+		# for vtk >= 9, only a .tar.gz is available with unix line endings:
+		CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/patches/vtk-parallelCoordinates.patch.template" "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch" NEWLINE_STYLE UNIX)
 	endif()
-	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/patches/vtk-parallelCoordinates.patch.template" "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch" NEWLINE_STYLE UNIX)
 	set (VTK_PC_PATCH_COMMAND "${GIT_EXECUTABLE}" apply "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch")
 	set (VTK_QT_PATCH_COMMAND "")
 	if (Qt5_VERSION VERSION_GREATER "5.14.99" AND VTK_VERSION VERSION_LESS "9.0.1") # when using >= Qt 5.15, VTK up to (and including) 9.0.0 requires a minor patch:
