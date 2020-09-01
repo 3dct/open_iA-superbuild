@@ -1,0 +1,11 @@
+--- a/@ONNX_INCLUDE_SUBDIR@/onnxruntime_c_api.h
++++ b/@ONNX_INCLUDE_SUBDIR@/onnxruntime_c_api.h
+@@ -212,7 +212,7 @@
+ typedef struct OrtCustomOp OrtCustomOp;
+ 
+ typedef enum OrtAllocatorType {
+-  Invalid = -1,
++  OrtInvalid = -1,
+   OrtDeviceAllocator = 0,
+   OrtArenaAllocator = 1
+ } OrtAllocatorType;
