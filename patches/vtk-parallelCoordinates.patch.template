@@ -1,11 +1,13 @@
 --- a/Charts/Core/vtkChartParallelCoordinates.cxx
 +++ b/Charts/Core/vtkChartParallelCoordinates.cxx
-@@ -@VTK_PARALLEL_COORDINATE_PATCH_LINE@,6 +@VTK_PARALLEL_COORDINATE_PATCH_LINE@,8 @@
+@@ -@VTK_PARALLEL_COORDINATE_PATCH_LINE@,6 +@VTK_PARALLEL_COORDINATE_PATCH_LINE@,10 @@
    }
    else if (mouse.GetButton() == this->Actions.Pan())
    {
 +    if (this->Storage->CurrentAxis == -1)
++    {
 +      return true;
++    }
      vtkAxis* axis = this->Storage->Axes[this->Storage->CurrentAxis];
      if (this->Storage->AxisResize == 0)
      {
