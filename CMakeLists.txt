@@ -756,18 +756,19 @@ if (ENABLE_TOOLS)
 		"-DModule_BoneThickness:BOOL=ON"
 		"-DModule_DreamCaster:BOOL=${ENABLE_OPENCL}"
 		"-DModule_DynamicVolumeLines:BOOL=ON"
+		"-DModule_ElastixRegistration:BOOL=ON"
+		"-DModule_FeatureAnalyzer:BOOL=ON"
 		"-DModule_FeatureScout:BOOL=ON"
 		"-DModule_FiAKEr:BOOL=ON"
 		"-DModule_FoamCharacterization:BOOL=ON"
 		"-DModule_FuzzyFeatureTracking:BOOL=ON"
 		"-DModule_GEMSe:BOOL=ON"
+		"-DModule_InSpectr:BOOL=ON"
 		"-DModule_ModalityExplorer:BOOL=ON"
 		"-DModule_ParameterExplorer:BOOL=ON"
 		"-DModule_PolygonPrimitives:BOOL=ON"
-		"-DModule_PorosityAnalyser:BOOL=ON"
 		"-DModule_TripleHistogramTF:BOOL=ON"
 		"-DModule_Uncertainty:BOOL=ON"
-		"-DModule_XRF:BOOL=ON"
 		"-DQt5Charts_DIR:PATH=${Qt5_DIR}Charts")
 endif()
 if (ENABLE_TEST)
