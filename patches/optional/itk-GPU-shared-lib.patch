@@ -1,0 +1,186 @@
+diff --git a/CMake/itkOpenCL.cmake b/CMake/itkOpenCL.cmake
+index 0ccbe144da3..fa381524f9f 100644
+--- a/CMake/itkOpenCL.cmake
++++ b/CMake/itkOpenCL.cmake
+@@ -48,7 +48,7 @@ if(ITK_USE_GPU)
+                       )
+     set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE}
+                                 PROPERTIES GENERATED ON)
+-    set(${SRC_VAR} ${${SRC_VAR}} ${OUTPUT_FILE})
++    set(${SRC_VAR} ${${SRC_VAR}} ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE})
+   endmacro()
+ 
+   macro(write_gpu_kernels GPUKernels GPU_SRC)
+diff --git a/Modules/Core/Common/include/itkMacro.h b/Modules/Core/Common/include/itkMacro.h
+index 1816f722a70..05a8fc81fa1 100644
+--- a/Modules/Core/Common/include/itkMacro.h
++++ b/Modules/Core/Common/include/itkMacro.h
+@@ -1146,22 +1146,16 @@ compilers.
+  * provides the GPU kernel source code as a const char*
+  */
+ #define itkGPUKernelClassMacro(kernel)                                                                                 \
+-  /**\class kernel \                                                                                                   \
+-   * Workaround KWstyle bug \                                                                                          \
+-   * \ingroup ITKCommon \                                                                                              \
+-   */                                                                                                                  \
+-  class kernel                                                                                                         \
++  kernel                                                                                                               \
+   {                                                                                                                    \
+   public:                                                                                                              \
+-    static const char *                                                                                                \
+-    GetOpenCLSource();                                                                                                 \
++    static const char * GetOpenCLSource();                                                                             \
+                                                                                                                        \
+   private:                                                                                                             \
+     kernel();                                                                                                          \
+     virtual ~kernel();                                                                                                 \
+     kernel(const kernel &);                                                                                            \
+-    void                                                                                                               \
+-    operator=(const kernel &);                                                                                         \
++    void operator=(const kernel &);                                                                                    \
+   };
+ 
+ #define itkGetOpenCLSourceFromKernelMacro(kernel)                                                                      \
+diff --git a/Modules/Core/GPUCommon/include/itkGPUImageOps.h b/Modules/Core/GPUCommon/include/itkGPUImageOps.h
+index f4eb8f33bcc..fbdf3d75784 100644
+--- a/Modules/Core/GPUCommon/include/itkGPUImageOps.h
++++ b/Modules/Core/GPUCommon/include/itkGPUImageOps.h
+@@ -23,7 +23,7 @@
+ namespace itk
+ {
+ /** Create a helper GPU Kernel class for GPUImageOps */
+-itkGPUKernelClassMacro(GPUImageOpsKernel);
++class itkGPUKernelClassMacro(GPUImageOpsKernel);
+ 
+ /** \class GPUImageOps
+  *
+diff --git a/Modules/Core/GPUCommon/include/itkGPUReduction.h b/Modules/Core/GPUCommon/include/itkGPUReduction.h
+index 524a5cd01c9..1b3ce91e918 100644
+--- a/Modules/Core/GPUCommon/include/itkGPUReduction.h
++++ b/Modules/Core/GPUCommon/include/itkGPUReduction.h
+@@ -26,7 +26,7 @@
+ namespace itk
+ {
+ /** Create a helper GPU Kernel class for GPUReduction */
+-itkGPUKernelClassMacro(GPUReductionKernel);
++class itkGPUKernelClassMacro(GPUReductionKernel);
+ 
+ /**
+  * \class GPUReduction
+diff --git a/Modules/Core/GPUFiniteDifference/include/itkGPUDenseFiniteDifferenceImageFilter.h b/Modules/Core/GPUFiniteDifference/include/itkGPUDenseFiniteDifferenceImageFilter.h
+index 853801cec22..2fccf0bc5e9 100644
+--- a/Modules/Core/GPUFiniteDifference/include/itkGPUDenseFiniteDifferenceImageFilter.h
++++ b/Modules/Core/GPUFiniteDifference/include/itkGPUDenseFiniteDifferenceImageFilter.h
+@@ -24,7 +24,7 @@
+ namespace itk
+ {
+ /** Create a helper GPU Kernel class for GPUDenseFiniteDifferenceImageFilter */
+-itkGPUKernelClassMacro(GPUDenseFiniteDifferenceImageFilterKernel);
++class ITKGPUFiniteDifference_EXPORT itkGPUKernelClassMacro(GPUDenseFiniteDifferenceImageFilterKernel);
+ 
+ /**
+  * \class GPUDenseFiniteDifferenceImageFilter
+diff --git a/Modules/Filtering/GPUAnisotropicSmoothing/include/itkGPUGradientNDAnisotropicDiffusionFunction.h b/Modules/Filtering/GPUAnisotropicSmoothing/include/itkGPUGradientNDAnisotropicDiffusionFunction.h
+index 4245ff914b4..1b21b709e10 100644
+--- a/Modules/Filtering/GPUAnisotropicSmoothing/include/itkGPUGradientNDAnisotropicDiffusionFunction.h
++++ b/Modules/Filtering/GPUAnisotropicSmoothing/include/itkGPUGradientNDAnisotropicDiffusionFunction.h
+@@ -54,7 +54,7 @@ namespace itk
+  */
+ 
+ /** Create a helper GPU Kernel class for GPUGradientNDAnisotropicDiffusionFunction */
+-itkGPUKernelClassMacro(GPUGradientNDAnisotropicDiffusionFunctionKernel);
++class itkGPUKernelClassMacro(GPUGradientNDAnisotropicDiffusionFunctionKernel);
+ 
+ template <typename TImage>
+ class ITK_TEMPLATE_EXPORT GPUGradientNDAnisotropicDiffusionFunction
+diff --git a/Modules/Filtering/GPUAnisotropicSmoothing/include/itkGPUScalarAnisotropicDiffusionFunction.h b/Modules/Filtering/GPUAnisotropicSmoothing/include/itkGPUScalarAnisotropicDiffusionFunction.h
+index 305f6490e41..d0d4330804a 100644
+--- a/Modules/Filtering/GPUAnisotropicSmoothing/include/itkGPUScalarAnisotropicDiffusionFunction.h
++++ b/Modules/Filtering/GPUAnisotropicSmoothing/include/itkGPUScalarAnisotropicDiffusionFunction.h
+@@ -32,7 +32,7 @@ namespace itk
+  * */
+ 
+ /** Create a helper GPU Kernel class for GPUScalarAnisotropicDiffusionFunction */
+-itkGPUKernelClassMacro(GPUScalarAnisotropicDiffusionFunctionKernel);
++class itkGPUKernelClassMacro(GPUScalarAnisotropicDiffusionFunctionKernel);
+ 
+ template <typename TImage>
+ class ITK_TEMPLATE_EXPORT GPUScalarAnisotropicDiffusionFunction : public GPUAnisotropicDiffusionFunction<TImage>
+diff --git a/Modules/Filtering/GPUImageFilterBase/include/itkGPUCastImageFilter.h b/Modules/Filtering/GPUImageFilterBase/include/itkGPUCastImageFilter.h
+index 23530ac5c02..e1b83f6968c 100644
+--- a/Modules/Filtering/GPUImageFilterBase/include/itkGPUCastImageFilter.h
++++ b/Modules/Filtering/GPUImageFilterBase/include/itkGPUCastImageFilter.h
+@@ -29,7 +29,7 @@ namespace itk
+ {
+ 
+ /** Create a helper GPU Kernel class for GPUCastImageFilter */
+-itkGPUKernelClassMacro(GPUCastImageFilterKernel);
++class itkGPUKernelClassMacro(GPUCastImageFilterKernel);
+ 
+ /** \class GPUCastImageFilter
+  * \brief GPU version of CastImageFilter.
+diff --git a/Modules/Filtering/GPUImageFilterBase/include/itkGPUNeighborhoodOperatorImageFilter.h b/Modules/Filtering/GPUImageFilterBase/include/itkGPUNeighborhoodOperatorImageFilter.h
+index c4adc29678e..69aeac6db46 100644
+--- a/Modules/Filtering/GPUImageFilterBase/include/itkGPUNeighborhoodOperatorImageFilter.h
++++ b/Modules/Filtering/GPUImageFilterBase/include/itkGPUNeighborhoodOperatorImageFilter.h
+@@ -41,7 +41,7 @@ namespace itk
+  */
+ 
+ /** Create a helper GPU Kernel class for GPUNeighborhoodOperatorImageFilter */
+-itkGPUKernelClassMacro(GPUNeighborhoodOperatorImageFilterKernel);
++class itkGPUKernelClassMacro(GPUNeighborhoodOperatorImageFilterKernel);
+ 
+ template <typename TInputImage,
+           typename TOutputImage,
+diff --git a/Modules/Filtering/GPUSmoothing/include/itkGPUMeanImageFilter.h b/Modules/Filtering/GPUSmoothing/include/itkGPUMeanImageFilter.h
+index 57bc3ebb750..4ff98c665e7 100644
+--- a/Modules/Filtering/GPUSmoothing/include/itkGPUMeanImageFilter.h
++++ b/Modules/Filtering/GPUSmoothing/include/itkGPUMeanImageFilter.h
+@@ -37,7 +37,7 @@ namespace itk
+  */
+ 
+ /** Create a helper GPU Kernel class for GPUMeanImageFilter */
+-itkGPUKernelClassMacro(GPUMeanImageFilterKernel);
++class itkGPUKernelClassMacro(GPUMeanImageFilterKernel);
+ 
+ template <typename TInputImage, typename TOutputImage>
+ class ITK_TEMPLATE_EXPORT GPUMeanImageFilter
+diff --git a/Modules/Filtering/GPUThresholding/include/itkGPUBinaryThresholdImageFilter.h b/Modules/Filtering/GPUThresholding/include/itkGPUBinaryThresholdImageFilter.h
+index 8d26dcfc527..613bc623f9f 100644
+--- a/Modules/Filtering/GPUThresholding/include/itkGPUBinaryThresholdImageFilter.h
++++ b/Modules/Filtering/GPUThresholding/include/itkGPUBinaryThresholdImageFilter.h
+@@ -85,7 +85,7 @@ class ITK_TEMPLATE_EXPORT GPUBinaryThreshold : public GPUFunctorBase
+ } // end of namespace Functor
+ 
+ /** Create a helper GPU Kernel class for GPUBinaryThresholdImageFilter */
+-itkGPUKernelClassMacro(GPUBinaryThresholdImageFilterKernel);
++class itkGPUKernelClassMacro(GPUBinaryThresholdImageFilterKernel);
+ 
+ /**
+  * \class GPUBinaryThresholdImageFilter
+diff --git a/Modules/Registration/GPUPDEDeformable/include/itkGPUDemonsRegistrationFunction.h b/Modules/Registration/GPUPDEDeformable/include/itkGPUDemonsRegistrationFunction.h
+index 28b21d592c9..0b46e27b8ec 100644
+--- a/Modules/Registration/GPUPDEDeformable/include/itkGPUDemonsRegistrationFunction.h
++++ b/Modules/Registration/GPUPDEDeformable/include/itkGPUDemonsRegistrationFunction.h
+@@ -51,7 +51,7 @@ namespace itk
+  * \ingroup ITKGPUPDEDeformableRegistration
+  */
+ /** Create a helper GPU Kernel class for GPUDemonsRegistrationFunction */
+-itkGPUKernelClassMacro(GPUDemonsRegistrationFunctionKernel);
++class itkGPUKernelClassMacro(GPUDemonsRegistrationFunctionKernel);
+ 
+ template <typename TFixedImage, typename TMovingImage, typename TDisplacementField>
+ class ITK_TEMPLATE_EXPORT GPUDemonsRegistrationFunction
+diff --git a/Modules/Registration/GPUPDEDeformable/include/itkGPUPDEDeformableRegistrationFilter.h b/Modules/Registration/GPUPDEDeformable/include/itkGPUPDEDeformableRegistrationFilter.h
+index 93ab975ec43..0afd848715b 100644
+--- a/Modules/Registration/GPUPDEDeformable/include/itkGPUPDEDeformableRegistrationFilter.h
++++ b/Modules/Registration/GPUPDEDeformable/include/itkGPUPDEDeformableRegistrationFilter.h
+@@ -73,7 +73,7 @@ namespace itk
+  */
+ 
+ /** Create a helper GPU Kernel class for GPUPDEDeformableRegistrationFilter */
+-itkGPUKernelClassMacro(GPUPDEDeformableRegistrationFilterKernel);
++class itkGPUKernelClassMacro(GPUPDEDeformableRegistrationFilterKernel);
+ 
+ template <typename TFixedImage,
+           typename TMovingImage,
