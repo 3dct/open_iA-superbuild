@@ -1,0 +1,305 @@
+diff --git a/Rendering/OpenVR/vtkOpenVRCamera.h b/Rendering/OpenVR/vtkOpenVRCamera.h
+index 2d0079af..ff91ca3a 100644
+--- a/Rendering/OpenVR/vtkOpenVRCamera.h
++++ b/Rendering/OpenVR/vtkOpenVRCamera.h
+@@ -42,10 +42,10 @@ public:
+   /**
+    * Implement base class method.
+    */
+-  virtual void Render(vtkRenderer *ren);
++  void Render(vtkRenderer *ren) override;
+ 
+-  virtual void GetKeyMatrices(vtkRenderer *ren, vtkMatrix4x4 *&WCVCMatrix,
+-    vtkMatrix3x3 *&normalMatrix, vtkMatrix4x4 *&VCDCMatrix, vtkMatrix4x4 *&WCDCMatrix);
++  void GetKeyMatrices(vtkRenderer *ren, vtkMatrix4x4 *&WCVCMatrix,
++    vtkMatrix3x3 *&normalMatrix, vtkMatrix4x4 *&VCDCMatrix, vtkMatrix4x4 *&WCDCMatrix) override;
+ 
+   /**
+    * Provides a matrix to go from absolute OpenVR tracking coordinates
+diff --git a/Rendering/OpenVR/vtkOpenVRInteractorStyle.h b/Rendering/OpenVR/vtkOpenVRInteractorStyle.h
+index a898c633..4743d012 100644
+--- a/Rendering/OpenVR/vtkOpenVRInteractorStyle.h
++++ b/Rendering/OpenVR/vtkOpenVRInteractorStyle.h
+@@ -83,7 +83,7 @@ public:
+   */
+   void ProbeData(vtkEventDataDevice controller);
+   void LoadNextCameraPose();
+-  virtual void PositionProp(vtkEventData *);
++  void PositionProp(vtkEventData *) override;
+   virtual void Clip(vtkEventDataDevice3D *);
+   //@}
+ 
+diff --git a/Rendering/OpenVR/vtkOpenVRRenderWindow.h b/Rendering/OpenVR/vtkOpenVRRenderWindow.h
+index ceb380cd..241cd542 100644
+--- a/Rendering/OpenVR/vtkOpenVRRenderWindow.h
++++ b/Rendering/OpenVR/vtkOpenVRRenderWindow.h
+@@ -77,7 +77,7 @@ public:
+ 
+   static vtkOpenVRRenderWindow *New();
+   vtkTypeMacro(vtkOpenVRRenderWindow,vtkOpenGLRenderWindow);
+-  void PrintSelf(ostream& os, vtkIndent indent);
++  void PrintSelf(ostream& os, vtkIndent indent) override;
+ 
+   /**
+    * Get the system pointer
+@@ -238,35 +238,35 @@ public:
+   /**
+    * Add a renderer to the list of renderers.
+    */
+-  virtual void AddRenderer(vtkRenderer *) override;
++  void AddRenderer(vtkRenderer *) override;
+ 
+   /**
+    * Begin the rendering process.
+    */
+-  virtual void Start(void);
++  void Start(void) override;
+ 
+   /**
+    * Update the system, if needed, due to stereo rendering. For some stereo
+    * methods, subclasses might need to switch some hardware settings here.
+    */
+-  virtual void StereoUpdate();
++  void StereoUpdate() override;
+ 
+   /**
+    * Intermediate method performs operations required between the rendering
+    * of the left and right eye.
+    */
+-  virtual void StereoMidpoint();
++  void StereoMidpoint() override;
+ 
+   /**
+    * Handles work required once both views have been rendered when using
+    * stereo rendering.
+    */
+-  virtual void StereoRenderComplete();
++  void StereoRenderComplete() override;
+ 
+   /**
+    * End the rendering process and display the image.
+    */
+-  void Frame(void);
++  void Frame(void) override;
+ 
+   /**
+    * Initialize the rendering window.  This will setup all system-specific
+@@ -274,91 +274,91 @@ public:
+    * should be possible to call them multiple times, even changing WindowId
+    * in-between.  This is what WindowRemap does.
+    */
+-  virtual void Initialize(void);
++  void Initialize(void) override;
+ 
+   /**
+    * Finalize the rendering window.  This will shutdown all system-specific
+    * resources.  After having called this, it should be possible to destroy
+    * a window that was used for a SetWindowId() call without any ill effects.
+    */
+-  virtual void Finalize(void);
++  void Finalize(void) override;
+ 
+   /**
+    * Make this windows OpenGL context the current context.
+    */
+-  void MakeCurrent();
++  void MakeCurrent() override;
+ 
+   /**
+    * Tells if this window is the current OpenGL context for the calling thread.
+    */
+-  virtual bool IsCurrent();
++  bool IsCurrent() override;
+ 
+   /**
+    * Get report of capabilities for the render window
+    */
+-  const char *ReportCapabilities() { return "OpenVR System";};
++  const char *ReportCapabilities() override { return "OpenVR System";};
+ 
+   /**
+    * Is this render window using hardware acceleration? 0-false, 1-true
+    */
+-  int IsDirect() { return 1; };
++  int IsDirect() override { return 1; };
+ 
+   /**
+    * Check to see if a mouse button has been pressed or mouse wheel activated.
+    * All other events are ignored by this method.
+    * Maybe should return 1 always?
+    */
+-  virtual  int GetEventPending() { return 0;};
++  int GetEventPending() override { return 0;};
+ 
+   /**
+    * Get the current size of the screen in pixels.
+    */
+-  virtual int *GetScreenSize();
++  int *GetScreenSize() override;
+ 
+   //@{
+   /**
+    * Set the size of the window in pixels.
+    */
+-  virtual void SetSize(int,int);
+-  virtual void SetSize(int a[2]) {vtkOpenGLRenderWindow::SetSize(a);};
++  void SetSize(int,int) override;
++  void SetSize(int a[2]) override {vtkOpenGLRenderWindow::SetSize(a);};
+   //@}
+ 
+     //@{
+     /**
+      * Set the position of the window.
+      */
+-  virtual void SetPosition(int,int);
+-  virtual void SetPosition(int a[2]) {vtkOpenGLRenderWindow::SetPosition(a);};
++  void SetPosition(int,int) override;
++  void SetPosition(int a[2]) override {vtkOpenGLRenderWindow::SetPosition(a);};
+     //@}
+ 
+   // implement required virtual functions
+-  void SetWindowInfo(const char *) {};
+-  void SetNextWindowInfo(const char *) {};
+-  void SetParentInfo(const char *) {};
+-  virtual void *GetGenericDisplayId() {return (void *)this->HelperWindow->GetGenericDisplayId();};
+-  virtual void *GetGenericWindowId()  {return (void *)this->HelperWindow->GetGenericWindowId();};
+-  virtual void *GetGenericParentId()  {return (void *)nullptr;};
+-  virtual void *GetGenericContext() { return (void *)this->HelperWindow->GetGenericContext(); };
+-  virtual void *GetGenericDrawable()  {return (void *)this->HelperWindow->GetGenericDrawable();};
+-  virtual void SetDisplayId(void *) {};
+-  void  SetWindowId(void *) {};
+-  void  SetParentId(void *) {};
+-  void HideCursor() {};
+-  void ShowCursor() {};
+-  virtual void SetFullScreen(vtkTypeBool) {};
+-  virtual void WindowRemap(void) {};
+-  virtual void SetNextWindowId(void *) {};
++  void SetWindowInfo(const char *) override {};
++  void SetNextWindowInfo(const char *) override {};
++  void SetParentInfo(const char *) override {};
++  void *GetGenericDisplayId() override {return (void *)this->HelperWindow->GetGenericDisplayId();};
++  void *GetGenericWindowId()  override {return (void *)this->HelperWindow->GetGenericWindowId();};
++  void *GetGenericParentId()  override {return (void *)nullptr;};
++  void *GetGenericContext()   override { return (void *)this->HelperWindow->GetGenericContext(); };
++  void *GetGenericDrawable()  override {return (void *)this->HelperWindow->GetGenericDrawable();};
++  void SetDisplayId(void *) override {};
++  void SetWindowId(void *) override {};
++  void SetParentId(void *) override {};
++  void HideCursor() override {};
++  void ShowCursor() override {};
++  void SetFullScreen(vtkTypeBool) override {};
++  void WindowRemap(void) override {};
++  void SetNextWindowId(void *) override {};
+ 
+   /**
+    * Does this render window support OpenGL? 0-false, 1-true
+    */
+-  virtual int SupportsOpenGL() { return 1; };
++  int SupportsOpenGL() override { return 1; };
+ 
+   /**
+    * Overridden to not release resources that would interfere with an external
+    * application's rendering. Avoiding round trip.
+    */
+-  void Render();
++  void Render() override;
+ 
+   /**
+    * Set/Get the window to use for the openGL context
+@@ -378,10 +378,10 @@ protected:
+    * Free up any graphics resources associated with this window
+    * a value of nullptr means the context may already be destroyed
+    */
+-  virtual void ReleaseGraphicsResources(vtkRenderWindow *);
++  void ReleaseGraphicsResources(vtkRenderWindow *) override;
+ 
+-  virtual void CreateAWindow() {};
+-  virtual void DestroyWindow() {};
++  void CreateAWindow() override {};
++  void DestroyWindow() override {};
+ 
+   std::string m_strDriver;
+   std::string m_strDisplay;
+diff --git a/Rendering/OpenVR/vtkOpenVRRenderWindowInteractor.h b/Rendering/OpenVR/vtkOpenVRRenderWindowInteractor.h
+index e678f096..f765b4d6 100644
+--- a/Rendering/OpenVR/vtkOpenVRRenderWindowInteractor.h
++++ b/Rendering/OpenVR/vtkOpenVRRenderWindowInteractor.h
+@@ -41,19 +41,19 @@ public:
+   static vtkOpenVRRenderWindowInteractor *New();
+ 
+   vtkTypeMacro(vtkOpenVRRenderWindowInteractor,vtkRenderWindowInteractor3D);
+-  void PrintSelf(ostream& os, vtkIndent indent);
++  void PrintSelf(ostream& os, vtkIndent indent) override;
+ 
+   /**
+    * Initialize the event handler
+    */
+-  virtual void Initialize();
++  void Initialize() override;
+ 
+   /**
+    * OpenVR specific application terminate, calls ClassExitMethod then
+    * calls PostQuitMessage(0) to terminate the application. An application can Specify
+    * ExitMethod for alternative behavior (i.e. suppression of keyboard exit)
+    */
+-  void TerminateApp(void);
++  void TerminateApp(void) override;
+ 
+   //@{
+   /**
+@@ -70,17 +70,17 @@ public:
+    * These methods correspond to the Exit, User and Pick
+    * callbacks. They allow for the Style to invoke them.
+    */
+-  virtual void ExitCallback();
++  void ExitCallback() override;
+ 
+   //@{
+   /**
+    * Set/Get the optional translation to map world coordinates into the
+    * 3D physical space (meters, 0,0,0).
+    */
+-  virtual void SetPhysicalTranslation(vtkCamera *, double, double, double);
+-  virtual double *GetPhysicalTranslation(vtkCamera *);
+-  virtual void SetPhysicalScale(double);
+-  virtual double GetPhysicalScale();
++  void SetPhysicalTranslation(vtkCamera *, double, double, double) override;
++  double *GetPhysicalTranslation(vtkCamera *) override;
++  void SetPhysicalScale(double) override;
++  double GetPhysicalScale() override;
+   //@}
+ 
+   virtual void DoOneEvent(vtkOpenVRRenderWindow *renWin, vtkRenderer *ren);
+@@ -149,8 +149,8 @@ protected:
+    * Win32-specific internal timer methods. See the superclass for detailed
+    * documentation.
+    */
+-  virtual int InternalCreateTimer(int timerId, int timerType, unsigned long duration);
+-  virtual int InternalDestroyTimer(int platformTimerId);
++  int InternalCreateTimer(int timerId, int timerType, unsigned long duration) override;
++  int InternalDestroyTimer(int platformTimerId) override;
+   //@}
+ 
+   /**
+@@ -158,7 +158,7 @@ protected:
+    * call this method it will loop processing events until the
+    * application is exited.
+    */
+-  virtual void StartEventLoop();
++  void StartEventLoop() override;
+ 
+   /**
+   * Handle multitouch events. Multitouch events recognition starts when
+diff --git a/Rendering/OpenVR/vtkOpenVRRenderer.h b/Rendering/OpenVR/vtkOpenVRRenderer.h
+index 7bc0b635..9a0e8f35 100644
+--- a/Rendering/OpenVR/vtkOpenVRRenderer.h
++++ b/Rendering/OpenVR/vtkOpenVRRenderer.h
+@@ -74,7 +74,7 @@ public:
+   /**
+    * Concrete open gl render method.
+    */
+-  void DeviceRender(void);
++  void DeviceRender(void) override;
+ 
+   /**
+    * SHow the floor of the VR world
