@@ -758,6 +758,7 @@ if (ENABLE_TOOLS)
 		"-DModule_DynamicVolumeLines:BOOL=ON"
 		"-DModule_ElastixRegistration:BOOL=ON"
 		"-DModule_FeatureAnalyzer:BOOL=ON"
+		"-DModule_FeatureAnalyzerComputation:BOOL=ON"
 		"-DModule_FeatureScout:BOOL=ON"
 		"-DModule_FiAKEr:BOOL=ON"
 		"-DModule_FoamCharacterization:BOOL=ON"
