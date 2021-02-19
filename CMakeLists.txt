@@ -406,7 +406,12 @@ if (ENABLE_OPENCL)
 		set (CMD_COPY_OPENCL_CPP_HEADERS ${CMAKE_COMMAND} -E copy "${OPENCL_DIR}/cppheaders/include/CL/cl.hpp" "${OPENCL_DIR}/cppheaders/include/CL/cl2.hpp" "${OPENCL_DIR}/icdloader/inc/CL/")
 		set (OPENCL_ICD_INSTALL_HEADERS_COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icdloader/inc/CL" "${OPENCL_DIR}/include/CL")
 		# Find way to use different configurations properly...?
-		set (OPENCL_ICD_INSTALL_LIBS_COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icd-bin/$(Configuration)" "${OPENCL_DIR}/lib")
+		if (CMAKE_CONFIGURATION_TYPES)
+			# multi-configuration generator type
+			set (OPENCL_ICD_INSTALL_LIBS_COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icd-bin/$(Configuration)" "${OPENCL_DIR}/lib")
+		else()
+			set (OPENCL_ICD_INSTALL_LIBS_COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icd-bin" "${OPENCL_DIR}/lib")
+		endif()
 		set (OPENCL_ICD_CMAKE_ARGS
 			"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
 			"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
@@ -613,7 +618,7 @@ if (ENABLE_ASTRA)
 			set (ASTRA_BUILD_DIR "${ASTRA_DIR}/build/linux")
 			set (ASTRA_CONFIGURE_COMMAND1 "${CMAKE_COMMAND}" -E chdir "${ASTRA_BUILD_DIR}" "${ASTRA_BUILD_DIR}/autogen.sh")
 			set (ASTRA_CONFIGURE_COMMAND2 "${CMAKE_COMMAND}" -E chdir "${ASTRA_BUILD_DIR}" "${ASTRA_BUILD_DIR}/configure")
-			set (ASTRA_BUILD_COMMAND "${CMAKE_COMMAND}" -E chdir "${ASTRA_BUILD_DIR}" "${CMAKE_MAKE_PROGRAM}" -j 8)
+			set (ASTRA_BUILD_COMMAND "${CMAKE_COMMAND}" -E chdir "${ASTRA_BUILD_DIR}" "make" -j 8)
 		endif()
 
 		if (UNIX)
