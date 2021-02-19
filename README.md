@@ -16,7 +16,7 @@ Additional information can also be found in the [Windows build instructions](htt
 
 ### 1. Install Prerequisites
 First, you need to install the following applications:
-- CMake
+- CMake (>= 3.14.0)
 - Git
 - A build toolchain (build tool and compiler, e.g. make and g++ / clang on Linux; or Visual Studio on Windows)
 
@@ -40,7 +40,7 @@ On Windows, download and install:
 - Visual Studio (e.g. the free [Community Edition](https://visualstudio.microsoft.com/de/vs/older-downloads) of VS 2015 or newer)
 - OpenGL headers are included in the Windows SDK installed along with Visual Studio
 - optional: an OpenCL SDK; if available, some GPU operations will be available; some modules require it. The generic OpenCL-ICD loader can be built from within the superbuild (via `ENABLE_OPENCL`). Or you can use an SDK best fitting your build system, e.g. the AMD OpenCL SDK for an AMD graphics card, the NVidia CUDA SDK for an NVidia graphics card, or the Intel OpenCL SDK for an onboard graphics card (but note that this ties your build to machines having similar compute capabilities)
-- Open Source version of Qt 5 >= 5.9 (install 64 bit binaries for the respective Visual Studio version, recommended is e.g. 5.11.x or 5.12.x) 
+- Open Source version of Qt 5 >= 5.9 (install 64 bit binaries for the respective Visual Studio version, recommended is e.g. 5.14.x or 5.15.x). **Note:** We do NOT support Qt 6 yet!
 
 ### 2. Clone Repository
 
