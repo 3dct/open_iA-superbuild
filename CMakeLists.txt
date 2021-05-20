@@ -928,7 +928,6 @@ endif()
 if (ENABLE_TOOLS)
 	LIST (APPEND OPEN_IA_CMAKE_ARGS
 		"-DModule_4DCT:BOOL=ON"
-		"-DModule_AdaptiveThreshold:BOOL=ON"
 		"-DModule_BoneThickness:BOOL=ON"
 		"-DModule_DreamCaster:BOOL=${ENABLE_OPENCL}"
 		"-DModule_DynamicVolumeLines:BOOL=ON"
@@ -945,8 +944,15 @@ if (ENABLE_TOOLS)
 		"-DModule_ParameterExplorer:BOOL=ON"
 		"-DModule_PolygonPrimitives:BOOL=ON"
 		"-DModule_TripleHistogramTF:BOOL=ON"
-		"-DModule_Uncertainty:BOOL=ON"
-		"-DQt5Charts_DIR:PATH=${Qt5_DIR}Charts")
+		"-DModule_Uncertainty:BOOL=ON")
+	# Qt 6.0 does not come with Qt Charts; any Qt 5 version ships it though, and Qt >= 6.1 does too:
+	if (QT_VERSION_MAJOR LESS 6 OR QT_VERSION VERSION_GREATER_EQUAL "6.1.0")
+		LIST (APPEND OPEN_IA_CMAKE_ARGS
+			"-DModule_AdaptiveThreshold:BOOL=ON"
+			"-DQt${QT_VERSION_MAJOR}Charts_DIR:PATH=${Qt${QT_VERSION_MAJOR}_DIR}Charts")
+	else()
+		message(WARNING "Qt 6.0 does NOT support Qt charts, thus AdaptiveThresholding module depending on that library cannot be enabled!")
+	endif()
 endif()
 if (ENABLE_TEST)
 	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DopeniA_TESTING_ENABLED:BOOL=ON")
