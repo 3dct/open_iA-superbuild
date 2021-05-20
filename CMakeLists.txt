@@ -554,6 +554,15 @@ if (BUILD_ITK)
 	if (ITK_VERSION VERSION_LESS "5.1.0")
 		set (ITK_PATCH_COMMAND ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/itk-vtkGlue.patch")
 	endif()
+	set (ITK_LRINTF_PATCH_COMMAND "")
+	if (ITK_VERSION VERSION_LESS "5.2.0" AND MSVC_VERSION GREATER_EQUAL 1928)
+		if (ITK_PATCH_COMMAND STREQUAL "")
+			# apparently cmake won't execute second patch command if first one is empty
+			set (ITK_PATCH_COMMAND ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/itk-lrintf.patch")
+		else()
+			set (ITK_LRINTF_PATCH_COMMAND ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/itk-lrintf.patch")
+		endif()
+	endif()
 	set (ITK_DIR "${CMAKE_BINARY_DIR}/itk/bin-${ITK_VERSION}" CACHE PATH "ITK build folder." FORCE)
 	if (ITK_USE_GIT_REPO)
 		ExternalProject_Add (ITK
@@ -561,6 +570,7 @@ if (BUILD_ITK)
 			GIT_TAG           "v${ITK_VERSION}"
 			UPDATE_DISCONNECTED 1
 			PATCH_COMMAND     ${ITK_PATCH_COMMAND}
+			      COMMAND     ${ITK_LRINTF_PATCH_COMMAND}
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src.git"
 			BINARY_DIR        "${ITK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
@@ -573,6 +583,7 @@ if (BUILD_ITK)
 			URL               "${ITK_URL}"
 			URL_HASH          "SHA512=${ITK_ARCHIVE_SHA512}"
 			PATCH_COMMAND     ${ITK_PATCH_COMMAND}
+			      COMMAND     ${ITK_LRINTF_PATCH_COMMAND}
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src-${ITK_VERSION}"
 			BINARY_DIR        "${ITK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
