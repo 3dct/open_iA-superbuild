@@ -58,7 +58,9 @@ if (WIN32 AND NOT MSVC)
 	MESSAGE(WARNING "Building under windows with non-VS generator/compiler is currently not tested, expect errors! Please report any findings under https://github.com/3dct/open_iA-superbuild/issues!")
 endif()
 
-FIND_PACKAGE(Qt5 COMPONENTS Widgets Xml Network Test OpenGL PrintSupport REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets OpenGLWidgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Concurrent Gui OpenGL Svg Widgets Xml REQUIRED)
+set(QT_PATH ${Qt${QT_VERSION_MAJOR}_DIR})
 
 find_package(Git)
 if(NOT GIT_FOUND)
@@ -94,6 +96,37 @@ if (${vtk_version_index} EQUAL -1)
 	set (VTK_VERSION "${VTK_VERSION_DEFAULT}" CACHE STRING "Choose the VTK version to build." FORCE)
 	set_property(CACHE VTK_VERSION PROPERTY STRINGS ${VTK_VERSION_OPTIONS})
 endif()
+
+if (VTK_USE_GIT_REPO)
+	set (VTK_GIT_TAG_OPTIONS "")
+	foreach(version ${VTK_VERSION_OPTIONS})
+		list(APPEND VTK_GIT_TAG_OPTIONS "v${version}")
+	endforeach()
+	list(APPEND VTK_GIT_TAG_OPTIONS "master")
+	list(FIND VTK_GIT_TAG_OPTIONS "${VTK_GIT_TAG}" vtk_git_tag_index)
+	if (${vtk_git_tag_index} EQUAL -1)
+		set (VTK_GIT_TAG_DEFAULT "master")
+		if (DEFINED VTK_GIT_TAG)
+			MESSAGE(WARNING "Invalid VTK_GIT_TAG, resetting to default ${VTK_GIT_TAG_DEFAULT}!")
+		endif()
+		set (VTK_GIT_TAG "${VTK_GIT_TAG_DEFAULT}" CACHE STRING "Choose the VTK git tag to use in build." FORCE)
+		set_property(CACHE VTK_GIT_TAG PROPERTY STRINGS ${VTK_GIT_TAG_OPTIONS})
+	endif()
+	if (VTK_GIT_TAG STREQUAL "master")
+		# determine VTK_VERSION from source...
+		set (VTK_VERSION "9.99.99")
+		MESSAGE(WARNING "Note that when building from VTK git master branch, there is no reliable way "
+			"for me to determine the actual version number this branch currently refers to; therefore, "
+			"no compatibility checks are possible, these checks are therefore disabled, you "
+			"have to ensure compatibilities with versions of other libraries such as Qt or ITK "
+			"yourself; in case of any incompatibilities you might get build errors.")
+	endif()
+endif()
+
+if (${QT_VERSION_MAJOR} GREATER_EQUAL 6 AND VTK_VERSION VERSION_LESS "9.0.2")
+	MESSAGE(SEND_ERROR "VTK versions < 9.1.0 do not support Qt >= 6.x! Please either chose a newer VTK version, or an older Qt version!")
+endif()
+
 
 set (VTK_RENDER_BACKEND_OPTIONS "OpenGL" "OpenGL2")
 list (FIND VTK_RENDER_BACKEND_OPTIONS "${VTK_RENDER_BACKEND}" backend_index)
@@ -308,10 +341,16 @@ if (BUILD_VTK)
 	set (VTK_CMAKE_ARGS
 		"-DBUILD_SHARED_LIBS:BOOL=On"
 		"-DVTK_LEGACY_REMOVE:BOOL=On"
-		"-DQt5_DIR:PATH=${Qt5_DIR}"
+		"-DQt${QT_VERSION_MAJOR}_DIR:PATH=${QT_PATH}"
 		"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
 		"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
 	)
+	if (QT_VERSION_MAJOR GREATER_EQUAL 6)
+		LIST (APPEND VTK_CMAKE_ARGS
+			"-DQt6WidgetsTools_DIR=${Qt6_DIR}WidgetsTools"
+			"-DQt6CoreTools_DIR=${Qt6_DIR}CoreTools"
+			"-DQt6GuiTools_DIR=${Qt6_DIR}GuiTools")
+	endif()
 	if (NOT CMAKE_CONFIGURATION_TYPES)
 		LIST (APPEND VTK_CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 	endif()
@@ -334,7 +373,6 @@ if (BUILD_VTK)
 	endif()
 	set (VTK_DIR "${CMAKE_BINARY_DIR}/vtk/bin-${VTK_VERSION}" CACHE PATH
 		"VTK build folder." FORCE)
-
 	set (VTK_DEPENDS "")
 	set (VTK_VR_PATCH_COMMAND "")
 	if (ENABLE_VR)
@@ -389,14 +427,14 @@ if (BUILD_VTK)
 	set (VTK_PC_PATCH_COMMAND ${GIT_APPLY_CMD} "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch")
 	set (VTK_QT_PATCH_COMMAND "")
 
-	if (Qt5_VERSION VERSION_GREATER "5.14.99" AND VTK_VERSION VERSION_LESS "9.0.1") # when using >= Qt 5.15, VTK up to (and including) 9.0.0 requires a minor patch:
+	if (QT_VERSION_MAJOR EQUAL 5 AND Qt5_VERSION VERSION_GREATER "5.14.99" AND VTK_VERSION VERSION_LESS "9.0.1") # when using >= Qt 5.15, VTK up to (and including) 9.0.0 requires a minor patch:
 		set (VTK_QT_PATCH_COMMAND ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/vtk-${VTK_VERSION}-qt-5.15.patch")
 	else()
 	endif()
 	if (VTK_USE_GIT_REPO)
 		ExternalProject_Add (VTK
 			GIT_REPOSITORY    "${VTK_REPOSITORY}"
-			GIT_TAG           "v${VTK_VERSION}"
+			GIT_TAG           "${VTK_GIT_TAG}"
 			UPDATE_DISCONNECTED 1
 			PATCH_COMMAND     ${VTK_PC_PATCH_COMMAND}
 			      COMMAND     ${VTK_QT_PATCH_COMMAND}
@@ -533,7 +571,7 @@ if (BUILD_ITK)
 		"-DModule_HigherOrderAccurateGradient:BOOL=On"
 		"-DModule_SplitComponents:BOOL=On"
 		"-DVTK_DIR:PATH=${VTK_DIR}"
-		"-DQt5_DIR:PATH=${Qt5_DIR}"
+		"-DQt${QT_VERSION_MAJOR}_DIR:PATH=${QT_PATH}"
 		"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
 		"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
 	)
@@ -852,10 +890,17 @@ if (ENABLE_AI)
 endif()
 
 set (OPEN_IA_CMAKE_ARGS
+	"-DQT_DIR:PATH=${QT_PATH}"
 	"-DITK_DIR:PATH=${ITK_DIR}"
 	"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
 	"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
 )
+if (QT_VERSION_MAJOR GREATER_EQUAL 6)
+	LIST (APPEND OPEN_IA_CMAKE_ARGS
+		"-DQt6WidgetsTools_DIR=${Qt6_DIR}WidgetsTools"
+		"-DQt6CoreTools_DIR=${Qt6_DIR}CoreTools"
+		"-DQt6GuiTools_DIR=${Qt6_DIR}GuiTools")
+endif()
 if (NOT CMAKE_CONFIGURATION_TYPES)
 	LIST (APPEND OPEN_IA_CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 endif()
@@ -978,12 +1023,12 @@ ExternalProject_Add (open_iA
 
 if (MSVC)
 	string(REPLACE "/" "\\" OPEN_IA_BIN_DIR_WIN "${OPEN_IA_BIN_DIR}")
-	STRING(REPLACE "/lib/cmake/Qt5" "/bin" Qt5_LIB_DIR ${Qt5_DIR})
-	STRING(REPLACE "/" "\\" Qt5_LIB_DIR ${Qt5_LIB_DIR})
+	STRING(REPLACE "/lib/cmake/Qt${QT_VERSION_MAJOR}" "/bin" QT_LIB_DIR ${Qt${QT_VERSION_MAJOR}_DIR})
+	STRING(REPLACE "/" "\\" QT_LIB_DIR ${QT_LIB_DIR})
 	STRING(REPLACE "/" "\\" VTK_WIN_DIR ${VTK_DIR})
 	STRING(REPLACE "/" "\\" ITK_WIN_DIR ${ITK_DIR})
 	set (openia_cmd  "${OPEN_IA_BIN_DIR_WIN}\\x64\\$(Configuration)\\open_iA.exe")
-	set (openia_path "${Qt5_LIB_DIR};${VTK_WIN_DIR}\\bin\\$(Configuration);${ITK_WIN_DIR}\\bin\\$(Configuration)${ADDITIONAL_LIB_PATHS}")
+	set (openia_path "${QT_LIB_DIR};${VTK_WIN_DIR}\\bin\\$(Configuration);${ITK_WIN_DIR}\\bin\\$(Configuration)${ADDITIONAL_LIB_PATHS}")
 	set_target_properties(open_iA PROPERTIES VS_DEBUGGER_COMMAND "${openia_cmd}")
 	set_target_properties(open_iA PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=${openia_path}")
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT open_iA)
