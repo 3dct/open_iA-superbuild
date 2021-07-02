@@ -447,7 +447,9 @@ if (BUILD_VTK)
 				"-DVTK_MODULE_ENABLE_VTK_RenderingOpenVR=YES"
 				${OPENVR_LIB_AND_INCLUDE})
 			# In VTK 9, some code was changed in Rendering/OpenVR module that produces an error on clang 10, let's patch it:
-			set (VTK_VR_PATCH_COMMAND ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/vtk-9.0.0-openvr.patch")
+			IF (NOT VTK_USE_GIT_REPO OR NOT VTK_GIT_TAG STREQUAL "master")		# but it's fixed in git master
+				set (VTK_VR_PATCH_COMMAND ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/vtk-9.0.0-openvr.patch")
+			ENDIF()
 		endif()
 		if (MSVC)
 			STRING(REPLACE "/" "\\" OPENVR_WIN_DIR "${OPENVR_ROOT_DIR}")
