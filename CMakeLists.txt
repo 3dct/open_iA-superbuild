@@ -96,10 +96,10 @@ endif()
 
 ## VTK
 
-set (VTK_VERSION_OPTIONS "8.1.2" "8.2.0" "9.0.0" "9.0.1")
+set (VTK_VERSION_OPTIONS "8.1.2" "8.2.0" "9.0.0" "9.0.1" "9.0.2")
 list (FIND VTK_VERSION_OPTIONS "${VTK_VERSION}" vtk_version_index)
 if (${vtk_version_index} EQUAL -1)
-	set (VTK_VERSION_DEFAULT "9.0.1")
+	set (VTK_VERSION_DEFAULT "9.0.2")
 	if (DEFINED VTK_VERSION)
 		MESSAGE(WARNING "Invalid VTK_VERSION, resetting to default ${VTK_VERSION_DEFAULT}!")
 	endif()
@@ -135,8 +135,8 @@ if (VTK_USE_GIT_REPO)
 	# set (VTK_REPOSITORY "https://gitlab.kitware.com/vtk/vtk.git")
 endif()
 
-if (${QT_VERSION_MAJOR} GREATER_EQUAL 6 AND VTK_VERSION VERSION_LESS "9.0.2")
-	MESSAGE(SEND_ERROR "VTK versions < 9.1.0 do not support Qt >= 6.x! Please either chose a newer VTK version, or an older Qt version!")
+if (${QT_VERSION_MAJOR} GREATER_EQUAL 6 AND VTK_VERSION VERSION_LESS "10.0.0")
+	MESSAGE(SEND_ERROR "No released VTK version supports Qt >= 6.x yet! Please chose the VTK git master (VTK_USE_GIT_REPO ON, VTK_GIT_TAG \"master\"), or an older Qt version!")
 endif()
 
 
@@ -170,6 +170,12 @@ if (NOT VTK_USE_GIT_REPO)
 	elseif ("${VTK_VERSION}" STREQUAL "9.0.1")
 		unset (VTK_ZIP_SHA512) # no .zip available (yet?) for 9.x
 		set (VTK_GZIP_SHA512 "EB2508E2409AD302CC5DB65282A9C1FF4477AC8A93E0FEE898AD8F0974D72DECC7D5D444DC825A3C2F7952EBF59853616097EBE0D134649CAB0D49A9619065BF")
+		if ("${VTK_RENDER_BACKEND}" STREQUAL "OpenGL")
+			MESSAGE(SEND_ERROR "OpenGL backend not available in VTK 9.0.1. Please either choose OpenGL2 backend or VTK version 8.1.2!")
+		endif()
+	elseif ("${VTK_VERSION}" STREQUAL "9.0.2")
+		unset (VTK_ZIP_SHA512) # no .zip available (yet?) for 9.x
+		set (VTK_GZIP_SHA512 "65C6BCE3023B45F2D145023AE6BF224257A6D89CDF7BBD4ACDA3D6A25CB6B8C947F0E9A44129BD1882D6D8A8D46FD4CAEF0463BFB94AFC9F4EDCCA8566BC2393")
 		if ("${VTK_RENDER_BACKEND}" STREQUAL "OpenGL")
 			MESSAGE(SEND_ERROR "OpenGL backend not available in VTK 9.0.1. Please either choose OpenGL2 backend or VTK version 8.1.2!")
 		endif()
