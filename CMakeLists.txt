@@ -135,7 +135,8 @@ if (VTK_USE_GIT_REPO)
 	# set (VTK_REPOSITORY "https://gitlab.kitware.com/vtk/vtk.git")
 endif()
 
-if (${QT_VERSION_MAJOR} GREATER_EQUAL 6 AND VTK_VERSION VERSION_LESS "10.0.0")
+if (${QT_VERSION_MAJOR} GREATER_EQUAL 6 AND NOT VTK_USE_GIT_REPO)
+# VTK_VERSION VERSION_LESS "10.0.0")
 	MESSAGE(SEND_ERROR "No released VTK version supports Qt >= 6.x yet! Please chose the VTK git master (VTK_USE_GIT_REPO ON, VTK_GIT_TAG \"master\"), or an older Qt version!")
 endif()
 
