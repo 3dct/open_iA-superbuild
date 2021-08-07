@@ -394,6 +394,12 @@ if (BUILD_VTK)
 		"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
 		"-DVTK_SMP_IMPLEMENTATION_TYPE=${VTK_SMP_TYPE}"
 	)
+	set (VTK_GENERATOR_TOOLSET "")
+	if (APPLE)
+		# use "legacy" XCode buildsystem, since there seem to be problems with the "new build system" (https://discourse.vtk.org/t/problem-building-vtk/6197/5)
+		# solution from https://stackoverflow.com/questions/65473503
+		set (VTK_GENERATOR_TOOLSET "buildsystem=1")
+	endif()
 	if (QT_VERSION_MAJOR GREATER_EQUAL 6)
 		list(APPEND VTK_CMAKE_ARGS
 			"-DQt6WidgetsTools_DIR=${Qt6_DIR}WidgetsTools"
@@ -500,6 +506,7 @@ if (BUILD_VTK)
 			BINARY_DIR        "${VTK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
 			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
+			CMAKE_GENERATOR_TOOLSET "${VTK_GENERATOR_TOOLSET}"
 			CMAKE_ARGS        "${VTK_CMAKE_ARGS}"
 			INSTALL_COMMAND   ""
 			DEPENDS           ${VTK_DEPENDS})
@@ -515,6 +522,7 @@ if (BUILD_VTK)
 			BINARY_DIR        "${VTK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
 			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
+			CMAKE_GENERATOR_TOOLSET "${VTK_GENERATOR_TOOLSET}"
 			CMAKE_ARGS        "${VTK_CMAKE_ARGS}"
 			INSTALL_COMMAND   ""
 			DEPENDS           ${VTK_DEPENDS})
@@ -580,6 +588,10 @@ if (ENABLE_OPENCL)
 		if (WIN32)
 			LIST(APPEND OPENCL_ICD_CMAKE_ARGS "-DOPENCL_ICD_LOADER_REQUIRE_WDK:BOOL=OFF")
 		endif()
+		set (OPENCL_PATCH_APPLE_PROBLEMS "")
+		if (APPLE)
+			set (OPENCL_PATCH_APPLE_PROBLEMS ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/OpenCL-Apple.patch")
+		endif()
 		ExternalProject_Add (OpenCL_ICD
 			GIT_REPOSITORY    ${OPENCL_ICD_REPO}
 			GIT_TAG           "${OPENCL_TAG}"
@@ -587,6 +599,7 @@ if (ENABLE_OPENCL)
 			UPDATE_DISCONNECTED 1
 			PATCH_COMMAND     ${CMD_COPY_OPENCL_C_HEADERS}
 			      COMMAND     ${CMD_COPY_OPENCL_CPP_HEADERS}
+			      COMMAND     ${OPENCL_PATCH_APPLE_PROBLEMS}
 			SOURCE_DIR        "${OPENCL_DIR}/icdloader"
 			BINARY_DIR        "${OPENCL_DIR}/icd-bin"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
@@ -600,6 +613,9 @@ if (ENABLE_OPENCL)
 		set(OPENCL_INCLUDE_DIRS "${OPENCL_DIR}/include")
 		if (WIN32)
 			set(OPENCL_LIB_SUFFIX ".lib") # only Windows has the peculiarity of requiring to link against the stub .lib file
+		elseif (APPLE AND CMAKE_CONFIGURATION_TYPES) # when using XCode multi-config generator on Mac OS
+			set (OPENCL_LIBRARIES "${OPENCL_DIR}/lib/$(CONFIGURATION)/${CMAKE_SHARED_LIBRARY_PREFIX}OpenCL${CMAKE_SHARED_LIBRARY_SUFFIX}")
+			message(STATUS "${OPENCL_LIBRARIES}")
 		else()
 			set(OPENCL_LIB_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
 		endif()
