@@ -136,7 +136,7 @@ if (VTK_USE_GIT_REPO)
 endif()
 
 if (${QT_VERSION_MAJOR} GREATER_EQUAL 6 AND NOT VTK_USE_GIT_REPO)
-# VTK_VERSION VERSION_LESS "10.0.0")
+# VTK_VERSION VERSION_LESS "9.1.0")
 	MESSAGE(SEND_ERROR "No released VTK version supports Qt >= 6.x yet! Please chose the VTK git master (VTK_USE_GIT_REPO ON, VTK_GIT_TAG \"master\"), or an older Qt version!")
 endif()
 
@@ -233,7 +233,7 @@ endif()
 
 
 # TODO:
-#   - Download/install Qt?
+#   - Also fetch Qt: Build from source? Download & install probably not an option (only GUI installer available)
 #   - check behavior when there are changes in git (and tag not the one referenced in ExternalProject_Add) / offline
 
 ## OpenVR SDK
@@ -270,10 +270,10 @@ if (ENABLE_ASTRA)
 	set (ASTRA_REPOSITORY "https://github.com/astra-toolbox/astra-toolbox.git")
 	set (ASTRA_TAG        "06322245a638e435d29bc8f027aed0bd976139d0") # version "1.9.9dev"
 
-	set (BOOST_VERSION_OPTIONS "1.72.0" "1.73.0" "1.75.0" "1.76.0")
+	set (BOOST_VERSION_OPTIONS "1.72.0" "1.73.0" "1.75.0" "1.76.0" "1.77.0")
 	list (FIND BOOST_VERSION_OPTIONS "${BOOST_VERSION}" boost_version_index)
 	if (${boost_version_index} EQUAL -1)
-		set (BOOST_VERSION_DEFAULT  "1.76.0")
+		set (BOOST_VERSION_DEFAULT  "1.77.0")
 		if (DEFINED BOOST_VERSION)
 			MESSAGE(WARNING "Invalid BOOST_VERSION, resetting to default ${BOOST_VERSION_DEFAULT}!")
 		endif()
@@ -292,6 +292,9 @@ if (ENABLE_ASTRA)
 	elseif ("${BOOST_VERSION}" STREQUAL "1.76.0")
 		set (BOOST_SHORTVER "1_76")
 		set (BOOST_ARCHIVE_SHA512 "FFDD828F4837F0C7D4E3E9932C6C2E75EB3142ECF0DA924879DCDB89CE606D920B1AF1A5D2C93B3885AD95D7FC98B777305D8DAE78FD8F511251BC591B052CF8")
+	elseif ("${BOOST_VERSION}" STREQUAL "1.77.0")
+		set (BOOST_SHORTVER "1_77")
+		set (BOOST_ARCHIVE_SHA512 "34CAA0F45BBB20CD162E7B9B6BDC39382B8E9FA036F2B872CC45C3EBFE03CB056097507A5DCA4A0D7B7DA4CB0FAB30484FFAE4E8108DE48C7F2ECC846938AFBB")
 	endif()
 	if (MSVC)
 		if (MSVC_VERSION LESS 1900)
