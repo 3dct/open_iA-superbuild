@@ -1,0 +1,15 @@
+--- a/Modules/Numerics/Statistics/include/itkImageToNeighborhoodSampleAdaptor.h
++++ b/Modules/Numerics/Statistics/include/itkImageToNeighborhoodSampleAdaptor.h
+@@ -191,10 +191,12 @@
+       return *this;
+       }
+ 
++#if  __cplusplus <= 201703L
+     bool operator!=(const ConstIterator &it)
+       {
+       return (m_MeasurementVectorCache[0] != it.m_MeasurementVectorCache[0]);
+       }
++#endif
+ 
+     bool operator==(const ConstIterator &it)
+       {
