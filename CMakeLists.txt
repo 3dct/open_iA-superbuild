@@ -235,7 +235,6 @@ endif()
 # TODO:
 #   - Download/install Qt?
 #   - check behavior when there are changes in git (and tag not the one referenced in ExternalProject_Add) / offline
-#   - hdf5
 
 ## OpenVR SDK
 
@@ -337,6 +336,7 @@ if (ENABLE_EIGEN)
 	set (EIGEN_URL "https://gitlab.com/libeigen/eigen/-/archive/${EIGEN_VERSION}/eigen-${EIGEN_VERSION}.zip")
 endif()
 
+# TODO: configurable HDF5 version (as for other libraries)
 set (HDF5_VERSION "1.12.0")
 STRING (SUBSTRING "${HDF5_VERSION}" 0 4 HDF5_SHORT_VERSION)
 set (HDF5_URL "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-${HDF5_SHORT_VERSION}/hdf5-${HDF5_VERSION}/src/CMake-hdf5-${HDF5_VERSION}")
@@ -850,23 +850,12 @@ if (ENABLE_AI)
 				MESSAGE(SEND_ERROR "CUDA, required for ONNX, not found! Specify CUDA_TOOLKIT_ROOT_DIR, or uncheck ENABLE_AI (or AI_ONNX_USE_CUDA, if you want to use DirectML, see note there)!")
 			endif()
 			if ("${ONNX_VERSION}" STREQUAL "1.4.0")
-				set (ONNX_REQUIRED_CUDA_VERSION "10.1")
-				set (ONNX_REQUIRED_CUDNN_VERSION "???")
 				set (ONNX_HASH "BF892FCEF02AE2F060C93BF20F6DBE868B5282C907403A4820F5D037AB2AF9973BA406F6F25D1E35BE125BC02ABDDFDCEEF2C58B5ö48469E632B962B4AAB88EF2")
 			elseif ("${ONNX_VERSION}" STREQUAL "1.6.0")
-				set (ONNX_REQUIRED_CUDA_VERSION "10.2")
-				set (ONNX_REQUIRED_CUDNN_VERSION "8.0")
 				set (ONNX_HASH "ADED9F8529DEDC4380D70D7755452DD99AFC18ACB1B8E6AAE4DE88E105C874287CC9406FA1A158D12E487504D574DB7B851B105A1CD47C02ACAC784496C499DA")
 			elseif ("${ONNX_VERSION}" STREQUAL "1.8.1")
-				set (ONNX_REQUIRED_CUDA_VERSION "10.2")		# though supposedly it _also_ supports CUDA 11.1 (see https://github.com/microsoft/onnxruntime/releases/tag/v1.8.1)
-				set (ONNX_REQUIRED_CUDNN_VERSION "8.0")
 				set (ONNX_HASH "1657EB1111BB7FF936BE009B6BD5D104CEFAAD77E74CB166216C0DD4FB85548C9895B08028405C498D73C97E28EC2B4DF134B73919AA3E56235ABE5528215020")
 			endif()
-
-			if (NOT "${CUDA_VERSION}" STREQUAL "${ONNX_REQUIRED_CUDA_VERSION}")
-				MESSAGE(WARNING "Wrong CUDA version - ONNX CUDA backend requires CUDA version ${ONNX_REQUIRED_CUDA_VERSION}")
-			endif()
-			MESSAGE(WARNING "onnx CUDA runtime v${ONNX_VERSION} requires cuDNN version ${ONNX_REQUIRED_CUDNN_VERSION} (I cannot check for cuDNN at the moment; so you need to make sure yourself you have installed it)!")
 
 			set (ONNX_ARCHIVE "https://github.com/microsoft/onnxruntime/releases/download/v${ONNX_VERSION}/onnxruntime-win-x64-gpu-${ONNX_VERSION}.zip")
 			set (ONNX_LIB_DIR "${ONNX_SRC_DIR}/lib")
@@ -889,6 +878,7 @@ if (ENABLE_AI)
 		endif()
 	elseif (UNIX)
 		# only CUDA option avalailable for linux
+		set(AI_ONNX_USE_CUDA ON)
 		set (ONNX_ARCHIVE "https://github.com/microsoft/onnxruntime/releases/download/v${ONNX_VERSION}/onnxruntime-linux-x64-gpu-${ONNX_VERSION}.tgz")
 		if ("${ONNX_VERSION}" STREQUAL "1.4.0")
 			set (ONNX_HASH "e9803f467e2d9dc9cd2c708b2ef58ba0844f039ee54544fc5a127ae9812fae1426dbcc47b0531ca41a75d02f4cda462055e2c9d27086b7af14da3a3643d3c43c")
@@ -906,6 +896,24 @@ if (ENABLE_AI)
 	else()
 		MESSAGE(SEND_ERROR "Unknown operating system, no supported ONNX runtime available. Please disable ENABLE_AI option!")
 	endif()
+
+	if (AI_ONNX_USE_CUDA)
+		if ("${ONNX_VERSION}" STREQUAL "1.4.0")
+			set (ONNX_REQUIRED_CUDA_VERSION "10.1")
+			set (ONNX_REQUIRED_CUDNN_VERSION "???")
+		elseif ("${ONNX_VERSION}" STREQUAL "1.6.0")
+			set (ONNX_REQUIRED_CUDA_VERSION "10.2")
+			set (ONNX_REQUIRED_CUDNN_VERSION "8.0")
+		elseif ("${ONNX_VERSION}" STREQUAL "1.8.1")
+			set (ONNX_REQUIRED_CUDA_VERSION "10.2")		# though supposedly it _also_ supports CUDA 11.1 (see https://github.com/microsoft/onnxruntime/releases/tag/v1.8.1)
+			set (ONNX_REQUIRED_CUDNN_VERSION "8.0")
+		endif()
+		if (NOT "${CUDA_VERSION}" STREQUAL "${ONNX_REQUIRED_CUDA_VERSION}")
+			MESSAGE(WARNING "Wrong CUDA version - ONNX CUDA backend requires CUDA version ${ONNX_REQUIRED_CUDA_VERSION}")
+		endif()
+		MESSAGE(WARNING "onnx CUDA runtime v${ONNX_VERSION} requires cuDNN version ${ONNX_REQUIRED_CUDNN_VERSION} (I cannot check for cuDNN at the moment; so you need to make sure yourself you have installed it)!")
+	endif()
+
 	# Patch onnx runtime api to have unscoped "OrtInvalid" instead of "Invalid" enum entry
 	# (which might clash with an enum value in open_iA, in older versions)
 	if ("${ONNX_VERSION}" STREQUAL "1.4.0")
