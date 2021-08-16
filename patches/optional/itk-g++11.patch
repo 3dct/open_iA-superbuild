@@ -1,0 +1,11 @@
+--- a/Modules/ThirdParty/GDCM/src/gdcm/Source/MediaStorageAndFileFormat/gdcmImageChangePhotometricInterpretation.h
++++ b/Modules/ThirdParty/GDCM/src/gdcm/Source/MediaStorageAndFileFormat/gdcmImageChangePhotometricInterpretation.h
+@@ -17,6 +17,8 @@
+ #include "gdcmImageToImageFilter.h"
+ #include "gdcmPhotometricInterpretation.h"
+ 
++#include <limits>
++
+ namespace gdcm
+ {
+ 
