@@ -1,0 +1,11 @@
+--- a/include/cuda_provider_factory.h
++++ b/include/cuda_provider_factory.h
+@@ -4,7 +4,7 @@
+ #include "onnxruntime_c_api.h"
+ 
+ #ifdef __cplusplus
+-#include "core/framework/provider_options.h"
++#include "provider_options.h"
+ 
+ namespace onnxruntime {
+ class IAllocator;

@@ -928,6 +928,7 @@ if (ENABLE_AI)
 		message(WARNING "onnx CUDA runtime v${ONNX_VERSION} requires cuDNN version ${ONNX_REQUIRED_CUDNN_VERSION} (I cannot check for cuDNN at the moment; so you need to make sure yourself you have installed it)!")
 	endif()
 
+	set(ONNX_PATCH_COMMAND2 "")
 	# Patch onnx runtime api to have unscoped "OrtInvalid" instead of "Invalid" enum entry
 	# (which might clash with an enum value in open_iA, in older versions)
 	if ("${ONNX_VERSION}" STREQUAL "1.4.0")
@@ -936,6 +937,8 @@ if (ENABLE_AI)
 		set(ONNX_ENUM_PATCH_LINE 235)
 	elseif ("${ONNX_VERSION}" STREQUAL "1.8.1")
 		set(ONNX_ENUM_PATCH_LINE 241)
+		# fix include folder bug in 1.8.1:
+		set(ONNX_PATCH_COMMAND2 ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/onnx-1.8.1-include.patch")
 	endif()
 	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/patches/onnx-runtime_c_api.h.patch.template" "${CMAKE_BINARY_DIR}/onnx-runtime_c_api.h.patch")
 	set(ONNX_PATCH_COMMAND ${GIT_APPLY_CMD} "${CMAKE_BINARY_DIR}/onnx-runtime_c_api.h.patch")
@@ -945,6 +948,7 @@ if (ENABLE_AI)
 		URL_HASH          "SHA512=${ONNX_HASH}"
 		SOURCE_DIR        "${ONNX_SRC_DIR}"
 		PATCH_COMMAND     ${ONNX_PATCH_COMMAND}
+		      COMMAND     ${ONNX_PATCH_COMMAND2}
 		BUILD_IN_SOURCE   1
 		CONFIGURE_COMMAND ""
 		BUILD_COMMAND     ""
