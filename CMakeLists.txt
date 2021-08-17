@@ -621,16 +621,31 @@ if (BUILD_ITK)
 			${OPENVR_LIB_AND_INCLUDE})
 	endif()
 	set(ITK_PATCH_COMMAND "")
+	set(ITK_PATCH_COMMAND2 "")
+	set(ITK_PATCH_COMMAND3 "")
 	if (ITK_VERSION VERSION_LESS "5.1.0")
 		set(ITK_PATCH_COMMAND ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/itk-vtkGlue.patch")
 	endif()
-	set(ITK_LRINTF_PATCH_COMMAND "")
 	if (ITK_VERSION VERSION_LESS "5.2.0" AND MSVC_VERSION GREATER_EQUAL 1928)
+		set (ITK_LRINTF_PATCH ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/itk-lrintf.patch")
 		if (ITK_PATCH_COMMAND STREQUAL "")
 			# apparently cmake won't execute second patch command if first one is empty
-			set(ITK_PATCH_COMMAND ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/itk-lrintf.patch")
+			set(ITK_PATCH_COMMAND ${ITK_LRINTF_PATCH})
 		else()
-			set(ITK_LRINTF_PATCH_COMMAND ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/itk-lrintf.patch")
+			set(ITK_PATCH_COMMAND2 ${ITK_LRINTF_PATCH})
+		endif()
+	endif()
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "11.0.0")
+		if (NOT ITK_VERSION VERSION_EQUAL "5.2.0")
+			message(WARNING "Using g++ version >= 11 requires a patch for ITK; only ITK version 5.2.0 is currently tested with that patch. Other versions might fail, if so, please choose ITK version 5.2.0 to be built!")
+		endif()
+		set (ITK_G++11_PATCH ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/itk-g++11.patch")
+		if (ITK_PATCH_COMMAND STREQUAL "")
+			set(ITK_PATCH_COMMAND ${ITK_G++11_PATCH})
+		elseif (ITK_PATCH_COMMAND2 STREQUAL "")
+			set(ITK_PATCH_COMMAND2 ${ITK_G++11_PATCH})
+		else()
+			set(ITK_PATCH_COMMAND3 ${ITK_G++11_PATCH})
 		endif()
 	endif()
 	if (ITK_USE_GIT_REPO)
@@ -640,7 +655,8 @@ if (BUILD_ITK)
 			GIT_TAG           "${ITK_GIT_TAG}"
 			UPDATE_DISCONNECTED 1
 			PATCH_COMMAND     ${ITK_PATCH_COMMAND}
-			      COMMAND     ${ITK_LRINTF_PATCH_COMMAND}
+			      COMMAND     ${ITK_PATCH_COMMAND2}
+			      COMMAND     ${ITK_PATCH_COMMAND3}
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src.git"
 			BINARY_DIR        "${ITK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
@@ -654,7 +670,8 @@ if (BUILD_ITK)
 			URL               "${ITK_URL}"
 			URL_HASH          "SHA512=${ITK_ARCHIVE_SHA512}"
 			PATCH_COMMAND     ${ITK_PATCH_COMMAND}
-			      COMMAND     ${ITK_LRINTF_PATCH_COMMAND}
+			      COMMAND     ${ITK_PATCH_COMMAND2}
+			      COMMAND     ${ITK_PATCH_COMMAND3}
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src-${ITK_VERSION}"
 			BINARY_DIR        "${ITK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
