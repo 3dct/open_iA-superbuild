@@ -765,7 +765,7 @@ if (ENABLE_ASTRA)
 			set(ASTRA_PATCH_COMMAND "")
 			set(ASTRA_BUILD_DIR "${ASTRA_DIR}/build/linux")
 			set(ASTRA_CONFIGURE_COMMAND1 "${CMAKE_COMMAND}" -E chdir "${ASTRA_BUILD_DIR}" "${ASTRA_BUILD_DIR}/autogen.sh")
-			set(ASTRA_CONFIGURE_COMMAND2 "${CMAKE_COMMAND}" -E chdir "${ASTRA_BUILD_DIR}" "${ASTRA_BUILD_DIR}/configure")
+			set(ASTRA_CONFIGURE_COMMAND2 "${CMAKE_COMMAND}" -E chdir "${ASTRA_BUILD_DIR}" "${ASTRA_BUILD_DIR}/configure" "--with-cuda=${CUDA_TOOLKIT_ROOT_DIR}")
 			set(ASTRA_BUILD_COMMAND "${CMAKE_COMMAND}" -E chdir "${ASTRA_BUILD_DIR}" "make" -j 8)
 		endif()
 
