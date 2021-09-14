@@ -17,7 +17,7 @@ option(ENABLE_FILTERS "Whether to build image processing filters (smoothing, seg
 option(ENABLE_TOOLS "Whether to build common tool modules, e.g. FeatureScout, 4DCT, GEMSe, Dynamic Volume Lines, FIAKER, ... (default: enabled)" ON)
 option(ENABLE_TEST "Whether to enable build of tests runners and the capability to submit CDash test runs (default: disabled)" OFF)
 option(ENABLE_ASTRA "Whether to build ASTRA reconstruction library and open_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time! (default: disabled)" OFF)
-option(ENABLE_VR "Enable VR module; requires OpenVR SDK, which will be fetched automatically (default: disabled)" OFF)
+option(ENABLE_VR "Enable VR module; requires OpenVR SDK, which will be fetched automatically; also boost (includes) are required (default: disabled)" OFF)
 option(ENABLE_AI "Enable AI module; requires onnx runtime, which will be fetched automatically; on Windows, you can change whether CUDA or DirectML backend is chosen with the option AI_ONNX_USE_CUDA (default: disabled)" OFF)
 option(ENABLE_EIGEN "Whether to fetch and use eigen (default: disabled)" OFF)
 option(ENABLE_HDF5 "Whether to fetch and build HDF5 library and use it in open_iA (default: disabled)" OFF)
@@ -42,7 +42,11 @@ if (ENABLE_ALL)
 	set(ENABLE_HDF5 "ON" CACHE BOOL "" FORCE)
 endif()
 
-if (ENABLE_ASTRA)
+set(BUILD_BOOST_OPTION OFF)
+if (ENABLE_ASTRA OR ENABLE_VR)
+	set(BUILD_BOOST_OPTION ON)
+endif()
+if (BUILD_BOOST_OPTION)
 	if (WIN32)
 		set(BUILD_BOOST_DEFAULT_VAL ON)
 	else()
@@ -52,7 +56,6 @@ if (ENABLE_ASTRA)
 endif()
 
 message(STATUS "Compilers: C++: ${CMAKE_CXX_COMPILER}, C: ${CMAKE_C_COMPILER}")
-
 
 if (WIN32 AND NOT MSVC)
 	message(WARNING "Building under windows with non-VS generator/compiler is currently not tested, expect errors! Please report any findings under https://github.com/3dct/open_iA-superbuild/issues!")
@@ -272,7 +275,9 @@ endif()
 if (ENABLE_ASTRA)
 	set(ASTRA_REPOSITORY "https://github.com/astra-toolbox/astra-toolbox.git")
 	set(ASTRA_TAG        "06322245a638e435d29bc8f027aed0bd976139d0") # version "1.9.9dev"
+endif()
 
+if (BUILD_BOOST)
 	set(BOOST_VERSION_OPTIONS "1.72.0" "1.73.0" "1.75.0" "1.76.0" "1.77.0")
 	list(FIND BOOST_VERSION_OPTIONS "${BOOST_VERSION}" boost_version_index)
 	if (${boost_version_index} EQUAL -1)
@@ -314,8 +319,12 @@ if (ENABLE_ASTRA)
 			set(MSVC_TOOLSET "v142")
 			set(BOOST_MSVC_TOOLSET "msvc-14.2")
 			set(BOOST_LIB_SUFFIX "vc142")
+		elseif (MSVC_VERSION LESS 1940)
+			set(MSVC_TOOLSET "v143")
+			set(BOOST_MSVC_TOOLSET "msvc-14.3")
+			set(BOOST_LIB_SUFFIX "vc143")
 		else()
-			message(SEND_ERROR "Visual Studio > 2019 (more precisely, MSVC_VERSION >= 1930) is not supported (yet), please use an older version!")
+			message(SEND_ERROR "Visual Studio > 2022 (more precisely, MSVC_VERSION >= 1940) is not supported (yet), please use an older version!")
 		endif()
 	endif()
 endif()
@@ -701,6 +710,40 @@ if (CUDA_FIND_ENABLED)
 		message(SEND_ERROR "CUDA, required for ASTRA / AI, not found! Specify CUDA_TOOLKIT_ROOT_DIR, or uncheck ENABLE_ASTRA!")
 	endif()
 endif()
+
+if (BUILD_BOOST)
+	# fetch and build boost...
+	# inspired by https://github.com/apache/geode-native/blob/develop/dependencies/boost/CMakeLists.txt
+	string(REPLACE "." "_" BOOST_VERSION_UNDERSCORE ${BOOST_VERSION})
+	set(BOOST_URL "https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_UNDERSCORE}.zip")
+	set(BOOST_BOOTSTRAP_OPTS "")
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+		set(BOOST_BOOTSTRAP_OPTS "--with-toolset=clang")
+	endif()
+	set(B2_FLAGS "-j8 address-model=64 architecture=x86 link=static threading=multi runtime-link=shared --build-type minimal stage")
+	if (WIN32)
+		set( BOOST_BOOTSTRAP_COMMAND ${CMAKE_BINARY_DIR}\\boost\\bootstrap.bat )
+		set( B2_COMMAND ${CMAKE_BINARY_DIR}\\boost\\b2 )
+		set( B2_FLAGS ${B2_FLAGS} toolset=${BOOST_MSVC_TOOLSET} )
+	else()
+		set( BOOST_BOOTSTRAP_COMMAND ${CMAKE_BINARY_DIR}/boost/bootstrap.sh )
+		set( B2_COMMAND ${CMAKE_BINARY_DIR}/boost/b2 )
+		set( B2_FLAGS ${B2_FLAGS} )
+	endif()
+	set(BOOST_DIR "${CMAKE_BINARY_DIR}/boost")
+	ExternalProject_Add (boost
+		URL               ${BOOST_URL}
+		URL_HASH          SHA512=${BOOST_ARCHIVE_SHA512}
+		BUILD_IN_SOURCE   1
+		SOURCE_DIR        "${BOOST_DIR}"
+		CONFIGURE_COMMAND ${BOOST_BOOTSTRAP_COMMAND} ${BOOST_BOOTSTRAP_OPTS}
+		BUILD_COMMAND     ${B2_COMMAND} ${B2_FLAGS}
+		INSTALL_COMMAND   ""  # ${B2_COMMAND} ${B2_FLAGS} install
+	)
+	# set boost include dir
+	set (BOOST_INCLUDE_DIR ${BOOST_DIR})
+endif()
+
 if (ENABLE_ASTRA)
 	option(BUILD_ASTRA "Build Astra Toolbox in the superbuild. If disabled, you need to set ASTRA_DIR to an existing Astra Toolkit build" ON)
 	if (BUILD_ASTRA)
@@ -716,34 +759,6 @@ if (ENABLE_ASTRA)
 		set(CMD_COPY_BOOST_LIBS "")
 
 		if (BUILD_BOOST)
-			# fetch and build boost...
-			# inspired by https://github.com/apache/geode-native/blob/develop/dependencies/boost/CMakeLists.txt
-			string(REPLACE "." "_" BOOST_VERSION_UNDERSCORE ${BOOST_VERSION})
-			set(BOOST_URL "https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_UNDERSCORE}.zip")
-			set(BOOST_BOOTSTRAP_OPTS "")
-			if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-				set(BOOST_BOOTSTRAP_OPTS "--with-toolset=clang")
-			endif()
-			set(B2_FLAGS "-j8 address-model=64 architecture=x86 link=static threading=multi runtime-link=shared --build-type minimal stage")
-			if (WIN32)
-				set( BOOST_BOOTSTRAP_COMMAND ${CMAKE_BINARY_DIR}\\boost\\bootstrap.bat )
-				set( B2_COMMAND ${CMAKE_BINARY_DIR}\\boost\\b2 )
-				set( B2_FLAGS ${B2_FLAGS} toolset=${BOOST_MSVC_TOOLSET} )
-			else()
-				set( BOOST_BOOTSTRAP_COMMAND ${CMAKE_BINARY_DIR}/boost/bootstrap.sh )
-				set( B2_COMMAND ${CMAKE_BINARY_DIR}/boost/b2 )
-				set( B2_FLAGS ${B2_FLAGS} )
-			endif()
-			set(BOOST_DIR "${CMAKE_BINARY_DIR}/boost")
-			ExternalProject_Add (boost
-				URL               ${BOOST_URL}
-				URL_HASH          SHA512=${BOOST_ARCHIVE_SHA512}
-				BUILD_IN_SOURCE   1
-				SOURCE_DIR        "${BOOST_DIR}"
-				CONFIGURE_COMMAND ${BOOST_BOOTSTRAP_COMMAND} ${BOOST_BOOTSTRAP_OPTS}
-				BUILD_COMMAND     ${B2_COMMAND} ${B2_FLAGS}
-				INSTALL_COMMAND   ""  # ${B2_COMMAND} ${B2_FLAGS} install
-			)
 			# prepare the commands required to copy over boost stuff into astra build tree:
 			set(CMD_COPY_BOOST_HEADERS ${CMAKE_COMMAND} -E copy_directory "${BOOST_DIR}/boost" "${ASTRA_DIR}/lib/include/boost")
 			set(CMD_CREATE_LIBX64_DIR ${CMAKE_COMMAND} -E make_directory "${ASTRA_DIR}/lib/x64")
@@ -830,8 +845,10 @@ if (ENABLE_HDF5)
 			set(HDF5_GENERATOR "VS201764")
 		elseif (MSVC_VERSION LESS 1930)
 			set(HDF5_GENERATOR "VS201964")
+		#elseif (MSVC_VERSION LESS 1940)
+		#	set(HDF5_GENERATOR "VS202264")
 		else()
-			message(SEND_ERROR "Visual Studio > 2019 (more precisely, MSVC_VERSION >= 1930) is not supported (yet), please use an older version!")
+			message(SEND_ERROR "Visual Studio >= 2022 (more precisely, MSVC_VERSION >= 1930) is not supported (yet) in HDF5 build, please use an older MSVC version if you require HDF5!")
 		endif()
 		set(HDF5_BUILD_COMMAND "${CMAKE_CTEST_COMMAND}" -S HDF5config.cmake,BUILD_GENERATOR=${HDF5_GENERATOR} -C Release -V -O hdf5.log)
 		set(HDF5_PLATFORM_SUFFIX "win64.zip")
@@ -1056,6 +1073,12 @@ if (ENABLE_VR)
 	else()
 		list(APPEND OPEN_IA_CMAKE_ARGS
 			${OPENVR_LIB_AND_INCLUDE})
+	endif()
+	if (BUILD_BOOST)
+		list(APPEND openiA_DEPENDS boost)
+	endif()
+	if (NOT ENABLE_ASTRA)	# if astra module is enabled, it will care for setting up boost include directory; otherwise, we need to set it manually:
+		list(APPEND OPEN_IA_CMAKE_ARGS "-DBOOST_INCLUDE_DIR:PATH=${BOOST_INCLUDE_DIR}")
 	endif()
 endif()
 if (ENABLE_AI)
