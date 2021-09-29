@@ -632,33 +632,25 @@ if (BUILD_ITK)
 		list(APPEND ITK_CMAKE_ARGS
 			${OPENVR_LIB_AND_INCLUDE})
 	endif()
-	set(ITK_PATCH_COMMAND "")
-	set(ITK_PATCH_COMMAND2 "")
-	set(ITK_PATCH_COMMAND3 "")
+	set(ITK_PATCH_COMMAND ${GIT_APPLY_CMD})
 	if (ITK_VERSION VERSION_LESS "5.1.0")
-		set(ITK_PATCH_COMMAND ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/itk-vtkGlue.patch")
+		set(ITK_VTKGLUE_PATCH "${CMAKE_SOURCE_DIR}/patches/itk-vtkGlue.patch")
+		LIST(APPEND ITK_PATCH_COMMAND ${ITK_VTKGLUE_PATCH})
 	endif()
 	if (ITK_VERSION VERSION_LESS "5.2.0" AND MSVC_VERSION GREATER_EQUAL 1928)
-		set (ITK_LRINTF_PATCH ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/itk-lrintf.patch")
-		if (ITK_PATCH_COMMAND STREQUAL "")
-			# apparently cmake won't execute second patch command if first one is empty
-			set(ITK_PATCH_COMMAND ${ITK_LRINTF_PATCH})
-		else()
-			set(ITK_PATCH_COMMAND2 ${ITK_LRINTF_PATCH})
-		endif()
+		set (ITK_LRINTF_PATCH "${CMAKE_SOURCE_DIR}/patches/itk-lrintf.patch")
+		LIST(APPEND ITK_PATCH_COMMAND ${ITK_LRINTF_PATCH})
 	endif()
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "11.0.0" AND ITK_VERSION VERSION_LESS "5.2.1")
 		if (NOT ITK_VERSION VERSION_EQUAL "5.2.0")
 			message(WARNING "You are using g++ version >= 11 with ITK < 5.2.0. Using g++ version >= 11 requires a patch for ITK 5.2.0, and most likely also for versions below, but the patch included in this superbuild is only tested with ITK version 5.2.0. For other ITK versions the patch might fail! If it fails, your options are to choose a newer ITK version (>= 5.2.0), use a different/older compiler, or fix any compilation errors that you get yourself!")
 		endif()
-		set (ITK_G++11_PATCH ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/itk-g++11.patch")
-		if (ITK_PATCH_COMMAND STREQUAL "")
-			set(ITK_PATCH_COMMAND ${ITK_G++11_PATCH})
-		elseif (ITK_PATCH_COMMAND2 STREQUAL "")
-			set(ITK_PATCH_COMMAND2 ${ITK_G++11_PATCH})
-		else()
-			set(ITK_PATCH_COMMAND3 ${ITK_G++11_PATCH})
-		endif()
+		set (ITK_GCC11_PATCH ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/itk-g++11.patch")
+		LIST(APPEND ITK_PATCH_COMMAND ${ITK_GCC11_PATCH})
+	endif()
+	if (ITK_VERSION VERSION_GREATER_EQUAL "5.2.0")
+		set (ITK_GREATER2GB_PATCH ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/itk-5.2-metaIO-decompressgreater2GBfix.patch")
+		LIST(APPEND ITK_PATCH_COMMAND ${ITK_GREATER2GB_PATCH})
 	endif()
 	if (ITK_USE_GIT_REPO)
 		set(ITK_DIR "${CMAKE_BINARY_DIR}/itk/bin-${ITK_GIT_TAG}" CACHE PATH "ITK build folder." FORCE)
@@ -667,8 +659,6 @@ if (BUILD_ITK)
 			GIT_TAG           "${ITK_GIT_TAG}"
 			UPDATE_DISCONNECTED 1
 			PATCH_COMMAND     ${ITK_PATCH_COMMAND}
-			      COMMAND     ${ITK_PATCH_COMMAND2}
-			      COMMAND     ${ITK_PATCH_COMMAND3}
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src.git"
 			BINARY_DIR        "${ITK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
@@ -682,8 +672,6 @@ if (BUILD_ITK)
 			URL               "${ITK_URL}"
 			URL_HASH          "SHA512=${ITK_ARCHIVE_SHA512}"
 			PATCH_COMMAND     ${ITK_PATCH_COMMAND}
-			      COMMAND     ${ITK_PATCH_COMMAND2}
-			      COMMAND     ${ITK_PATCH_COMMAND3}
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src-${ITK_VERSION}"
 			BINARY_DIR        "${ITK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"

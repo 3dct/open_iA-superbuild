@@ -1,0 +1,11 @@
+--- Modules/ThirdParty/MetaIO/src/MetaIO/src/metaObject.cxx.old	2021-05-28 15:17:11.000000000 +0200
++++ Modules/ThirdParty/MetaIO/src/MetaIO/src/metaObject.cxx	2021-09-29 09:01:53.193729400 +0200
+@@ -1487,7 +1487,7 @@
+   mF = MET_GetFieldRecord("CompressedDataSize", &m_Fields);
+   if (mF && mF->defined)
+   {
+-    m_CompressedDataSize = static_cast<long>(mF->value[0]);
++    m_CompressedDataSize = static_cast<std::streamoff>(mF->value[0]);
+   }
+ 
+   mF = MET_GetFieldRecord("BinaryData", &m_Fields);
