@@ -406,7 +406,7 @@ if (BUILD_VTK)
 			"-DVTK_MODULE_ENABLE_VTK_ViewsQt=YES")
 	endif()
 	set(VTK_DEPENDS "")
-	set(VTK_VR_PATCH_COMMAND "")
+	set(VTK_PATCH_COMMAND ${GIT_APPLY_CMD})
 	if (ENABLE_VR)
 		set(OPENVR_ROOT_DIR "${CMAKE_BINARY_DIR}/openvr-${OPENVR_VERSION}")
 		set(OPENVR_INCLUDE_DIR "${OPENVR_ROOT_DIR}/headers")
@@ -442,7 +442,7 @@ if (BUILD_VTK)
 				${OPENVR_LIB_AND_INCLUDE})
 			# In VTK 9, some code was changed in Rendering/OpenVR module that produces an error on clang 10, let's patch it:
 			if (NOT VTK_USE_GIT_REPO OR NOT VTK_GIT_TAG STREQUAL "master")		# but it's fixed in git master
-				set(VTK_VR_PATCH_COMMAND ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/vtk-9.0.0-openvr.patch")
+				list(APPEND VTK_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/vtk-9.0.0-openvr.patch")
 			endif()
 		endif()
 		if (MSVC)
@@ -458,11 +458,13 @@ if (BUILD_VTK)
 		set(VTK_PARALLEL_COORDINATE_PATCH_LINE 492)
 	endif()
 	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/patches/vtk-parallelCoordinates.patch.template" "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch")
-	set(VTK_PC_PATCH_COMMAND ${GIT_APPLY_CMD} "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch")
-	set(VTK_QT_PATCH_COMMAND "")
+	list(APPEND VTK_PATCH_COMMAND "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch")
 
 	if (QT_VERSION_MAJOR EQUAL 5 AND Qt5_VERSION VERSION_GREATER "5.14.99" AND VTK_VERSION VERSION_LESS "9.0.1") # when using >= Qt 5.15, VTK up to (and including) 9.0.0 requires a minor patch:
-		set(VTK_QT_PATCH_COMMAND ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/vtk-${VTK_VERSION}-qt-5.15.patch")
+		list(APPEND VTK_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/vtk-${VTK_VERSION}-qt-5.15.patch")
+	endif()
+	if (VTK_PATCH_COMMAND STREQUAL "${GIT_APPLY_CMD}")
+		set(VTK_PATCH_COMMAND "")	# if no patch to apply, set empty
 	endif()
 	if (VTK_USE_GIT_REPO)
 		set(VTK_DIR "${CMAKE_BINARY_DIR}/vtk/bin-${VTK_GIT_TAG}" CACHE PATH
@@ -471,9 +473,7 @@ if (BUILD_VTK)
 			GIT_REPOSITORY    "${VTK_REPOSITORY}"
 			GIT_TAG           "${VTK_GIT_TAG}"
 			UPDATE_DISCONNECTED 1
-			PATCH_COMMAND     ${VTK_PC_PATCH_COMMAND}
-			      COMMAND     ${VTK_QT_PATCH_COMMAND}
-			      COMMAND     ${VTK_VR_PATCH_COMMAND}
+			PATCH_COMMAND     ${VTK_PATCH_COMMAND}
 			#UPDATE_COMMAND    ""  # to force cmake to stick to the tag specified above, otherwise it will always go to latest 'release' branch commit
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src.git"
 			BINARY_DIR        "${VTK_DIR}"
@@ -488,9 +488,7 @@ if (BUILD_VTK)
 		ExternalProject_Add (VTK
 			URL               ${VTK_URL}
 			URL_HASH          "SHA512=${VTK_ARCHIVE_SHA512}"
-			PATCH_COMMAND     ${VTK_PC_PATCH_COMMAND}
-			      COMMAND     ${VTK_QT_PATCH_COMMAND}
-			      COMMAND     ${VTK_VR_PATCH_COMMAND}
+			PATCH_COMMAND     ${VTK_PATCH_COMMAND}
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src-${VTK_VERSION}"
 			BINARY_DIR        "${VTK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
@@ -638,19 +636,22 @@ if (BUILD_ITK)
 		LIST(APPEND ITK_PATCH_COMMAND ${ITK_VTKGLUE_PATCH})
 	endif()
 	if (ITK_VERSION VERSION_LESS "5.2.0" AND MSVC_VERSION GREATER_EQUAL 1928)
-		set (ITK_LRINTF_PATCH "${CMAKE_SOURCE_DIR}/patches/itk-lrintf.patch")
+		set(ITK_LRINTF_PATCH "${CMAKE_SOURCE_DIR}/patches/itk-lrintf.patch")
 		LIST(APPEND ITK_PATCH_COMMAND ${ITK_LRINTF_PATCH})
 	endif()
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "11.0.0" AND ITK_VERSION VERSION_LESS "5.2.1")
 		if (NOT ITK_VERSION VERSION_EQUAL "5.2.0")
 			message(WARNING "You are using g++ version >= 11 with ITK < 5.2.0. Using g++ version >= 11 requires a patch for ITK 5.2.0, and most likely also for versions below, but the patch included in this superbuild is only tested with ITK version 5.2.0. For other ITK versions the patch might fail! If it fails, your options are to choose a newer ITK version (>= 5.2.0), use a different/older compiler, or fix any compilation errors that you get yourself!")
 		endif()
-		set (ITK_GCC11_PATCH "${CMAKE_SOURCE_DIR}/patches/itk-g++11.patch")
+		set(ITK_GCC11_PATCH "${CMAKE_SOURCE_DIR}/patches/itk-g++11.patch")
 		LIST(APPEND ITK_PATCH_COMMAND ${ITK_GCC11_PATCH})
 	endif()
 	if (ITK_VERSION VERSION_GREATER_EQUAL "5.2.0")
-		set (ITK_GREATER2GB_PATCH "${CMAKE_SOURCE_DIR}/patches/itk-5.2-metaIO-decompressgreater2GBfix.patch")
+		set(ITK_GREATER2GB_PATCH "${CMAKE_SOURCE_DIR}/patches/itk-5.2-metaIO-decompressgreater2GBfix.patch")
 		LIST(APPEND ITK_PATCH_COMMAND ${ITK_GREATER2GB_PATCH})
+	endif()
+	if (ITK_PATCH_COMMAND STREQUAL "${GIT_APPLY_CMD}")
+		set(ITK_PATCH_COMMAND "")	# if no patch to apply, set empty
 	endif()
 	if (ITK_USE_GIT_REPO)
 		set(ITK_DIR "${CMAKE_BINARY_DIR}/itk/bin-${ITK_GIT_TAG}" CACHE PATH "ITK build folder." FORCE)
