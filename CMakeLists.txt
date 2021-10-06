@@ -30,6 +30,10 @@ option(BUILD_ITK "Build ITK in the superbuild. If disabled, you need to set ITK_
 #option(BUILD_HDF5 "Fetch and build HDF5. If disabled, you need to set HDF5_DIR to an existing HDF5 build" ON)
 #option(FETCH_ONNX "Fetch required ONNX runtime. If disabled, you need to set ONNX_RUNTIME_DIR to an existing ONNX runtime directory" ON) # could be a bit complicated to implement, since we would have to check the type of runtime (CUDA/DirectML/CPU) and set according flags
 
+if (NOT ARCHIVE_DIR)
+	set(ARCHIVE_DIR ${CMAKE_BINARY_DIR}/archives CACHE PATH "Directory for storing downloaded archive files." FORCE)
+endif()
+
 if (ENABLE_ALL)
 	set(ENABLE_FILTERS "ON" CACHE BOOL "" FORCE)
 	set(ENABLE_OPENCL "ON" CACHE BOOL "" FORCE)
@@ -426,6 +430,7 @@ if (BUILD_VTK)
 		ExternalProject_Add (OpenVR
 			URL               ${OPENVR_URL}
 			URL_HASH          "SHA512=${OPENVR_ARCHIVE_SHA512}"
+			DOWNLOAD_DIR      ${ARCHIVE_DIR}
 			SOURCE_DIR        "${OPENVR_ROOT_DIR}"
 			BUILD_IN_SOURCE   1
 			CONFIGURE_COMMAND ""
@@ -488,6 +493,7 @@ if (BUILD_VTK)
 		ExternalProject_Add (VTK
 			URL               ${VTK_URL}
 			URL_HASH          "SHA512=${VTK_ARCHIVE_SHA512}"
+			DOWNLOAD_DIR      ${ARCHIVE_DIR}
 			PATCH_COMMAND     ${VTK_PATCH_COMMAND}
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/vtk/src-${VTK_VERSION}"
 			BINARY_DIR        "${VTK_DIR}"
@@ -672,6 +678,7 @@ if (BUILD_ITK)
 		ExternalProject_Add (ITK
 			URL               "${ITK_URL}"
 			URL_HASH          "SHA512=${ITK_ARCHIVE_SHA512}"
+			DOWNLOAD_DIR      ${ARCHIVE_DIR}
 			PATCH_COMMAND     ${ITK_PATCH_COMMAND}
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src-${ITK_VERSION}"
 			BINARY_DIR        "${ITK_DIR}"
@@ -723,6 +730,7 @@ if (BUILD_BOOST)
 	ExternalProject_Add (boost
 		URL               ${BOOST_URL}
 		URL_HASH          SHA512=${BOOST_ARCHIVE_SHA512}
+		DOWNLOAD_DIR      ${ARCHIVE_DIR}
 		BUILD_IN_SOURCE   1
 		SOURCE_DIR        "${BOOST_DIR}"
 		CONFIGURE_COMMAND ${BOOST_BOOTSTRAP_COMMAND} ${BOOST_BOOTSTRAP_OPTS}
@@ -852,6 +860,7 @@ if (ENABLE_HDF5)
 	ExternalProject_Add (hdf5
 		URL               ${HDF5_URL}
 		URL_HASH          "SHA512=${HDF5_ARCHIVE_SHA512}"
+		DOWNLOAD_DIR      ${ARCHIVE_DIR}
 		PATCH_COMMAND     ${HDF5_PATCH_COMMAND}
 		SOURCE_DIR        "${HDF5_SRC_DIR}"
 		BUILD_IN_SOURCE   1
@@ -972,6 +981,7 @@ if (ENABLE_AI)
 	ExternalProject_Add (onnx
 		URL               ${ONNX_ARCHIVE}
 		URL_HASH          "SHA512=${ONNX_HASH}"
+		DOWNLOAD_DIR      ${ARCHIVE_DIR}
 		SOURCE_DIR        "${ONNX_SRC_DIR}"
 		PATCH_COMMAND     ${ONNX_PATCH_COMMAND}
 		      COMMAND     ${ONNX_PATCH_COMMAND2}
@@ -1084,6 +1094,7 @@ if (ENABLE_EIGEN)
 	ExternalProject_Add (eigen
 		URL               ${EIGEN_URL}
 		URL_HASH          "SHA512=${EIGEN_ARCHIVE_SHA512}"
+		DOWNLOAD_DIR      ${ARCHIVE_DIR}
 		SOURCE_DIR        "${EIGEN_BIN_DIR}"
 		BUILD_IN_SOURCE   1
         CONFIGURE_COMMAND ""
