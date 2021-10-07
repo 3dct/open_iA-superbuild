@@ -114,6 +114,17 @@ if (${vtk_version_index} EQUAL -1)
 	set_property(CACHE VTK_VERSION PROPERTY STRINGS ${VTK_VERSION_OPTIONS})
 endif()
 
+set(VTK_SMP_TYPE_OPTIONS "Sequential" "OpenMP" "TBB")
+list(FIND VTK_SMP_TYPE_OPTIONS "${VTK_SMP_TYPE}" vtk_smp_index)
+if (${vtk_smp_index} EQUAL -1)
+	set(VTK_SMP_TYPE_DEFAULT "OpenMP")
+	if (DEFINED VTK_SMP_TYPE)
+		message(WARNING "Invalid VTK_SMP_TYPE, resetting to default ${VTK_SMP_TYPE_DEFAULT}!")
+	endif()
+	set(VTK_SMP_TYPE "${VTK_SMP_TYPE_DEFAULT}" CACHE STRING "Choose the SMP implementation to use in the VTK build to speed up filters with parallel implementations - available are sequential (no parallelization), OpenMP, and TBB (Intel Thread Building Blocks - will require installation of Intel OneAPI SDK)  (default: OpenMP)." FORCE)
+	set_property(CACHE VTK_SMP_TYPE PROPERTY STRINGS ${VTK_SMP_TYPE_OPTIONS})
+endif()
+
 if (VTK_USE_GIT_REPO)
 	set(VTK_GIT_TAG_OPTIONS "")
 	foreach(version ${VTK_VERSION_OPTIONS})
@@ -382,6 +393,7 @@ if (BUILD_VTK)
 		"-DQt${QT_VERSION_MAJOR}_DIR:PATH=${QT_PATH}"
 		"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
 		"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
+		"-DVTK_SMP_IMPLEMENTATION_TYPE=${VTK_SMP_TYPE}"
 	)
 	if (QT_VERSION_MAJOR GREATER_EQUAL 6)
 		list(APPEND VTK_CMAKE_ARGS
