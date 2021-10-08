@@ -46,6 +46,10 @@ if (ENABLE_ALL)
 	set(ENABLE_HDF5 "ON" CACHE BOOL "" FORCE)
 endif()
 
+if (ENABLE_ASTRA)
+	option(BUILD_ASTRA "Build Astra Toolbox in the superbuild. If disabled, you need to set ASTRA_DIR to an existing Astra Toolkit build" ON)
+endif()
+
 set(BUILD_BOOST_OPTION OFF)
 if (ENABLE_ASTRA OR ENABLE_VR)
 	set(BUILD_BOOST_OPTION ON)
@@ -754,7 +758,6 @@ if (BUILD_BOOST)
 endif()
 
 if (ENABLE_ASTRA)
-	option(BUILD_ASTRA "Build Astra Toolbox in the superbuild. If disabled, you need to set ASTRA_DIR to an existing Astra Toolkit build" ON)
 	if (BUILD_ASTRA)
 		set(ASTRA_DIR "${CMAKE_BINARY_DIR}/astra" CACHE PATH
 			"Astra toolbox directory" FORCE)
