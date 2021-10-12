@@ -102,7 +102,7 @@ You only need to go back to executing a build on the whole superbuild folder if 
 ### Controlling library build options
 - `BUILD_TYPE` - The type of build to do (Release, Debug, RelWithDebInfo or MinSizeRel); only available on single-configuration generators (e.g. Unix Makefiles, ninja), not on multi-configuration generators (Visual Studio, XCode) (default: Release)
 - `BUILD_ASTRA` - Whether to build ASTRA in the superbuild (provided that `ENABLE_ASTRA` is enabled). If disabled, you need to set ASTRA_DIR to an existing ASTRA build (default: enabled)
-- `BUILD_BOOST` - Whether to build BOOST in the superbuild (provided that either `ENABLE_ASTRA` or `ENABLE_VR` is enabled) (default: enabled)
+- `BUILD_BOOST` - Whether to build BOOST in the superbuild (provided that either `ENABLE_ASTRA` or `ENABLE_VR` is enabled). If disabled, you need to either have a boost installation or a boost build available, and you will be required to set `BOOST_DIR` accordingly (default: enabled)
 - `BUILD_VTK` - Whether to build VTK in the superbuild. If disabled, you need to set VTK_DIR to an existing VTK build (default: enabled)
 - `BUILD_ITK` - Whether to build ITK in the superbuild. If disabled, you need to set ITK_DIR to an existing ITK build (default: enabled)
 - `AI_ONNX_USE_CUDA` - Whether to use the CUDA version of the ONNX runtime; if disabled, use DirectML. Only available on Windows (on Linux, DirectML is not available) (default: disabled)
