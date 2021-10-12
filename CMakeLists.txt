@@ -94,7 +94,6 @@ set(GIT_APPLY_CMD "${GIT_EXECUTABLE}" apply ${GIT_APPLY_OPTS})
 
 
 function(selector varname options default desc)
-	message(STATUS "selector ${varname}=${${varname}} opt=${options} def=${default} desc='${desc}'")
 	list(FIND options "${${varname}}" options_index)
 	if (${options_index} EQUAL -1)
 		if (DEFINED ${varname})
