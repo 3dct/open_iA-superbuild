@@ -9,7 +9,7 @@ In short, these are the steps required to set up a build environment for open\_i
 2. Clone  this repository to some folder on your machine
 3. Run CMake on the checked out repository for the desired toolchain
 4. Build with the toolchain configured in CMake
-5. Done!
+5. Done! For developing with open\_iA, go to the `open_iA` subfolder of the superbuild binary folder: the source repository is in `src`, the build directory in `bin`!
 
 Detailed descriptions of these steps are given below.
 Additional information can also be found in the [Windows build instructions](https://github.com/3dct/open_iA/wiki/Windows-Build) and the [Linux build instructions](https://github.com/3dct/open_iA/wiki/Linux-Build) in the open\_iA wiki.
@@ -74,25 +74,65 @@ Build everything. The specific steps required here differ for the build environm
 
 When the build finished successfully, open\_iA executables will be built in the `open_iA/bin/bin` subfolder of the folder configured in CMake as "Where to build the binaries".
 
-## Troubleshooting / Adaptations:
+The superbuild is intended for setting up a build environment with all dependencies.
+For development in open\_iA or its modules, you therefore subsequently don't need to run the full superbuild anymore.
+To start developing in open\_iA, navigate to the `open_iA/src` subfolder, where you will find a git repository set up for you with all of open\_iA's sources.
+Use the `open_iA/bin` subfolder as basis for building and for CMake Configure/Generate runs, once the first superbuild has finished successfully.
 
-- If you don't find your problem mentioned here, please check the troubleshooting sections of our detailed [Windows](https://github.com/3dct/open_iA/wiki/Windows-Build#troubleshooting) and [Linux](https://github.com/3dct/open_iA/wiki/Linux-Build#troubleshooting) build instructions.
+You only need to go back to executing a build on the whole superbuild folder if you need to change something in one of the libraries that open\_iA depends on.
+
+
+## Configuration Options
+
+### Enabling specific features/modules
+- `ENABLE_OPENCL` - Enables OpenCL; the DreamCaster tool depends is only enabled if this setting is enabled; enabling this option also enables some GPU-optimized ITK filters (default: disabled)
+- `ENABLE_FILTERS` - Whether to build image processing filters (smoothing, segmentation, intensity transformations, geometric transformations, ...) (default: enabled)
+- `ENABLE_TOOLS` - Whether to build common tool modules, e.g. FeatureScout, 4DCT, GEMSe, Dynamic Volume Lines, FIAKER, ... (default: enabled)
+- `ENABLE_TEST` - Whether to enable build of tests runners and the capability to submit CDash test runs (default: disabled)
+- `ENABLE_ASTRA` - Whether to build ASTRA reconstruction library and open_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time! (default: disabled)
+- `ENABLE_ASTRA` - enable building the Astra reconstruction module; this will also cause the [astra toolbox](https://www.astra-toolbox.com) to be built, along with the boost library, which is required by astra
+- `ENABLE_VR` - Whether to build VR module; requires OpenVR SDK, which will be fetched automatically; also boost (includes) are required (default: disabled)
+- `ENABLE_AI` - Whether to build AI module; requires ONNX runtime, which will be fetched automatically; on Windows, you can change whether CUDA or DirectML backend is chosen with the option `AI_ONNX_USE_CUDA` (default: disabled)
+- `ENABLE_EIGEN` - Whether to fetch and use eigen (default: disabled)
+- `ENABLE_HDF5` - Whether to fetch and build HDF5 library and use it in open_iA (default: disabled)
+- `ENABLE_PRECOMPILE` - Whether to build open_iA with precompiled headers enabled (default: disabled; NOT included in `ENABLE_ALL`)
+- `ENABLE_ALL` Enables all optional modules and filters (see also the ENABLE_xyz options above; all except for ENABLE_PRECOMPILE are enabled if this is set to on. Note that unchecking this box again does NOT have any direct effect; it will not automatically set these options to unchecked or their state before. But you will have to uncheck the option if you want to disable any of the single ENABLE_xyz options affected by this setting, otherwise they will be re-enabled on next 'Configure' run) (default: disabled)
+
+### Controlling library build options
+- `BUILD_TYPE` - The type of build to do (Release, Debug, RelWithDebInfo or MinSizeRel); only available on single-configuration generators (e.g. Unix Makefiles, ninja), not on multi-configuration generators (Visual Studio, XCode) (default: Release)
+- `BUILD_ASTRA` - Whether to build ASTRA in the superbuild (provided that `ENABLE_ASTRA` is enabled). If disabled, you need to set ASTRA_DIR to an existing ASTRA build (default: enabled)
+- `BUILD_BOOST` - Whether to build BOOST in the superbuild (provided that either `ENABLE_ASTRA` or `ENABLE_VR` is enabled) (default: enabled)
+- `BUILD_VTK` - Whether to build VTK in the superbuild. If disabled, you need to set VTK_DIR to an existing VTK build (default: enabled)
+- `BUILD_ITK` - Whether to build ITK in the superbuild. If disabled, you need to set ITK_DIR to an existing ITK build (default: enabled)
+- `AI_ONNX_USE_CUDA` - Whether to use the CUDA version of the ONNX runtime; if disabled, use DirectML. Only available on Windows (on Linux, DirectML is not available) (default: disabled)
+- `VTK_USE_GIT_REPO` - Whether to use git repository for VTK library. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times significantly (since cloning the full repository is much slower than downloading and extracting a release archive).
+- `VTK_VERSION` - The VTK version to build, in case `BUILD_VTK` is enabled and `VTK_USE_GIT_REPO` is disabled; if `VTK_USE_GIT_REPO` is enabled, use `VTK_GIT_TAG` instead.
+- `VTK_GIT_TAG` - The VTK git tag to use in build, in case `BUILD_VTK` is enabled and `VTK_USE_GIT_REPO` is enabled; if `VTK_USE_GIT_REPO` is disabled, use `VTK_VERSION` instead.
+- `VTK_SMP_TYPE` - Choose the SMP implementation to use in the VTK build to speed up filters with parallel implementations - available are sequential (no parallelization), OpenMP, and TBB (Intel Thread Building Blocks - will require installation of Intel OneAPI SDK) (default: OpenMP)
+- `ITK_USE_GIT_REPO` - Whether to use git repository for ITK library. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times significantly (since cloning the full repository is much slower than downloading and extracting a release archive).
+- `ITK_VERSION` - The ITK version to build, in case `BUILD_ITK` is enabled and `ITK_USE_GIT_REPO` is disabled; if `ITK_USE_GIT_REPO` is enabled, use `ITK_GIT_TAG` instead.
+- `ITK_GIT_TAG` - The ITK git tag to use in build, in case `BUILD_ITK` is enabled and `ITK_USE_GIT_REPO` is enabled; if `ITK_USE_GIT_REPO` is disabled, use `ITK_VERSION` instead.
+- `OPENVR_VERSION` - The OpenVR version to fetch, if `ENABLE_VR` is enabled.
+
+### Convenience options
+- `ARCHIVE_DIR` - A cache directory for downloaded library archives. Set to a directory with existing archives to avoid re-downloading files already present on the local machine / in the local network.
+
+## Troubleshooting:
+
+- The `$` sign in any code above indicates the shell prompt, do not enter this sign.
+
+- If there is a problem in building open\_iA itself, and the problem is not mentioned in this section, please also check the troubleshooting sections of our detailed [Windows](https://github.com/3dct/open_iA/wiki/Windows-Build#troubleshooting) and [Linux](https://github.com/3dct/open_iA/wiki/Linux-Build#troubleshooting) build instructions.
+
+- CMake might encounter an error telling you that some library is missing which you still need to install. If that happens for a library not mentioned in the prerequisites above, please let us know [via the superbuild issue tracker](https://github.com/3dct/open_iA-superbuild/issues).
 
 - Ninja as build tool is known to cause problems at the moment with the superbuild; it produces error messages such as `ninja: error: 'OpenCL\_ICD', needed by 'ITK-prefix/src/ITK-stamp/ITK-mkdir', missing and no known rule to make it`. Workaround: Use "Unix Makefiles" generator instead of "Ninja".
-
-- The `$` sign in the code above indicates the shell prompt, do not enter this sign.
 
 - For the prerequisites installation on Linux: the command to install packages as well as the names of the packages will differ on distributions other than Ubuntu, please consult the manual or community of your distribution.
 
 - The method described above sets up a basic build environment.
   - It will only build VTK and ITK libraries.
   - It builds the core executables as well as some of the advanced analysis modules.
-  - If you require more modules or other library support, e.g. Eigen, OpenCL or HDF5 support, see the `ENABLE_...` flags
-  - Support for the Astra reconstruction module is implemented (`ENABLE_ASTRA`), but still very much experimental, it works only under very specific circumstances.
-
-- The superbuild is intended for setting up a build environment. For development of open\_iA modules, it is recommended to switch to using the `open_iA/bin` subfolder of the superbuild binary folder as build / CMake base once the first superbuild has finished successfully.
-
-	- If CMake encounters an error, it probably will tell you that some library is missing which you still need to install. If that happens, please let us know [via the superbuild issue tracker](https://github.com/3dct/open_iA-superbuild/issues).
+  - If you require more modules or other library support, e.g. Eigen, OpenCL or HDF5 support, see the `ENABLE_...` flags in the [Configuration Options](#configuration-options).
 
 - If you use the Unix Makefile generator and have more than 4 cores in your system, you will probably want to increase the number of parallel builds (it is set to 4 in step 4 above). To e.g. run a make build with 8 parallel threads, run
   `$ make -j 8`
