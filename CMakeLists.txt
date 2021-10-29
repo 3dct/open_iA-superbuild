@@ -31,6 +31,15 @@ option(BUILD_ITK "Build ITK in the superbuild. If disabled, you need to set ITK_
 #option(BUILD_HDF5 "Fetch and build HDF5. If disabled, you need to set HDF5_DIR to an existing HDF5 build" ON)
 #option(FETCH_ONNX "Fetch required ONNX runtime. If disabled, you need to set ONNX_RUNTIME_DIR to an existing ONNX runtime directory" ON) # could be a bit complicated to implement, since we would have to check the type of runtime (CUDA/DirectML/CPU) and set according flags
 
+option(DISABLE_LIB_WARNINGS "Disables all compilation warnings on the built libraries" OFF)
+
+# Find proper way to append flags here...
+#if(MSVC)
+#	set(DISABLE_WARNINGS_OPT "\"-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} /W0\"")
+#else()
+#	set(DISABLE_WARNINGS_OPT "\"-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -w\"")
+#endif()
+#
 if (NOT ARCHIVE_DIR)
 	set(ARCHIVE_DIR ${CMAKE_BINARY_DIR}/archives CACHE PATH "Directory for storing downloaded archive files." FORCE)
 endif()
@@ -255,7 +264,7 @@ endif()
 
 if (ENABLE_ASTRA)
 	set(ASTRA_REPOSITORY "https://github.com/astra-toolbox/astra-toolbox.git")
-	set(ASTRA_TAG        "06322245a638e435d29bc8f027aed0bd976139d0") # version "1.9.9dev"
+	set(ASTRA_TAG        "v2.0.0")
 endif()
 
 if (BUILD_BOOST)
@@ -351,6 +360,9 @@ if (BUILD_VTK)
 			"-DQt6CoreTools_DIR=${Qt6_DIR}CoreTools"
 			"-DQt6GuiTools_DIR=${Qt6_DIR}GuiTools")
 	endif()
+	#if (DISABLE_LIB_WARNINGS)
+	#	list(APPEND VTK_CMAKE_ARGS ${DISABLE_WARNINGS_OPT})
+	#endif()
 	if (NOT CMAKE_CONFIGURATION_TYPES)
 		list(APPEND VTK_CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 	endif()
@@ -388,7 +400,6 @@ if (BUILD_VTK)
 		set(OPENVR_LIB_AND_INCLUDE
 			"-DOpenVR_INCLUDE_DIR:PATH=${OPENVR_INCLUDE_DIR}"
 			"-DOpenVR_LIBRARY:FILEPATH=${OPENVR_LIB_FILES}")
-
 		ExternalProject_Add (OpenVR
 			URL               ${OPENVR_URL}
 			URL_HASH          "SHA512=${OPENVR_ARCHIVE_SHA512}"
@@ -517,6 +528,9 @@ if (ENABLE_OPENCL)
 			"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
 			"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
 		)
+		#if (DISABLE_LIB_WARNINGS)
+		#	list(APPEND OPENCL_ICD_CMAKE_ARGS ${DISABLE_WARNINGS_OPT})
+		#endif()
 		if (NOT CMAKE_CONFIGURATION_TYPES)
 			LIST(APPEND OPENCL_ICD_CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 		endif()
@@ -579,6 +593,9 @@ if (BUILD_ITK)
 		"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
 		"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
 	)
+#	if (DISABLE_LIB_WARNINGS)
+#		list(APPEND ITK_CMAKE_ARGS ${DISABLE_WARNINGS_OPT})
+#	endif()
 	if (QT_VERSION_MAJOR GREATER_EQUAL 6)
 		list(APPEND ITK_CMAKE_ARGS
 			"-DQt6WidgetsTools_DIR=${Qt6_DIR}WidgetsTools"
@@ -744,18 +761,16 @@ if (ENABLE_ASTRA)
 			message(STATUS "Note: Building Astra Toolbox is enabled but building BOOST is disabled")
 			message(STATUS "	Make sure to install boost via package manager, e.g. on Ubuntu via `sudo apt install libboost-dev`")
 		endif()
+		set(ASTRA_PATCH_COMMAND ${GIT_APPLY_CMD})
 		if (WIN32)
 			CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/patches/astra-vs.patch.template" "${CMAKE_BINARY_DIR}/astra-vs.patch")
 			# find way to only do this once:
 			if (ASTRA_PATCH)
-				set(ASTRA_PATCH_COMMAND ${GIT_APPLY_CMD} "${CMAKE_BINARY_DIR}/astra-vs.patch")
-			else()
-				set(ASTRA_PATCH_COMMAND "")
+				list(APPEND ASTRA_PATCH_COMMAND "${CMAKE_BINARY_DIR}/astra-vs.patch")
 			endif()
 			set(ASTRA_CONFIGURE_COMMAND "")
 			set(ASTRA_BUILD_COMMAND "${CMAKE_MAKE_PROGRAM}" "${ASTRA_DIR}/astra_vc14.sln" -t:astra_vc14 -p:Configuration=Release_CUDA -p:Platform=x64)
 		else()
-			set(ASTRA_PATCH_COMMAND "")
 			set(ASTRA_BUILD_DIR "${ASTRA_DIR}/build/linux")
 			set(ASTRA_CONFIGURE_COMMAND1 "${CMAKE_COMMAND}" -E chdir "${ASTRA_BUILD_DIR}" "${ASTRA_BUILD_DIR}/autogen.sh")
 			set(ASTRA_CONFIGURE_COMMAND2 "${CMAKE_COMMAND}" -E chdir "${ASTRA_BUILD_DIR}" "${ASTRA_BUILD_DIR}/configure" "--with-cuda=${CUDA_TOOLKIT_ROOT_DIR}")
@@ -765,6 +780,14 @@ if (ENABLE_ASTRA)
 		if (UNIX)
 			message(STATUS "Note: Building Astra Toolbox is enabled, and you're building under *nix.")
 			message(STATUS "	Make sure to install autoconf/automake/libtool, e.g. on Ubuntu via `sudo apt install automake libtool`")
+		endif()
+
+		if (DISABLE_LIB_WARNINGS)
+			list(APPEND ASTRA_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/astra-vs-warnings.patch")
+		endif()
+
+		if (ASTRA_PATCH_COMMAND STREQUAL "${GIT_APPLY_CMD}")
+			set(ASTRA_PATCH_COMMAND "")	# if no patch to apply, set empty
 		endif()
 
 		# fetch and build astra:
