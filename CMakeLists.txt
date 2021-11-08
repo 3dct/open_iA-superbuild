@@ -8,7 +8,7 @@ project(open_iA_superbuild LANGUAGES CXX)
 
 include(ExternalProject)
 
-option(VTK_USE_GIT_REPO "Whether to use git repository for VTK library. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times significantly." OFF)
+option(VTK_USE_GIT_REPO "Whether to use git repository for VTK library. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times significantly. Also, you have to take care of any eventually required patches manually (as for example 'master' branch is subject to daily change)." OFF)
 option(ITK_USE_GIT_REPO "Whether to use git repository for ITK library. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times significantly." OFF)
 
 option(ENABLE_ALL "Enables all optional modules and filters (see also separate ENABLE_xyz options; all except for ENABLE_PRECOMPILE are enabled if this is set to on. Note that unchecking this box again does NOT have any direct effect; it will not automatically set these options to unchecked or their state before. But you will have to uncheck the option if you want to disable any of the single ENABLE_xyz options affected by this setting, otherwise they will be re-enabled on next 'Configure' run) (default: disabled)" OFF)
@@ -121,9 +121,9 @@ endif()
 
 ## VTK
 
-set(VTK_VERSION_OPTIONS "8.1.2" "8.2.0" "9.0.0" "9.0.1" "9.0.2" "9.0.3")
+set(VTK_VERSION_OPTIONS "8.1.2" "8.2.0" "9.0.0" "9.0.1" "9.0.2" "9.0.3" "9.1.0")
 set(VTK_VERSION_DESC "Choose the VTK version to build (only used if VTK_USE_GIT_REPO is DISABLED; if VTK_USE_GIT_REPO is enabled, use VTK_GIT_TAG instead).")
-selector(VTK_VERSION "${VTK_VERSION_OPTIONS}" "9.0.3" ${VTK_VERSION_DESC})
+selector(VTK_VERSION "${VTK_VERSION_OPTIONS}" "9.1.0" ${VTK_VERSION_DESC})
 
 set(VTK_SMP_TYPE_OPTIONS "Sequential" "OpenMP" "TBB")
 set(VTK_SMP_TYPE_DEFAULT "OpenMP")
@@ -151,9 +151,8 @@ if (VTK_USE_GIT_REPO)
 	# set(VTK_REPOSITORY "https://gitlab.kitware.com/vtk/vtk.git")
 endif()
 
-if (${QT_VERSION_MAJOR} GREATER_EQUAL 6 AND NOT VTK_USE_GIT_REPO)
-# VTK_VERSION VERSION_LESS "9.1.0")
-	message(SEND_ERROR "No released VTK version supports Qt >= 6.x yet! Please chose the VTK git master (VTK_USE_GIT_REPO ON, VTK_GIT_TAG \"master\"), or an older Qt version!")
+if (${QT_VERSION_MAJOR} GREATER_EQUAL 6 AND (NOT VTK_USE_GIT_REPO AND VTK_VERSION VERSION_LESS "9.1.0"))
+	message(SEND_ERROR "The chosen VTK version does not support Qt >= 6.x! Please either chose VTK >= 9.1.0, git master (VTK_USE_GIT_REPO ON, VTK_GIT_TAG \"master\"), or an older Qt version!")
 endif()
 
 if (NOT VTK_USE_GIT_REPO)
@@ -175,6 +174,9 @@ if (NOT VTK_USE_GIT_REPO)
 	elseif ("${VTK_VERSION}" STREQUAL "9.0.3")
 		unset(VTK_ZIP_SHA512) # no .zip available for 9.x
 		set(VTK_GZIP_SHA512 "00528011F9206444D09FC6CEA05C46930745BB70EA02BE6244AB3EB510AE82AF772157C025157B1761DC4C6A9AB538B57F814C03A708F30AA3598A421FDC6AE2")
+	elseif ("${VTK_VERSION}" STREQUAL "9.1.0")
+		unset(VTK_ZIP_SHA512) # no .zip available for 9.x
+		set(VTK_GZIP_SHA512 "B2C4BE8795FA082E0776E6FFDB9A3FD88DBB235841A8369A34EBE26CF4C5FCB1610FCCA987BE314510629DA3EDC74EE76C0CE2CC88D5EF4B099AC550AC892B0A")
 	endif()
 	string(SUBSTRING "${VTK_VERSION}" 0 3 VTK_SHORT_VERSION)
 	set(VTK_URL "https://www.vtk.org/files/release/${VTK_SHORT_VERSION}/VTK-${VTK_VERSION}")
@@ -419,7 +421,7 @@ if (BUILD_VTK)
 				"-DVTK_MODULE_ENABLE_VTK_RenderingOpenVR=YES"
 				${OPENVR_LIB_AND_INCLUDE})
 			# In VTK 9, some code was changed in Rendering/OpenVR module that produces an error on clang 10, let's patch it:
-			if (NOT VTK_USE_GIT_REPO OR NOT VTK_GIT_TAG STREQUAL "master")		# but it's fixed in git master
+			if (VTK_VERSION VERSION_LESS "9.1.0" AND NOT VTK_USE_GIT_REPO)	# but it's fixed in >= 9.1.0
 				list(APPEND VTK_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/vtk-9.0.0-openvr.patch")
 			endif()
 		endif()
