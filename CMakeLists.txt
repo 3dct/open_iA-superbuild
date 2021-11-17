@@ -803,6 +803,10 @@ if (ENABLE_ASTRA)
 			list(APPEND ASTRA_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/astra-vs-warnings.patch")
 		endif()
 
+		if (CUDA_VERSION VERSION_GREATER_EQUAL "11.0")
+			list(APPEND ASTRA_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/astra-vs-remove_30.patch")
+		endif()
+
 		if (ASTRA_PATCH_COMMAND STREQUAL "${GIT_APPLY_CMD}")
 			set(ASTRA_PATCH_COMMAND "")	# if no patch to apply, set empty
 		endif()

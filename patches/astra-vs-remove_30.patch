@@ -1,0 +1,38 @@
+--- a/astra_vc14.vcxproj
++++ b/astra_vc14.vcxproj
+@@ -199,7 +199,7 @@
+     <CudaCompile>
+       <TargetMachinePlatform>32</TargetMachinePlatform>
+       <GenerateLineInfo>true</GenerateLineInfo>
+-      <CodeGeneration>compute_30,sm_30;compute_35,sm_35;compute_50,sm_50;compute_60,sm_60;compute_60,compute_60</CodeGeneration>
++      <CodeGeneration>compute_35,sm_35;compute_50,sm_50;compute_60,sm_60;compute_60,compute_60</CodeGeneration>
+     </CudaCompile>
+   </ItemDefinitionGroup>
+   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|x64'">
+@@ -222,7 +222,7 @@
+     <CudaCompile>
+       <TargetMachinePlatform>64</TargetMachinePlatform>
+       <GenerateLineInfo>true</GenerateLineInfo>
+-      <CodeGeneration>compute_30,sm_30;compute_35,sm_35;compute_50,sm_50;compute_60,sm_60;compute_60,compute_60</CodeGeneration>
++      <CodeGeneration>compute_35,sm_35;compute_50,sm_50;compute_60,sm_60;compute_60,compute_60</CodeGeneration>
+     </CudaCompile>
+   </ItemDefinitionGroup>
+   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+@@ -287,7 +287,7 @@
+     <CudaCompile>
+       <TargetMachinePlatform>32</TargetMachinePlatform>
+       <GenerateLineInfo>true</GenerateLineInfo>
+-      <CodeGeneration>compute_30,sm_30;compute_35,sm_35;compute_50,sm_50;compute_60,sm_60;compute_60,compute_60</CodeGeneration>
++      <CodeGeneration>compute_35,sm_35;compute_50,sm_50;compute_60,sm_60;compute_60,compute_60</CodeGeneration>
+     </CudaCompile>
+   </ItemDefinitionGroup>
+   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_CUDA|x64'">
+@@ -316,7 +316,7 @@
+     <CudaCompile>
+       <TargetMachinePlatform>64</TargetMachinePlatform>
+       <GenerateLineInfo>true</GenerateLineInfo>
+-      <CodeGeneration>compute_30,sm_30;compute_35,sm_35;compute_50,sm_50;compute_60,sm_60;compute_60,compute_60</CodeGeneration>
++      <CodeGeneration>compute_35,sm_35;compute_50,sm_50;compute_60,sm_60;compute_60,compute_60</CodeGeneration>
+     </CudaCompile>
+   </ItemDefinitionGroup>
+   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
