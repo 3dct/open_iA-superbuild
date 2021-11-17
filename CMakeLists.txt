@@ -1110,7 +1110,7 @@ if (ENABLE_HDF5)
 		"-DHDF5_DIR:PATH=${HDF5_INSTALL_DIR}/share/cmake/hdf5")
 endif()
 
-set(OPEN_IA_GIT_TAG_OPTIONS "develop" "master" "2020.09" "2020.04" "2020.01" "2019.12" "2019.07")
+set(OPEN_IA_GIT_TAG_OPTIONS "develop" "main" "2020.09" "2020.04" "2020.01" "2019.12" "2019.07")
 selector(OPEN_IA_GIT_TAG "${OPEN_IA_GIT_TAG_OPTIONS}" "develop" "Choose the open_iA version to build.")
 if ("${OPEN_IA_GIT_TAG}" STREQUAL "2019.07" AND "${ITK_VERSION}" STREQUAL "5.0.1")
 	message(SEND_ERROR "open_iA version ${OPEN_IA_GIT_TAG} is not compatible with ITK version ${ITK_VERSION}!")
