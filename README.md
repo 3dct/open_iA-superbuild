@@ -37,9 +37,9 @@ On Linux, those packages should be available from the distribution repository. F
 On Windows, download and install:
 - [CMake](https://cmake.org/)
 - [git](https://git-scm.com/download/win)
-- Visual Studio (e.g. the free [Community Edition](https://visualstudio.microsoft.com/de/vs/older-downloads)). We support Visual Studio 2015 or newer, and currently recommend to use Visual Studio 2019. **Note:** Visual Studio 2022 does work for a superbuild with typical tools and filters enabled, but not yet for modules requiring boost (astra, VR), since the latest boost release (1.77) does not support Visual Studio 2022 yet!
+- Visual Studio (e.g. the free [Community Edition](https://visualstudio.microsoft.com/de/vs/older-downloads)). We support Visual Studio 2015 or newer, and currently recommend to use Visual Studio 2019.
 - OpenGL headers are included in the Windows SDK installed along with Visual Studio
-- [Open Source version of Qt](https://www.qt.io/download-open-source) >= 5.9 (install 64 bit binaries for the respective Visual Studio version, recommended is e.g. 5.14.x or 5.15.x). **Note:** Qt 6 is supported, but requires to use VTK 9.1 or later, or git from its master branch.
+- [Open Source version of Qt](https://www.qt.io/download-open-source) >= 5.9 (install 64 bit binaries for the respective Visual Studio version, recommended is e.g. 5.14.x or 5.15.x). **Note:** Qt 6 is supported, but requires to use VTK 9.1 or later, or git from its master branch; pre-built binaries are only provided for VS 2019, but they seem to work on VS 2022 as well.
 - optional: an OpenCL SDK; if available, some GPU operations will be available; some modules require it. The generic OpenCL-ICD loader can be built from within the superbuild (via `ENABLE_OPENCL`). Or you can use an SDK best fitting your build system, e.g. the AMD OpenCL SDK for an AMD graphics card, the NVidia CUDA SDK for an NVidia graphics card, or the Intel OpenCL SDK for an onboard graphics card (but note that this ties your build to machines having similar compute capabilities)
 
 
