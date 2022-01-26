@@ -37,7 +37,7 @@ On Linux, those packages should be available from the distribution repository. F
 On Windows, download and install:
 - [CMake](https://cmake.org/)
 - [git](https://git-scm.com/download/win)
-- Visual Studio (e.g. the free [Community Edition](https://visualstudio.microsoft.com/de/vs/older-downloads)). We support Visual Studio 2015 or newer, and currently recommend to use Visual Studio 2019.
+- Visual Studio (e.g. the free [Community Edition](https://visualstudio.microsoft.com/de/vs/older-downloads)). We support Visual Studio 2015 or newer, and currently **recommend to use Visual Studio 2019**.
 - OpenGL headers are included in the Windows SDK installed along with Visual Studio
 - [Open Source version of Qt](https://www.qt.io/download-open-source) >= 5.9 (install 64 bit binaries for the respective Visual Studio version, recommended is e.g. 5.14.x or 5.15.x). **Note:** Qt 6 is supported, but requires to use VTK 9.1 or later, or git from its master branch; pre-built binaries are only provided for VS 2019, but they seem to work on VS 2022 as well.
 - optional: an OpenCL SDK; if available, some GPU operations will be available; some modules require it. The generic OpenCL-ICD loader can be built from within the superbuild (via `ENABLE_OPENCL`). Or you can use an SDK best fitting your build system, e.g. the AMD OpenCL SDK for an AMD graphics card, the NVidia CUDA SDK for an NVidia graphics card, or the Intel OpenCL SDK for an onboard graphics card (but note that this ties your build to machines having similar compute capabilities)
@@ -91,16 +91,16 @@ You only need to go back to executing a build on the whole superbuild folder if 
 
 ### Enabling specific features/modules
 
-- `ENABLE_AI` - Whether to build AI module; requires ONNX runtime, which will be fetched automatically; on Windows, you can change whether CUDA or DirectML backend is chosen with the option `AI_ONNX_USE_CUDA` (default: disabled)
-- `ENABLE_ASTRA` - Whether to build the [astra toolbox](https://www.astra-toolbox.com) reconstruction library and open_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time. (default: disabled). **Note:** As the latest boost release (1.77) does not currently work out of the box with Visual Studio 2022, please use Visual Studio <= 2019 in case you want to enable this module on Windows!
+- `ENABLE_AI` - Whether to build AI module; requires ONNX runtime, which will be fetched automatically; on Windows, you can change whether CUDA or DirectML backend is chosen with the option `AI_ONNX_USE_CUDA` (default: disabled) **Note:** Make sure to install a fitting CUDA version; there are built in checks / messages regarding the required CUDA version for the chosen ONNX runtime version. The latest versions (1.9.0 and 1.10.0) currently require CUDA 11.4, which only supports Visual Studio <= 2019.
+- `ENABLE_ASTRA` - Whether to build the [astra toolbox](https://www.astra-toolbox.com) reconstruction library and open_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time. (default: disabled). **Note:** Make sure to install a fitting CUDA version; on Windows, make sure it works together with the version of Visual Studio you are using!
 - `ENABLE_EIGEN` - Whether to fetch and use eigen (default: disabled)
 - `ENABLE_FILTERS` - Whether to build image processing filters (smoothing, segmentation, intensity transformations, geometric transformations, ...) (default: enabled)
-- `ENABLE_HDF5` - Whether to fetch and build HDF5 library and use it in open_iA (default: disabled)
+- `ENABLE_HDF5` - Whether to fetch and build HDF5 library and use it in open_iA (default: disabled). **Note:** The currently latest HDF5 version (1.12.1) does not come with support for building on Visual Studio 2022, use Visual Studio <= 2019 if you want to use HDF5!
 - `ENABLE_OPENCL` - Enables OpenCL; the DreamCaster tool depends is only enabled if this setting is enabled; enabling this option also enables some GPU-optimized ITK filters (default: disabled)
 - `ENABLE_PRECOMPILE` - Whether to build open_iA with precompiled headers enabled (default: disabled; NOT included in `ENABLE_ALL`)
 - `ENABLE_TOOLS` - Whether to build common tool modules, e.g. FeatureScout, 4DCT, GEMSe, Dynamic Volume Lines, FIAKER, ... (default: enabled)
 - `ENABLE_TEST` - Whether to enable build of tests runners and the capability to submit CDash test runs (default: disabled)
-- `ENABLE_VR` - Whether to build VR module; requires OpenVR SDK, which will be fetched automatically; also boost (includes) are required (default: disabled). **Note:** As the latest boost release (1.77) does not currently work out of the box with Visual Studio 2022, please use Visual Studio <= 2019 in case you want to enable this module on Windows!
+- `ENABLE_VR` - Whether to build VR module; requires OpenVR SDK, which will be fetched automatically; also boost (includes) are required (default: disabled).
 - `ENABLE_ALL` Enables all optional modules and filters (see also the ENABLE_xyz options above; all except for ENABLE_PRECOMPILE are enabled if this is set to on. Note that unchecking this box again does NOT have any direct effect; it will not automatically set these options to unchecked or their state before. But you will have to uncheck the option if you want to disable any of the single ENABLE_xyz options affected by this setting, otherwise they will be re-enabled on next 'Configure' run) (default: disabled)
 
 
