@@ -970,7 +970,7 @@ if (ENABLE_AI)
 			else()
 				set(ONNX_REQUIRED_CUDNN_VERSION "8.0.4")
 			endif()
-		elseif ("${ONNX_VERSION}" STREQUAL "1.9.0")
+		elseif ("${ONNX_VERSION}" STREQUAL "1.9.0" OR "${ONNX_VERSION}" STREQUAL "1.10.0")
 			set(ONNX_REQUIRED_CUDA_VERSION "11.4")  # supposedly also supports CUDA 11.x...
 			if (WIN32)
 				set(ONNX_REQUIRED_CUDNN_VERSION "8.2.2.26")
