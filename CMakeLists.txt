@@ -33,6 +33,10 @@ option(BUILD_ITK "Build ITK in the superbuild. If disabled, you need to set ITK_
 
 option(DISABLE_LIB_WARNINGS "Disables all compilation warnings on the built libraries" OFF)
 
+if (MSVC AND BUILD_VTK)
+	option(ENABLE_VTK_AVIWRITER "Enable usage of *.avi (an old Windows movie file format) writer in open_iA. Note that enabling this might cause linker errors, since we cannot reliably determine whether VTK builds the required parts or not." OFF)
+endif()
+
 # Find proper way to append flags here...
 #if(MSVC)
 #	set(DISABLE_WARNINGS_OPT "\"-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} /W0\"")
@@ -1124,6 +1128,10 @@ if (ENABLE_HDF5)
 	list(APPEND openiA_DEPENDS hdf5)
 	list(APPEND OPEN_IA_CMAKE_ARGS
 		"-DHDF5_DIR:PATH=${HDF5_INSTALL_DIR}/share/cmake/hdf5")
+endif()
+if (ENABLE_VTK_AVIWRITER)
+	list(APPEND OPEN_IA_CMAKE_ARGS
+		"-DVTK_USE_AVIWRITER=YES")
 endif()
 
 set(OPEN_IA_GIT_TAG_OPTIONS "develop" "main" "2020.09" "2020.04" "2020.01" "2019.12" "2019.07")
