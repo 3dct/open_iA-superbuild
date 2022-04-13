@@ -44,6 +44,23 @@ endif()
 #	set(DISABLE_WARNINGS_OPT "\"-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -w\"")
 #endif()
 #
+
+function(selector varname options default desc)
+	list(FIND options "${${varname}}" options_index)
+	if (${options_index} EQUAL -1)
+		if (DEFINED ${varname})
+			message(WARNING "Invalid ${varname}, resetting to default ${default}!")
+		endif()
+		set(${varname} "${default}" CACHE STRING "${desc}" FORCE)
+		set_property(CACHE ${varname} PROPERTY STRINGS ${options})
+	endif()
+endfunction()
+
+set(AVX_OPTIMIZATION_OPTIONS "off" "AVX" "AVX2")
+set(AVX_OPTIMIZATION_DEFAULT "off")
+set(AVX_OPTIMIZATION_DESC "Choose whether code should use AVX instructions, and if so which (AVX/AVX2)  (default: ${AVX_OPTIMIZATION_DEFAULT}).")
+selector(AVX_OPTIMIZATION "${AVX_OPTIMIZATION_OPTIONS}" ${AVX_OPTIMIZATION_DEFAULT} ${AVX_OPTIMIZATION_DESC})
+
 if (NOT ARCHIVE_DIR)
 	set(ARCHIVE_DIR ${CMAKE_BINARY_DIR}/archives CACHE PATH "Directory for storing downloaded archive files." FORCE)
 endif()
@@ -104,18 +121,6 @@ endif()
 set(GIT_APPLY_OPTS --ignore-whitespace)
 #--whitespace=nowarn --inaccurate-eof) # potential additional options in case of whitespace errors....
 set(GIT_APPLY_CMD "${GIT_EXECUTABLE}" apply ${GIT_APPLY_OPTS})
-
-
-function(selector varname options default desc)
-	list(FIND options "${${varname}}" options_index)
-	if (${options_index} EQUAL -1)
-		if (DEFINED ${varname})
-			message(WARNING "Invalid ${varname}, resetting to default ${default}!")
-		endif()
-		set(${varname} "${default}" CACHE STRING "${desc}" FORCE)
-		set_property(CACHE ${varname} PROPERTY STRINGS ${options})
-	endif()
-endfunction()
 
 # build types
 if (NOT CMAKE_CONFIGURATION_TYPES)
@@ -1012,6 +1017,7 @@ set(OPEN_IA_CMAKE_ARGS
 	"-DITK_DIR:PATH=${ITK_DIR}"
 	"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
 	"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
+	"-DopeniA_AVX_SUPPORT=${AVX_OPTIMIZATION}"
 )
 if (QT_VERSION_MAJOR GREATER_EQUAL 6)
 	list(APPEND OPEN_IA_CMAKE_ARGS
