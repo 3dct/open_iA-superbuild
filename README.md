@@ -37,9 +37,19 @@ On Linux, those packages should be available from the distribution repository. F
 On Windows, download and install:
 - [CMake](https://cmake.org/)
 - [git](https://git-scm.com/download/win)
-- Visual Studio (e.g. the free [Community Edition](https://visualstudio.microsoft.com/de/vs/older-downloads)). We support Visual Studio 2015 or newer, and currently **recommend to use Visual Studio 2019**.
+- Visual Studio (e.g. the free [Community Edition](https://visualstudio.microsoft.com/de/vs/older-downloads)). We currently **recommend to use Visual Studio 2019**; Visual Studio 2022 should also work, but could cause problems when using anything CUDA-related.
 - OpenGL headers are included in the Windows SDK installed along with Visual Studio
-- [Open Source version of Qt](https://www.qt.io/download-open-source) >= 5.9 (install 64 bit binaries for the respective Visual Studio version, recommended is e.g. 5.14.x or 5.15.x). **Note:** Qt 6 is supported, but requires to use VTK 9.1 or later, or git from its master branch; pre-built binaries are only provided for VS 2019, but they seem to work on VS 2022 as well.
+- Qt:
+	- Go to the [Qt for Open Source Development](https://www.qt.io/download-open-source) page.
+	- Under "Looking for Qt binaries?", you should see a button to download the "Qt Online Installer" (if it doesn't show up, try another browser).
+	- In the installer, log in to your Qt account (or create one if you haven't got one yet)
+    - In the "Select Components" step:
+		- expand the "Qt" tree item
+		- decide on a version
+			- current recommendation is 5.15.2 at the moment; any version >= 5.9.9 should work
+			- **Note on Qt versions >= 6**: These are supported, but require to use VTK 9.1 or later, or git from its master branch, see `VTK_VERSION`, `VTK_USE_GIT_REPO` and `VTK_GIT_TAG` options below.
+			- **Note on Visual Studio 2022:** pre-built binaries are only provided for VS 2019, but they seem to work on VS 2022 as well.
+		- for that version, expand the tree and **only check** the "MSVC 2019 64-bit" option, as well as the "Qt Charts" option under "Additional Libraries"; make sure no other version or option than those two is checked (unless you require them for something else than open\_iA, of course).
 - optional: an OpenCL SDK; if available, some GPU operations will be available; some modules require it. The generic OpenCL-ICD loader can be built from within the superbuild (via `ENABLE_OPENCL`). Or you can use an SDK best fitting your build system, e.g. the AMD OpenCL SDK for an AMD graphics card, the NVidia CUDA SDK for an NVidia graphics card, or the Intel OpenCL SDK for an onboard graphics card (but note that this ties your build to machines having similar compute capabilities)
 
 
