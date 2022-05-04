@@ -27,12 +27,13 @@ open\_iA also requires some headers and libraries:
 
 On Linux, those packages should be available from the distribution repository. For example, on Ubuntu, execute:
 ```
-  $ sudo apt install cmake g++ make git \
+  $ sudo apt install cmake cmake-qt-gui g++ make git \
     libgl1-mesa-dev libxt-dev \
     ocl-icd-opencl-dev opencl-headers opencl-clhpp-headers \
-    qtbase5-dev libqt5x11extras5-dev qttools5-dev qt5-default \
+    qtbase5-dev libqt5x11extras5-dev qttools5-dev \
     libxt-dev libqt5opengl5-dev libqt5svg5-dev libqt5charts5-dev
 ```
+On versions of Ubuntu prior to 21.04, you might have to also install the `qt5-default` package in order to make Qt 5 the default.
 
 On Windows, download and install:
 - [CMake](https://cmake.org/)
@@ -65,7 +66,7 @@ Alternatively, use a git GUI tool of your choice for checking out the superbuild
 ### 3. CMake Configure+Generate
 
 Run CMake; you have two options:
-1. If you prefer the command line, open a shell in the cloned repository, and execute `$ cmake .`. In case of errors, we recommend to switch to option 2.
+1. If you prefer the command line, open a shell inside the cloned repository, and execute `$ cmake .`. In case of errors, we recommend to switch to option 2.
 2. Run the graphical user interface version of CMake:
   - Enter the cloned repository folder under "Where is the source code"
   - Enter the folder you wish that vtk, itk and open\_iA sources and binaries shall be put in, under "Where to build the binaries".
