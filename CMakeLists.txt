@@ -110,9 +110,12 @@ if (QT_DIR AND NOT Qt${QT_VERSION_MAJOR}_DIR)
 		set(Qt${QT_VERSION_MAJOR}WidgetsTools_DIR ${QT_DIR}WidgetsTools CACHE PATH "" FORCE)
 	endif()
 endif()
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Concurrent Gui OpenGL Svg Widgets Xml REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS  Concurrent Gui OpenGL Svg Widgets Xml OPTIONAL_COMPONENTS Charts REQUIRED)
 set(QT_PATH ${Qt${QT_VERSION_MAJOR}_DIR})
-message(STATUS "Using Qt version ${QT_VERSION} in ${QT_DIR}")
+if (Qt${QT_VERSION_MAJOR}Charts_FOUND)
+    set(QTFEATURES " (with Qt Charts)")
+endif()
+message(STATUS "Qt: ${QT_VERSION}${QTFEATURES} in ${QT_DIR}")
 
 find_package(Git)
 if(NOT GIT_FOUND)
@@ -1073,12 +1076,13 @@ if (ENABLE_TOOLS)
 		"-DModule_TripleHistogramTF:BOOL=ON"
 		"-DModule_Uncertainty:BOOL=ON")
 	# Qt 6.0 does not come with Qt Charts; any Qt 5 version ships it though, and Qt >= 6.1 does too:
-	if (QT_VERSION_MAJOR LESS 6 OR QT_VERSION VERSION_GREATER_EQUAL "6.1.0")
+	# ToDo: enable only based on whether Qt Charts are actually installed?
+	if (QT_VERSION_MAJOR LESS 6 OR QT_VERSION VERSION_GREATER_EQUAL "6.1.0" AND Qt${QT_VERSION_MAJOR}Charts_FOUND)
 		list(APPEND OPEN_IA_CMAKE_ARGS
 			"-DModule_AdaptiveThreshold:BOOL=ON"
 			"-DQt${QT_VERSION_MAJOR}Charts_DIR:PATH=${Qt${QT_VERSION_MAJOR}_DIR}Charts")
 	else()
-		message(WARNING "Qt 6.0 does NOT support Qt charts, thus AdaptiveThresholding module depending on that library cannot be enabled!")
+		message(WARNING "We did not find the Qt Charts component! Either you are using Qt 6.0.x, which does not supply that component, or you did not select the component during Qt installation. The AdaptiveThresholding module depending on that component is therefore disabled!")
 	endif()
 	if (NOT ENABLE_FILTERS)		# if filters are not enabled,
 		list(APPEND OPEN_IA_CMAKE_ARGS	# we need to enable at least those filters required by modules:
