@@ -823,15 +823,15 @@ if (ENABLE_ASTRA)
 			message(STATUS "	Make sure to install autoconf/automake/libtool, e.g. on Ubuntu via `sudo apt install automake libtool`")
 		endif()
 
-		if (DISABLE_LIB_WARNINGS)
+		if (ASTRA_PATCH AND DISABLE_LIB_WARNINGS)
 			list(APPEND ASTRA_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/astra-vs-warnings.patch")
 		endif()
 
-		if (CUDA_VERSION VERSION_GREATER_EQUAL "11.0")
-			list(APPEND ASTRA_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/astra-vs-remove_30.patch")
+		if (ASTRA_PATCH AND CUDA_VERSION VERSION_GREATER_EQUAL "11.0")
+			list(APPEND ASTRA_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/astra-${ASTRA_TAG}-vs-remove_30.patch")
 		endif()
 
-		if (ASTRA_PATCH_COMMAND STREQUAL "${GIT_APPLY_CMD}")
+		if (ASTRA_PATCH AND ASTRA_PATCH_COMMAND STREQUAL "${GIT_APPLY_CMD}")
 			set(ASTRA_PATCH_COMMAND "")	# if no patch to apply, set empty
 		endif()
 
