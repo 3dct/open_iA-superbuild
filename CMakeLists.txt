@@ -1080,6 +1080,11 @@ if (ENABLE_TOOLS)
 	else()
 		message(WARNING "Qt 6.0 does NOT support Qt charts, thus AdaptiveThresholding module depending on that library cannot be enabled!")
 	endif()
+	if (NOT ENABLE_FILTERS)		# if filters are not enabled,
+		list(APPEND OPEN_IA_CMAKE_ARGS	# we need to enable at least those filters required by modules:
+			"-DModule_MetaFilters:BOOL=ON"				# required by GEMSe
+			"-DModule_Segmentation:BOOL=ON")			# required by AdaptiveThreshold, FiAKEr
+	endif()
 endif()
 if (ENABLE_TEST)
 	list(APPEND OPEN_IA_CMAKE_ARGS "-DopeniA_TESTING_ENABLED:BOOL=ON")
