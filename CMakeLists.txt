@@ -533,7 +533,7 @@ if (ENABLE_OPENCL)
 		set(OPENCL_C_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-Headers.git")
 		set(OPENCL_CPP_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-CLHPP.git")
 		set(OPENCL_ICD_REPO "https://github.com/KhronosGroup/OpenCL-ICD-Loader.git")
-		set(OPENCL_TAG "v2020.03.13")
+		set(OPENCL_TAG "v2020.06.16")
 		# newer versions of OpenCL CPP don't include cl.hpp, which we still need
 		set(OPENCL_CPP_TAG "v2.0.11")
 		ExternalProject_Add (OpenCL_C
