@@ -174,4 +174,6 @@ You only need to go back to executing a build on the whole superbuild folder if 
   $ cmake /home/youruser/open_iA-superbuild
   ```
 
+- On Ubuntu (22.04, but maybe also other versions), there is a known incompatibility between CUDA 11.5 as installed from the package sources and boost, resulting in the astra build reporting `configure: error: Boost and CUDA versions are incompatible. You probably have to upgrade boost.`, similar [as reported here](https://github.com/NVlabs/instant-ngp/issues/119). This happens even when using the latest boost version available (1.78 at the time of writing this); it is fixed with CUDA 11.6. So, in order to use CUDA on Ubuntu, install the latest CUDA 11.6 release with the "runfile" installer.
+
 - If you encounter any error not mentioned here, please [post an issue](https://github.com/3dct/open_iA-superbuild/issues)!
