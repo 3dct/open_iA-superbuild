@@ -32,7 +32,7 @@ On Linux, those packages should be available from the distribution repository. F
     ocl-icd-opencl-dev opencl-headers opencl-clhpp-headers \
     qtbase5-dev libqt5x11extras5-dev qttools5-dev \
     libxt-dev libqt5opengl5-dev libqt5svg5-dev libqt5charts5-dev \
-    libxcursor-dev
+    libxcursor-dev libsdl2-dev
 ```
 In case you want to use clang instead of gcc, you can remove `g++` from the above command line, and additionally execute:
 ```
