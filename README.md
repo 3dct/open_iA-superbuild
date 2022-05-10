@@ -31,9 +31,14 @@ On Linux, those packages should be available from the distribution repository. F
     libgl1-mesa-dev libxt-dev \
     ocl-icd-opencl-dev opencl-headers opencl-clhpp-headers \
     qtbase5-dev libqt5x11extras5-dev qttools5-dev \
-    libxt-dev libqt5opengl5-dev libqt5svg5-dev libqt5charts5-dev
+    libxt-dev libqt5opengl5-dev libqt5svg5-dev libqt5charts5-dev \
+    libxcursor-dev
 ```
-On versions of Ubuntu prior to 21.04, you might have to also install the `qt5-default` package in order to make Qt 5 the default.
+In case you want to use clang instead of gcc, you can remove `g++` from the above command line, and additionally execute:
+```
+  $ sudo apt install clang libomp-dev
+```
+(OpenMP is required, and installs as separate package for clang). On versions of Ubuntu prior to 21.04, you might have to also install the `qt5-default` package in order to make Qt 5 the default.
 
 On Windows, download and install:
 - [CMake](https://cmake.org/)
