@@ -1,6 +1,6 @@
 ## open\_iA Superbuild
 
-This document provides the currently simplest way of setting up a build environment for [open\_iA](https://github.com/3dct/open_iA). The build steps here were tested on Ubuntu 18.04.1 and 18.10, as well as on Windows 10. They might or might not work on other distributions and operating systems. Please let us know of your experience [in the issue tracker](https://github.com/3dct/open_iA-superbuild/issues). In case of problems, make sure to check the troubleshooting section below.
+This document provides the currently simplest way of setting up a build environment for [open\_iA](https://github.com/3dct/open_iA). The build steps here were tested on Ubuntu 18.04.1 and 18.10, as well as on Windows 10. They might or might not work on other distributions and operating systems. Please let us know of your experience [in the issue tracker](https://github.com/3dct/open_iA-superbuild/issues). In case of problems, make sure to check the [Troubleshooting section](#Troubleshooting) below.
 
 ## Build steps
 
@@ -25,20 +25,36 @@ open\_iA also requires some headers and libraries:
 - optional: OpenCL
 - Qt
 
-On Linux, those packages should be available from the distribution repository. For example, on Ubuntu, execute:
-```
-  $ sudo apt install cmake cmake-qt-gui g++ make git \
-    libgl1-mesa-dev libxt-dev \
-    ocl-icd-opencl-dev opencl-headers opencl-clhpp-headers \
-    qtbase5-dev libqt5x11extras5-dev qttools5-dev \
-    libxt-dev libqt5opengl5-dev libqt5svg5-dev libqt5charts5-dev \
-    libxcursor-dev libsdl2-dev
-```
-In case you want to use clang instead of gcc, you can remove `g++` from the above command line, and additionally execute:
-```
-  $ sudo apt install clang libomp-dev
-```
-(OpenMP is required, and installs as separate package for clang). On versions of Ubuntu prior to 21.04, you might have to also install the `qt5-default` package in order to make Qt 5 the default.
+On Linux, those packages should be available from the distribution repository.
+  - For example, on Ubuntu 22.04, execute:
+    ```
+    $ sudo apt install cmake cmake-qt-gui g++ make git \
+      libgl1-mesa-dev libxt-dev \
+      ocl-icd-opencl-dev opencl-headers opencl-clhpp-headers \
+      qtbase5-dev libqt5x11extras5-dev qttools5-dev \
+      libxt-dev libqt5opengl5-dev libqt5svg5-dev libqt5charts5-dev \
+      libxcursor-dev libsdl2-dev
+    ```
+    In case you want to use clang instead of gcc, you can remove `g++` from the above command line, and additionally execute:
+    ```
+    $ sudo apt install clang libomp-dev
+    ```
+    OpenMP is required, and installs as separate package for clang. On versions of Ubuntu prior to 21.04, you might have to also install the `qt5-default` package in order to make Qt 5 the default.
+
+  - On Fedora (36), the command required to install the required packages is:
+    ```
+    $ sudo dnf install automake boost-devel clang cmake \
+      cmake-gui libomp-devel libtool libxkbcommon-devel \
+      make ninja-build mesa-libGL-devel ocl-icd-devel \
+      opencl-headers qt6-qtbase-devel qt6-qtcharts-devel \
+      qt6-qtsvg-devel qt6-qttools-devel
+    ```
+    (installing both ninja and make build tools, and the clang compiler, in this example)
+
+  - If you require any CUDA-dependant module (the Astra Reconstruction and the AI module currently),
+    please refer to guides for how to install CUDA on your distribution. Also, make sure that the CUDA
+    version that you install fits to other required libraries; see [the onnx CUDA execution provider compatibility list](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html), as well as the notes
+    on boost and CUDA in the [Troubleshooting section](#Troubleshooting) below.
 
 On Windows, download and install:
 - [CMake](https://cmake.org/)
