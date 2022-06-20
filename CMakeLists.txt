@@ -1074,6 +1074,7 @@ if (ENABLE_TOOLS)
 	list(APPEND OPEN_IA_CMAKE_ARGS
 		"-DModule_4DCT:BOOL=ON"
 		"-DModule_BoneThickness:BOOL=ON"
+		"-DModule_CompVis:BOOL=ON"
 		"-DModule_DreamCaster:BOOL=${ENABLE_OPENCL}"
 		"-DModule_DynamicVolumeLines:BOOL=ON"
 		"-DModule_ElastixRegistration:BOOL=ON"
@@ -1085,13 +1086,12 @@ if (ENABLE_TOOLS)
 		"-DModule_FuzzyFeatureTracking:BOOL=ON"
 		"-DModule_GEMSe:BOOL=ON"
 		"-DModule_InSpectr:BOOL=ON"
-		"-DModule_ModalityExplorer:BOOL=ON"
-		"-DModule_ParameterExplorer:BOOL=ON"
+		"-DModule_Labelling:BOOL=ON"
+		"-DModule_NModalTF:BOOL=ON"
 		"-DModule_PolygonPrimitives:BOOL=ON"
 		"-DModule_TripleHistogramTF:BOOL=ON"
 		"-DModule_Uncertainty:BOOL=ON")
 	# Qt 6.0 does not come with Qt Charts; any Qt 5 version ships it though, and Qt >= 6.1 does too:
-	# ToDo: enable only based on whether Qt Charts are actually installed?
 	if (QT_VERSION_MAJOR LESS 6 OR QT_VERSION VERSION_GREATER_EQUAL "6.1.0" AND Qt${QT_VERSION_MAJOR}Charts_FOUND)
 		list(APPEND OPEN_IA_CMAKE_ARGS
 			"-DModule_AdaptiveThreshold:BOOL=ON"
@@ -1120,7 +1120,9 @@ if (ENABLE_ASTRA)
 	endif()
 endif()
 if (ENABLE_VR)
-	list(APPEND OPEN_IA_CMAKE_ARGS "-DModule_VR:BOOL=ON")
+	list(APPEND OPEN_IA_CMAKE_ARGS
+		"-DModule_ImNDT:BOOL=ON"
+		"-DModule_XVRA:BOOL=ON")
 	if (VTK_VERSION VERSION_LESS "9.0.0")
 		list(APPEND OPEN_IA_CMAKE_ARGS
 			"-DOPENVR_ROOT_DIR:PATH=${OPENVR_ROOT_DIR}")
