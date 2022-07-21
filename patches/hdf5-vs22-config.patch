@@ -1,6 +1,4 @@
-diff --git a/HDF5config.cmake.orig b/HDF5config.cmake
-index 004e600..22adf67 100644
---- a/HDF5config.cmake.orig
+--- a/HDF5config.cmake
 +++ b/HDF5config.cmake
 @@ -110,7 +110,13 @@ if (NOT DEFINED HPC)
    if (WIN32 AND NOT MINGW)
