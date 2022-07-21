@@ -396,9 +396,9 @@ if (BUILD_VTK)
 	)
 	if (QT_VERSION_MAJOR GREATER_EQUAL 6)
 		list(APPEND VTK_CMAKE_ARGS
-			"-DQt6WidgetsTools_DIR=${Qt6_DIR}WidgetsTools"
-			"-DQt6CoreTools_DIR=${Qt6_DIR}CoreTools"
-			"-DQt6GuiTools_DIR=${Qt6_DIR}GuiTools")
+			"-DQt6WidgetsTools_DIR:PATH=${Qt6_DIR}WidgetsTools"
+			"-DQt6CoreTools_DIR:PATH=${Qt6_DIR}CoreTools"
+			"-DQt6GuiTools_DIR:PATH=${Qt6_DIR}GuiTools")
 	endif()
 	#if (DISABLE_LIB_WARNINGS)
 	#	list(APPEND VTK_CMAKE_ARGS ${DISABLE_WARNINGS_OPT})
