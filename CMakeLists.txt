@@ -545,7 +545,15 @@ if (ENABLE_OPENCL)
 		set(OPENCL_CPP_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-CLHPP.git")
 		set(OPENCL_ICD_REPO "https://github.com/KhronosGroup/OpenCL-ICD-Loader.git")
 		set(OPENCL_TAG "v2020.06.16")
-		#set(OPENCL_TAG "v2022.05.18")
+# Notes on above ICD Loader versions:
+#      - v2022.05.18  known to cause error (`OpenCL/icdloader/test/layer/icd_print_layer_generated.c:946:50: error: expected function body after function declarator`) and warning (`CL_TARGET_OPENCL_VERSION is not a valid value (100, 110, 120, 200, 210, 220). Defaulting to 220 (OpenCL 2.2)")`)
+#      - v2022.01.04  not tested
+#      - v2021.06.30  not tested
+#      - v2021.04.29  not tested
+#      - v2020.12.18  not tested
+#      - v2020.06.16  known to work well!
+#      - v2020.03.13  known to make problems on linux (`multiple definition of ret_val)
+
 		# newer versions of OpenCL CPP don't include cl.hpp, which we still need
 		set(OPENCL_CPP_TAG "v2.0.11")
 		ExternalProject_Add (OpenCL_C
