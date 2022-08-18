@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.14...3.24)
 # Required CMake version: as high as open_iA!
 if (CMAKE_MAJOR_VERSION GREATER 3 OR (CMAKE_MAJOR_VERSION EQUAL 3 AND CMAKE_MINOR_VERSION GREATER 15))
 	# prevent all submodules to be fetched in ExternalProject_Add if GIT_SUBMODULES is ""
@@ -545,6 +545,7 @@ if (ENABLE_OPENCL)
 		set(OPENCL_CPP_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-CLHPP.git")
 		set(OPENCL_ICD_REPO "https://github.com/KhronosGroup/OpenCL-ICD-Loader.git")
 		set(OPENCL_TAG "v2020.06.16")
+		#set(OPENCL_TAG "v2022.05.18")
 		# newer versions of OpenCL CPP don't include cl.hpp, which we still need
 		set(OPENCL_CPP_TAG "v2.0.11")
 		ExternalProject_Add (OpenCL_C
