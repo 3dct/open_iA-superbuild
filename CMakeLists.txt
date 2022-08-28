@@ -911,15 +911,16 @@ if (ENABLE_HDF5)
 			message(SEND_ERROR "Visual Studio >= 2022 (more precisely, MSVC_VERSION >= 1930) is not supported (yet) in HDF5 build, please use an older MSVC version if you require HDF5!")
 		endif()
 		# Note: --no-tests=ignore only available with CMake >= 3.17!
-		set(HDF5_BUILD_COMMAND "${CMAKE_CTEST_COMMAND}" --no-tests=ignore -S HDF5config.cmake,BUILD_GENERATOR=${HDF5_GENERATOR} -C Release -V -O hdf5.log)
 		set(HDF5_PLATFORM_SUFFIX "win64")
 		set(HDF5_ARCHIVE_SUFFIX "zip")
 	else()
-		set(HDF5_BUILD_COMMAND "${HDF5_SRC_DIR}/build-unix.sh")
+		# set(HDF5_BUILD_COMMAND "${HDF5_SRC_DIR}/build-unix.sh") # does not include --no-tests=ignore
+		set(HDF5_GENERATOR Unix)
 		set(HDF5_PLATFORM_SUFFIX "Linux")
 		set(HDF5_ARCHIVE_SUFFIX "tar.gz")
 	# Apple?
 	endif()
+	set(HDF5_BUILD_COMMAND "${CMAKE_CTEST_COMMAND}" --no-tests=ignore -S HDF5config.cmake,BUILD_GENERATOR=${HDF5_GENERATOR} -C Release -V -O hdf5.log)
 	set(HDF5_FULL_NAME "HDF5-${HDF5_VERSION}-${HDF5_PLATFORM_SUFFIX}")
 	set(HDF5_INSTALL_COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_BINARY_DIR}" "${CMAKE_COMMAND}" -E tar x "${HDF5_SRC_DIR}/${HDF5_FULL_NAME}.${HDF5_ARCHIVE_SUFFIX}")
 	set(HDF5_INSTALL_DIR "${CMAKE_BINARY_DIR}/${HDF5_FULL_NAME}")
