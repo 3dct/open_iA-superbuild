@@ -877,10 +877,8 @@ if (ENABLE_HDF5)
 			if (HDF5_VERSION VERSION_LESS "1.12.1")
 				message(SEND_ERROR "HDF5 problem: Please use version >= 1.12.1 for Visual Studio 2022! Remove HDF5_VERSION variable and re-configure if the list does not contain these new versions yet!")
 			endif()
-			# HDF versions 1.12.x don't contain config for Visual Studio 2022 yet, patch it in:
-			if (HDF5_VERSION VERSION_LESS "1.13.0")
-				list(APPEND HDF5_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/hdf5-vs22-config.patch")
-			endif()
+			# HDF versions 1.12.x and 1.13.x don't contain config for Visual Studio 2022 yet, patch it in:
+			list(APPEND HDF5_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/hdf5-vs22-config.patch")
 		else()
 			message(SEND_ERROR "Visual Studio >= 2022 (more precisely, MSVC_VERSION >= 1930) is not supported (yet) in HDF5 build, please use an older MSVC version if you require HDF5!")
 		endif()
