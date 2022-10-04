@@ -1,6 +1,6 @@
 --- a/HDF5options.cmake
 +++ b/HDF5options.cmake
-@@ -26,7 +26,7 @@
+@@ -31,7 +31,7 @@
  
  #############################################################################################
  ####      Only build static libraries       ####
@@ -9,7 +9,7 @@
  ####      Only build shared libraries       ####
  #set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DONLY_SHARED_LIBS:BOOL=OFF")
  ####      Add PIC option on linux/mac       ####
-@@ -91,7 +91,7 @@
+@@ -96,7 +96,7 @@
  #############################################################################################
  ### disable test program builds
  
@@ -18,9 +18,8 @@
  
  #############################################################################################
  ### disable packaging
-@@ -106,3 +106,5 @@
- #set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DCMAKE_TOOLCHAIN_FILE:STRING=config/toolchain/intel.cmake")
+@@ -106,3 +106,4 @@
+ set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_PACKAGE_EXTLIBS:BOOL=ON")
  
  #############################################################################################
 +set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_EXAMPLES:BOOL=OFF -DHDF5_BUILD_TOOLS:BOOL=OFF -DHDF5_BUILD_UTILS:BOOL=OFF")
-\ No newline at end of file
