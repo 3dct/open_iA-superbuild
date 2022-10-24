@@ -73,7 +73,7 @@ index 430973a..b4525f9 100644
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
    <ImportGroup Label="ExtensionSettings">
 -    <Import Project="$(CUDA_PATH_V10_2)\extras\visual_studio_integration\MSBuildExtensions\CUDA 10.2.props" />
-+    <Import Project="$(CUDA_PATH_V@CUDA_VERSION_UNDERSCORE@)\extras\visual_studio_integration\MSBuildExtensions\CUDA @CUDA_VERSION@.props" />
++    <Import Project="$(CUDA_PATH_V@CUDAToolkit_VERSION_UNDERSCORE@)\extras\visual_studio_integration\MSBuildExtensions\CUDA @CUDAToolkit_VERSION@.props" />
    </ImportGroup>
    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'">
      <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -82,7 +82,7 @@ index 430973a..b4525f9 100644
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
    <ImportGroup Label="ExtensionTargets">
 -    <Import Project="$(CUDA_PATH_V10_2)\extras\visual_studio_integration\MSBuildExtensions\CUDA 10.2.targets" />
-+    <Import Project="$(CUDA_PATH_V@CUDA_VERSION_UNDERSCORE@)\extras\visual_studio_integration\MSBuildExtensions\CUDA @CUDA_VERSION@.targets" />
++    <Import Project="$(CUDA_PATH_V@CUDAToolkit_VERSION_UNDERSCORE@)\extras\visual_studio_integration\MSBuildExtensions\CUDA @CUDAToolkit_VERSION@.targets" />
    </ImportGroup>
  </Project>
 \ No newline at end of file
