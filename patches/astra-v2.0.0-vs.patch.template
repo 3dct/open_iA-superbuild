@@ -12,7 +12,7 @@
      <ProjectGuid>{DABD9D82-609E-4C71-B1CA-A41B07495290}</ProjectGuid>
      <RootNamespace>astra_vc14</RootNamespace>
 +    <WindowsTargetPlatformVersion>@CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION@</WindowsTargetPlatformVersion>
-+    <CudaToolkitCustomDir>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v@CUDAToolkit_VERSION@</CudaToolkitCustomDir>
++    <CudaToolkitCustomDir>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v@CUDAToolkit_VERSION_SHORT@</CudaToolkitCustomDir>
    </PropertyGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'" Label="Configuration">
@@ -78,7 +78,7 @@
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
    <ImportGroup Label="ExtensionSettings">
 -    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 9.0.props" />
-+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA @CUDAToolkit_VERSION@.props" />
++    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA @CUDAToolkit_VERSION_SHORT@.props" />
    </ImportGroup>
    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug_CUDA|Win32'">
      <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -86,7 +86,7 @@
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
    <ImportGroup Label="ExtensionTargets">
 -    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 9.0.targets" />
-+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA @CUDAToolkit_VERSION@.targets" />
++    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA @CUDAToolkit_VERSION_SHORT@.targets" />
    </ImportGroup>
 --- a/matlab/mex/astra_mex_algorithm_vc14.vcxproj
 +++ b/matlab/mex/astra_mex_algorithm_vc14.vcxproj
