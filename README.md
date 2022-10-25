@@ -59,7 +59,7 @@ On Linux, those packages should be available from the distribution repository.
 On Windows, download and install:
 - [CMake](https://cmake.org/)
 - [git](https://git-scm.com/download/win)
-- Visual Studio (e.g. the free [Community Edition](https://visualstudio.microsoft.com/de/vs/older-downloads)). We currently **recommend to use Visual Studio 2019**; Visual Studio 2022 should also work, but could cause problems when using anything CUDA-related.
+- Visual Studio (e.g. the free [Community Edition](https://visualstudio.microsoft.com/de/vs/older-downloads)); we recommend to use Visual Studio 2022.
 - OpenGL headers are included in the Windows SDK installed along with Visual Studio
 - Qt:
 	- Go to the [Qt for Open Source Development](https://www.qt.io/download-open-source) page.
@@ -68,10 +68,10 @@ On Windows, download and install:
     - In the "Select Components" step:
 		- expand the "Qt" tree item
 		- decide on a version
-			- current recommendation is 5.15.2 at the moment; any version >= 5.9.9 should work
-			- **Note on Qt versions >= 6**: These are supported, but require to use VTK 9.1 or later, or git from its master branch, see `VTK_VERSION`, `VTK_USE_GIT_REPO` and `VTK_GIT_TAG` options below.
-			- **Note on Visual Studio 2022:** pre-built binaries are only provided for VS 2019, but they seem to work on VS 2022 as well.
-		- for that version, expand the tree and **only check** the "MSVC 2019 64-bit" option, as well as the "Qt Charts" option under "Additional Libraries"; make sure no other version or option than those two is checked (unless you require them for something else than open\_iA, of course).
+			- current recommendation is to use version 6.4
+			- **Note on Qt versions >= 6**: Use VTK 9.1 or later, or git from its master branch, see `VTK_VERSION`, `VTK_USE_GIT_REPO` and `VTK_GIT_TAG` options below.
+			- **Note on Visual Studio 2022:** pre-built binaries are only provided for VS 2019, but these work with VS 2022 as well.
+		- for that version, expand the tree and **only check** the "MSVC 2019 64-bit" option, as well as the "Qt Charts", "Qt HTTP Server (TP)" (only available for Qt >= 6.4) and "Qt WebSockets" options under "Additional Libraries"; make sure no other version or option than those two is checked (unless you require them for something else than open\_iA, of course).
 - optional: an OpenCL SDK; if available, some GPU operations will be available; some modules require it. The generic OpenCL-ICD loader can be built from within the superbuild (via `ENABLE_OPENCL`). Or you can use an SDK best fitting your build system, e.g. the AMD OpenCL SDK for an AMD graphics card, the NVidia CUDA SDK for an NVidia graphics card, or the Intel OpenCL SDK for an onboard graphics card (but note that this ties your build to machines having similar compute capabilities)
 
 
@@ -124,16 +124,16 @@ You only need to go back to executing a build on the whole superbuild folder if 
 ### Enabling specific features/modules
 
 - `ENABLE_AI` - Whether to build AI module; requires ONNX runtime, which will be fetched automatically; on Windows, you can change whether CUDA or DirectML backend is chosen with the option `AI_ONNX_USE_CUDA` (default: disabled) **Note:** Make sure to install a fitting CUDA version; there are built in checks / messages regarding the required CUDA version for the chosen ONNX runtime version. The latest versions (1.9.0 and 1.10.0) currently require CUDA 11.4, which only supports Visual Studio <= 2019.
-- `ENABLE_ASTRA` - Whether to build the [astra toolbox](https://www.astra-toolbox.com) reconstruction library and open_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time. (default: disabled). **Note:** Make sure to install a fitting CUDA version; on Windows, make sure it works together with the version of Visual Studio you are using!
+- `ENABLE_ASTRA` - Whether to build the [astra toolbox](https://www.astra-toolbox.com) reconstruction library and open\_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time. (default: disabled). **Note:** Make sure to install a fitting CUDA version; on Windows, make sure it works together with the version of Visual Studio you are using!
 - `ENABLE_EIGEN` - Whether to fetch and use eigen (default: disabled)
 - `ENABLE_FILTERS` - Whether to build image processing filters (smoothing, segmentation, intensity transformations, geometric transformations, ...) (default: enabled)
-- `ENABLE_HDF5` - Whether to fetch and build HDF5 library and use it in open_iA (default: disabled). **Note:** The currently latest HDF5 version (1.12.1) does not come with support for building on Visual Studio 2022, use Visual Studio <= 2019 if you want to use HDF5!
+- `ENABLE_HDF5` - Whether to fetch and build HDF5 library and use it in open\_iA (default: disabled). **Note:** The currently latest HDF5 version (1.12.1) does not come with support for building on Visual Studio 2022, use Visual Studio <= 2019 if you want to use HDF5!
 - `ENABLE_OPENCL` - Enables OpenCL; the DreamCaster tool depends is only enabled if this setting is enabled; enabling this option also enables some GPU-optimized ITK filters (default: disabled)
-- `ENABLE_PRECOMPILE` - Whether to build open_iA with precompiled headers enabled (default: disabled; NOT included in `ENABLE_ALL`)
+- `ENABLE_PRECOMPILE` - Whether to build open\_iA with precompiled headers enabled (default: disabled; NOT included in `ENABLE_ALL`)
 - `ENABLE_TOOLS` - Whether to build common tool modules, e.g. FeatureScout, 4DCT, GEMSe, Dynamic Volume Lines, FIAKER, ... (default: enabled)
 - `ENABLE_TEST` - Whether to enable build of tests runners and the capability to submit CDash test runs (default: disabled)
 - `ENABLE_VR` - Whether to build VR module; requires OpenVR SDK, which will be fetched automatically; also boost (includes) are required (default: disabled).
-- `ENABLE_ALL` Enables all optional modules and filters (see also the ENABLE_xyz options above; all except for ENABLE_PRECOMPILE are enabled if this is set to on. Note that unchecking this box again does NOT have any direct effect; it will not automatically set these options to unchecked or their state before. But you will have to uncheck the option if you want to disable any of the single ENABLE_xyz options affected by this setting, otherwise they will be re-enabled on next 'Configure' run) (default: disabled)
+- `ENABLE_ALL` Enables all optional modules and filters (see also the ENABLE\_xyz options above; all except for `ENABLE_PRECOMPILE` are enabled if this is set to on. Note that unchecking this box again does NOT have any direct effect; it will not automatically set these options to unchecked or their state before. But you will have to uncheck the option if you want to disable any of the single `ENABLE_xyz` options affected by this setting, otherwise they will be re-enabled on next 'Configure' run) (default: disabled)
 
 
 ### Library build options
@@ -141,10 +141,10 @@ You only need to go back to executing a build on the whole superbuild folder if 
 - `ARCHIVE_DIR` - A cache directory for downloaded library archives. Set to a directory with existing archives to avoid re-downloading files already present on the local machine / in the local network.
 - `AI_ONNX_USE_CUDA` - Whether to use the CUDA version of the ONNX runtime; if disabled, use DirectML. Only available on Windows (on Linux, DirectML is not available) (default: disabled)
 - `BUILD_TYPE` - The type of build to do (Release, Debug, RelWithDebInfo or MinSizeRel); only available on single-configuration generators (e.g. Unix Makefiles, ninja), not on multi-configuration generators (Visual Studio, XCode) (default: Release)
-- `BUILD_ASTRA` - Whether to build ASTRA in the superbuild (provided that `ENABLE_ASTRA` is enabled). If disabled, you need to set ASTRA_DIR to an existing ASTRA build (default: enabled)
+- `BUILD_ASTRA` - Whether to build ASTRA in the superbuild (provided that `ENABLE_ASTRA` is enabled). If disabled, you need to set `ASTRA_DIR` to an existing ASTRA build (default: enabled)
 - `BUILD_BOOST` - Whether to build BOOST in the superbuild (provided that either `ENABLE_ASTRA` or `ENABLE_VR` is enabled). If disabled, you need to either have a boost installation or a boost build available, and you will be required to set `BOOST_DIR` accordingly (default: enabled)
-- `BUILD_VTK` - Whether to build VTK in the superbuild. If disabled, you need to set VTK_DIR to an existing VTK build (default: enabled)
-- `BUILD_ITK` - Whether to build ITK in the superbuild. If disabled, you need to set ITK_DIR to an existing ITK build (default: enabled)
+- `BUILD_VTK` - Whether to build VTK in the superbuild. If disabled, you need to set `VTK_DIR` to an existing VTK build (default: enabled)
+- `BUILD_ITK` - Whether to build ITK in the superbuild. If disabled, you need to set `ITK_DIR` to an existing ITK build (default: enabled)
 - `ITK_USE_GIT_REPO` - Whether to use git repository for ITK library. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times significantly (since cloning the full repository is much slower than downloading and extracting a release archive).
 - `ITK_VERSION` - The ITK version to build, in case `BUILD_ITK` is enabled and `ITK_USE_GIT_REPO` is disabled; if `ITK_USE_GIT_REPO` is enabled, use `ITK_GIT_TAG` instead.
 - `ITK_GIT_TAG` - The ITK git tag to use in build, in case `BUILD_ITK` is enabled and `ITK_USE_GIT_REPO` is enabled; if `ITK_USE_GIT_REPO` is disabled, use `ITK_VERSION` instead.
