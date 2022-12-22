@@ -681,7 +681,7 @@ if (CUDA_FIND_ENABLED)
 endif()
 
 if (BUILD_BOOST)
-	if (BUILD_ASTRA AND BOOST_VERSION VERSION_GREATER_EQUAL "1.79.0" AND CUDAToolkit_VERSION VERSION_LESS "11.4")
+	if (BOOST_VERSION VERSION_GREATER_EQUAL "1.79.0" AND DEFINED CUDAToolkit_VERSION AND CUDAToolkit_VERSION VERSION_LESS "11.4")
 		message(SEND_ERROR "The combination of boost >= 1.79 with CUDA < 11.4 can cause build problems (on Visual Studio, there is an error : identifier \"__builtin_FILE\" is undefined)! Please either choose a CUDA version >= 11.4, or a boost version < 1.79!")
 	endif()
 	# fetch and build boost...
