@@ -1,0 +1,11 @@
+--- a/Modules/Core/Common/include/itkShapedNeighborhoodIterator.h
++++ b/Modules/Core/Common/include/itkShapedNeighborhoodIterator.h
+@@ -179,7 +179,7 @@
+   using typename Superclass::IndexValueType;
+ 
+   /** An  iterator for the ShapedNeighborhood classes. */
+-  struct Iterator : public ConstIterator
++  struct Iterator : public Superclass::ConstIterator
+   {
+     Iterator() = default;
+     Iterator(Self * s)
