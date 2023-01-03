@@ -1,6 +1,6 @@
 ## open\_iA Superbuild
 
-This document provides the currently simplest way of setting up a build environment for [open\_iA](https://github.com/3dct/open_iA). The build steps here were tested on Ubuntu 18.04.1 and 18.10, as well as on Windows 10. They might or might not work on other distributions and operating systems. Please let us know of your experience [in the issue tracker](https://github.com/3dct/open_iA-superbuild/issues). In case of problems, make sure to check the [Troubleshooting section](#Troubleshooting) below.
+This document provides the currently simplest way of setting up a build environment for [open\_iA](https://github.com/3dct/open_iA). The build steps here were tested on Ubuntu 18.04.1 and 18.10, as well as on Windows 10. They might or might not work on other distributions and operating systems. In case of problems, make sure to check the [Troubleshooting section](#Troubleshooting) below. Please let us know of your experience [in the issue tracker](https://github.com/3dct/open_iA-superbuild/issues).
 
 ## Build steps
 
@@ -9,7 +9,7 @@ In short, these are the steps required to set up a build environment for open\_i
 2. Clone  this repository to some folder on your machine
 3. Run CMake on the checked out repository for the desired toolchain
 4. Build with the toolchain configured in CMake
-5. Done! For developing with open\_iA, go to the `open_iA` subfolder of the superbuild binary folder: the source repository is in `src`, the build directory in `bin`!
+5. You're all set up: For further developments in open\_iA, use the `open_iA` subfolder of the superbuild binary folder.
 
 Detailed descriptions of these steps are given below.
 Additional information can also be found in the [Windows build instructions](https://github.com/3dct/open_iA/wiki/Windows-Build) and the [Linux build instructions](https://github.com/3dct/open_iA/wiki/Linux-Build) in the open\_iA wiki.
@@ -107,15 +107,15 @@ Build everything. The specific steps required here differ for the build environm
 
 ### 5. Done!
 
-When the build finished successfully, open\_iA executables will be built in the `open_iA/bin/bin` subfolder of the folder configured in CMake as "Where to build the binaries".
+When the build finishes successfully, open\_iA executables will be built in the `open_iA/bin/bin` subfolder of the folder configured in CMake as "Where to build the binaries".
 
 **Note:** The superbuild is intended for setting up a build environment with all dependencies.
-For development in open\_iA or its modules, you therefore subsequently don't need to run the full superbuild anymore.
-Once the first superbuild has finished successfully, to start developing in open\_iA, navigate to the `open_iA` subfolder.
+For development in open\_iA or its modules, you therefore subsequently don't need to (and in fact **should not**) run the full superbuild anymore.
+Once the superbuild has finished successfully, to start developing in open\_iA, navigate to the `open_iA` subfolder.
 In its `src` subfolder, you will find a git repository set up for you with all of open\_iA's sources.
 Use the `bin` subfolder as basis for building and for CMake Configure/Generate runs.
 
-You only need to go back to executing a build on the whole superbuild folder if you need to change something in one of the libraries that open\_iA depends on.
+**You only need to go back to executing a build on the whole superbuild folder if you need to change something in one of the libraries that open\_iA depends on.**
 
 
 ## Configuration Options
@@ -156,7 +156,7 @@ You only need to go back to executing a build on the whole superbuild folder if 
 
 
 
-## Troubleshooting:
+## Troubleshooting
 
 - The `$` sign in any code above indicates the shell prompt, do not enter this sign.
 
