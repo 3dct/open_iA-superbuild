@@ -164,18 +164,18 @@ You only need to go back to executing a build on the whole superbuild folder if 
 
 - CMake might encounter an error telling you that some library is missing which you still need to install. If that happens for a library not mentioned in the prerequisites above, please let us know [via the superbuild issue tracker](https://github.com/3dct/open_iA-superbuild/issues).
 
-- Ninja as build tool is known to cause problems at the moment with the superbuild; it produces error messages such as `ninja: error: 'OpenCL\_ICD', needed by 'ITK-prefix/src/ITK-stamp/ITK-mkdir', missing and no known rule to make it`. Workaround: Use "Unix Makefiles" generator instead of "Ninja".
+- Ninja as build tool can cause problems with the superbuild; it produces error messages such as `ninja: error: 'OpenCL\_ICD', needed by 'ITK-prefix/src/ITK-stamp/ITK-mkdir', missing and no known rule to make it`. Workaround: Use "Unix Makefiles" generator instead of "Ninja".
 
 - For the prerequisites installation on Linux: the command to install packages as well as the names of the packages will differ on distributions other than Ubuntu, please consult the manual or community of your distribution.
 
 - The method described above sets up a basic build environment.
-  - It will only build VTK and ITK libraries.
+  - By default, it will only build VTK and ITK libraries.
   - It builds the core executables as well as some of the advanced analysis modules.
   - If you require more modules or other library support, e.g. Eigen, OpenCL or HDF5 support, see the `ENABLE_...` flags in the [Configuration Options](#configuration-options).
 
 - If you use the Unix Makefile generator and have more than 4 cores in your system, you will probably want to increase the number of parallel builds (it is set to 4 in step 4 above). To e.g. run a make build with 8 parallel threads, run
   `$ make -j 8`
-  It is recommended to choose here the number of processor cores available on your system (or twice that number if you processor supports Hyper-Threading).
+  Instead of the exemplary number 8 above, it is recommended to specify the number of processor cores available on your system (or twice that number if you processor supports Hyper-Threading).
 
 - If taking the first option under "CMake Configure+Generate", and you want to put the build environment for open\_iA somewhere else as where you checked out the superbuild,
   or if you want to keep the root folder of the superbuild clear (i.e. if you want to do a so-called out-of-source build),
@@ -191,5 +191,17 @@ You only need to go back to executing a build on the whole superbuild folder if 
   ```
 
 - On Ubuntu (22.04, but maybe also other versions), there is a known incompatibility between CUDA 11.5 as installed from the package sources and boost, resulting in the astra build reporting `configure: error: Boost and CUDA versions are incompatible. You probably have to upgrade boost.`, similar [as reported here](https://github.com/NVlabs/instant-ngp/issues/119). This happens even when using the latest boost version available (1.78 at the time of writing this); it is fixed with CUDA 11.6. So, in order to use CUDA on Ubuntu, install the latest CUDA 11.6 release with the "runfile" installer.
+
+- On Windows, open_iA might refuse to build the AstraReconstruction module if only the Debug configuration was built (output window message: `CMake Warning at cmake/Modules/Modules.cmake:58 (message): Module_AstraReconstruction requires ASTRA_TOOLBOX_FOUND to be TRUE disabling the option!`). As a workaround, build the Release configuration, afterwards finding Astra should work fine (there can be errors when building multiple astra configurations though, see next point).
+
+- On Windows, when switching configuration and building the astra library a second time, the build will probably fail due to the patch step being applied again, with output such as this:
+  ```
+  3> Performing patch step for 'astra'
+  3> CUSTOMBUILD : error : patch failed: astra_vc14.vcxproj:37
+  3> CUSTOMBUILD : error : astra_vc14.vcxproj: patch does not apply
+  ```
+  As a workaround, go to the superbuild folder, right click on the astra folder and select "Git Bash Here". In the opening command prompt, enter `git restore .` followed by enter. Then try the build again, this time it should run through fine.
+
+- With eigen, you might encounter a compilation error with AVX2 option enabled; e.g. on Visual Studio: `C3861: '_cvtss_sh': identifier not found`. There is [an issue](https://gitlab.com/libeigen/eigen/-/issues/2395) for it in eigen issue tracker.
 
 - If you encounter any error not mentioned here, please [post an issue](https://github.com/3dct/open_iA-superbuild/issues)!
