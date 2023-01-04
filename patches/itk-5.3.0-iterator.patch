@@ -1,6 +1,6 @@
 --- a/Modules/Core/Common/include/itkShapedNeighborhoodIterator.h
 +++ b/Modules/Core/Common/include/itkShapedNeighborhoodIterator.h
-@@ -179,7 +179,7 @@
+@@ -179,7 +179,7 @@ class ITK_TEMPLATE_EXPORT ShapedNeighborhoodIterator
    using typename Superclass::IndexValueType;
  
    /** An  iterator for the ShapedNeighborhood classes. */
@@ -9,3 +9,15 @@
    {
      Iterator() = default;
      Iterator(Self * s)
+--- a/Modules/Segmentation/LevelSets/include/itkShapePriorSegmentationLevelSetFunction.h
++++ b/Modules/Segmentation/LevelSets/include/itkShapePriorSegmentationLevelSetFunction.h
+@@ -128,8 +128,7 @@ class ITK_TEMPLATE_EXPORT ShapePriorSegmentationLevelSetFunction
+ 
+   /** A global data type used to store values needed to compute the time step.
+    */
+-  using typename Superclass::GlobalDataStruct;
+-  struct ShapePriorGlobalDataStruct : public GlobalDataStruct
++  struct ShapePriorGlobalDataStruct : public Superclass::GlobalDataStruct
+   {
+     ScalarValueType m_MaxShapePriorChange;
+   };
