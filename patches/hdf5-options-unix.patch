@@ -18,9 +18,8 @@
  
  #############################################################################################
  ### disable packaging
-@@ -106,3 +106,5 @@
+@@ -106,3 +106,4 @@
  #set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DCMAKE_TOOLCHAIN_FILE:STRING=config/toolchain/intel.cmake")
  
  #############################################################################################
 +set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_EXAMPLES:BOOL=OFF -DHDF5_BUILD_TOOLS:BOOL=OFF -DHDF5_BUILD_UTILS:BOOL=OFF")
-\ No newline at end of file
