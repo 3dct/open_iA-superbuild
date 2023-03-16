@@ -1,0 +1,191 @@
+diff --git a/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.h.orig b/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.h
+index f88ec6c..9ff1c19 100644
+--- a/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.h.orig
++++ b/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.h
+@@ -322,12 +322,25 @@ public:
+     return *this;
+   }
+ 
+-  /** Set/Get number of random samples to get from the image region */
++
++
++  /**  Set the number of samples to extract from the region */
+   void
+-  SetNumberOfSamples(SizeValueType number);
++  SetNumberOfSamples(SizeValueType number)
++  {
++    m_NumberOfSamplesRequested = number;
++    if (number > m_NumberOfPixelsInRegion)
++    {
++      m_NumberOfSamplesRequested = m_NumberOfPixelsInRegion;
++    }
++  }
+ 
++  /**  Set the number of samples to extract from the region */
+   SizeValueType
+-  GetNumberOfSamples() const;
++  GetNumberOfSamples() const
++  {
++    return m_NumberOfSamplesRequested;
++  }
+ 
+   /** Reinitialize the seed of the random number generator  */
+   void
+diff --git a/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.hxx.orig b/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.hxx
+index b145b0a..e4dbf7d 100644
+--- a/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.hxx.orig
++++ b/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.hxx
+@@ -72,26 +72,6 @@ ImageRandomNonRepeatingConstIteratorWithIndex<TImage>::operator=(const Self & it
+   return *this;
+ }
+ 
+-/**  Set the number of samples to extract from the region */
+-template <typename TImage>
+-void
+-ImageRandomNonRepeatingConstIteratorWithIndex<TImage>::SetNumberOfSamples(SizeValueType number)
+-{
+-  m_NumberOfSamplesRequested = number;
+-  if (number > m_NumberOfPixelsInRegion)
+-  {
+-    m_NumberOfSamplesRequested = m_NumberOfPixelsInRegion;
+-  }
+-}
+-
+-/**  Set the number of samples to extract from the region */
+-template <typename TImage>
+-auto
+-ImageRandomNonRepeatingConstIteratorWithIndex<TImage>::GetNumberOfSamples() const -> SizeValueType
+-{
+-  return m_NumberOfSamplesRequested;
+-}
+-
+ /** Reinitialize the seed of the random number generator */
+ template <typename TImage>
+ void
+diff --git a/Modules/Filtering/LabelMap/include/itkLabelMap.h.orig b/Modules/Filtering/LabelMap/include/itkLabelMap.h
+index 525f147..1b0518b 100644
+--- a/Modules/Filtering/LabelMap/include/itkLabelMap.h.orig
++++ b/Modules/Filtering/LabelMap/include/itkLabelMap.h
+@@ -169,10 +169,41 @@ public:
+    * inefficient.
+    * This method throws an exception if the index doesn't exist in this image.
+    */
+-  LabelObjectType *
+-  GetNthLabelObject(const SizeValueType & pos);
+-  const LabelObjectType *
+-  GetNthLabelObject(const SizeValueType & pos) const;
++
++
++  const LabelObjectType * GetNthLabelObject(const SizeValueType & pos) const
++  {
++    SizeValueType i = 0;
++
++    for (LabelObjectContainerConstIterator it = m_LabelObjectContainer.begin(); it != m_LabelObjectContainer.end();
++         ++it)
++    {
++      if (i == pos)
++      {
++        return it->second;
++      }
++      ++i;
++    }
++    itkExceptionMacro(<< "Can't access to label object at position " << pos << ". The label map has only "
++                      << this->GetNumberOfLabelObjects() << " label objects registered.");
++  }
++
++  
++  LabelObjectType * GetNthLabelObject(const SizeValueType & pos)
++  {
++    SizeValueType i = 0;
++
++    for (auto it = m_LabelObjectContainer.begin(); it != m_LabelObjectContainer.end(); ++it)
++    {
++      if (i == pos)
++      {
++        return it->second;
++      }
++      ++i;
++    }
++    itkExceptionMacro(<< "Can't access to label object at position " << pos << ". The label map has only "
++                      << this->GetNumberOfLabelObjects() << " label objects registered.");
++  }
+ 
+   /**
+    * Return the pixel value at a given index in the image. If the given index
+@@ -266,8 +297,10 @@ public:
+   /**
+    * Return the number of label objects in the image
+    */
+-  typename Self::SizeValueType
+-  GetNumberOfLabelObjects() const;
++  Self::SizeValueType GetNumberOfLabelObjects() const
++  {
++    return static_cast<typename Self::SizeValueType>(m_LabelObjectContainer.size());
++  }
+ 
+   /**
+    * Return the labels of the label objects available in the label map
+diff --git a/Modules/Filtering/LabelMap/include/itkLabelMap.hxx.orig b/Modules/Filtering/LabelMap/include/itkLabelMap.hxx
+index 09bc341..58127d0 100644
+--- a/Modules/Filtering/LabelMap/include/itkLabelMap.hxx.orig
++++ b/Modules/Filtering/LabelMap/include/itkLabelMap.hxx
+@@ -179,44 +179,6 @@ LabelMap<TLabelObject>::GetPixel(const IndexType & idx) const -> const LabelType
+ }
+ 
+ 
+-template <typename TLabelObject>
+-auto
+-LabelMap<TLabelObject>::GetNthLabelObject(const SizeValueType & pos) -> LabelObjectType *
+-{
+-  SizeValueType i = 0;
+-
+-  for (auto it = m_LabelObjectContainer.begin(); it != m_LabelObjectContainer.end(); ++it)
+-  {
+-    if (i == pos)
+-    {
+-      return it->second;
+-    }
+-    ++i;
+-  }
+-  itkExceptionMacro(<< "Can't access to label object at position " << pos << ". The label map has only "
+-                    << this->GetNumberOfLabelObjects() << " label objects registered.");
+-}
+-
+-
+-template <typename TLabelObject>
+-auto
+-LabelMap<TLabelObject>::GetNthLabelObject(const SizeValueType & pos) const -> const LabelObjectType *
+-{
+-  SizeValueType i = 0;
+-
+-  for (LabelObjectContainerConstIterator it = m_LabelObjectContainer.begin(); it != m_LabelObjectContainer.end(); ++it)
+-  {
+-    if (i == pos)
+-    {
+-      return it->second;
+-    }
+-    ++i;
+-  }
+-  itkExceptionMacro(<< "Can't access to label object at position " << pos << ". The label map has only "
+-                    << this->GetNumberOfLabelObjects() << " label objects registered.");
+-}
+-
+-
+ template <typename TLabelObject>
+ void
+ LabelMap<TLabelObject>::SetPixel(const IndexType & idx, const LabelType & iLabel)
+@@ -494,14 +456,6 @@ LabelMap<TLabelObject>::ClearLabels()
+ }
+ 
+ 
+-template <typename TLabelObject>
+-auto
+-LabelMap<TLabelObject>::GetNumberOfLabelObjects() const -> SizeValueType
+-{
+-  return static_cast<typename LabelMap<TLabelObject>::SizeValueType>(m_LabelObjectContainer.size());
+-}
+-
+-
+ template <typename TLabelObject>
+ auto
+ LabelMap<TLabelObject>::GetLabels() const -> LabelVectorType
