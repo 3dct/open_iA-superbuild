@@ -1,5 +1,5 @@
---- CMakeLists.txt.old	2021-05-28 15:17:11.000000000 +0200
-+++ CMakeLists.txt	2021-07-05 09:03:55.470726300 +0200
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
 @@ -29,7 +29,7 @@
      cmake_policy(SET ${pnew} NEW)
    endif()
