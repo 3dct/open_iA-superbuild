@@ -1,6 +1,4 @@
-diff --git a/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.h.orig b/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.h
-index f88ec6c..9ff1c19 100644
---- a/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.h.orig
+--- a/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.h
 +++ b/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.h
 @@ -322,12 +322,25 @@ public:
      return *this;
@@ -31,9 +29,7 @@ index f88ec6c..9ff1c19 100644
  
    /** Reinitialize the seed of the random number generator  */
    void
-diff --git a/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.hxx.orig b/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.hxx
-index b145b0a..e4dbf7d 100644
---- a/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.hxx.orig
+--- a/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.hxx
 +++ b/Modules/Core/Common/include/itkImageRandomNonRepeatingConstIteratorWithIndex.hxx
 @@ -72,26 +72,6 @@ ImageRandomNonRepeatingConstIteratorWithIndex<TImage>::operator=(const Self & it
    return *this;
@@ -62,9 +58,7 @@ index b145b0a..e4dbf7d 100644
  /** Reinitialize the seed of the random number generator */
  template <typename TImage>
  void
-diff --git a/Modules/Filtering/LabelMap/include/itkLabelMap.h.orig b/Modules/Filtering/LabelMap/include/itkLabelMap.h
-index 525f147..1b0518b 100644
---- a/Modules/Filtering/LabelMap/include/itkLabelMap.h.orig
+--- a/Modules/Filtering/LabelMap/include/itkLabelMap.h
 +++ b/Modules/Filtering/LabelMap/include/itkLabelMap.h
 @@ -169,10 +169,41 @@ public:
     * inefficient.
@@ -93,7 +87,7 @@ index 525f147..1b0518b 100644
 +                      << this->GetNumberOfLabelObjects() << " label objects registered.");
 +  }
 +
-+  
++
 +  LabelObjectType * GetNthLabelObject(const SizeValueType & pos)
 +  {
 +    SizeValueType i = 0;
@@ -125,9 +119,7 @@ index 525f147..1b0518b 100644
  
    /**
     * Return the labels of the label objects available in the label map
-diff --git a/Modules/Filtering/LabelMap/include/itkLabelMap.hxx.orig b/Modules/Filtering/LabelMap/include/itkLabelMap.hxx
-index 09bc341..58127d0 100644
---- a/Modules/Filtering/LabelMap/include/itkLabelMap.hxx.orig
+--- a/Modules/Filtering/LabelMap/include/itkLabelMap.hxx
 +++ b/Modules/Filtering/LabelMap/include/itkLabelMap.hxx
 @@ -179,44 +179,6 @@ LabelMap<TLabelObject>::GetPixel(const IndexType & idx) const -> const LabelType
  }
