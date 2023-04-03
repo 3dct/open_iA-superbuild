@@ -39,7 +39,7 @@ On Linux, those packages should be available from the distribution repository.
     ```
     $ sudo apt install clang libomp-dev
     ```
-    OpenMP is required, and installs as separate package for clang. On versions of Ubuntu prior to 21.04, you might have to also install the `qt5-default` package in order to make Qt 5 the default.
+    OpenMP is required, and installs as separate package for clang. On versions of Ubuntu prior to 21.04, you might have to also install the `qt6-default` package in order to make Qt 6 the default.
 
   - On Fedora (36), the command required to install the required packages is:
     ```
@@ -68,7 +68,7 @@ On Windows, download and install:
     - In the "Select Components" step:
 		- expand the "Qt" tree item
 		- decide on a version
-			- current recommendation is to use version 6.4
+			- current recommendation is to use version 6.4(.3 or whichever is the latest in that branch)
 			- **Note on Qt versions >= 6**: Use VTK 9.1 or later, or git from its master branch, see `VTK_VERSION`, `VTK_USE_GIT_REPO` and `VTK_GIT_TAG` options below.
 			- **Note on Visual Studio 2022:** pre-built binaries are only provided for VS 2019, but these work with VS 2022 as well.
 		- for that version, expand the tree and **only check** the "MSVC 2019 64-bit" option, as well as the "Qt Charts", "Qt HTTP Server (TP)" (only available for Qt >= 6.4) and "Qt WebSockets" options under "Additional Libraries"; make sure no other version or option than those two is checked (unless you require them for something else than open\_iA, of course).
@@ -81,8 +81,8 @@ On Windows, download and install:
 - Clone the superbuild repository: `$ git clone https://github.com/3dct/open_iA-superbuild.git`
 
 Alternatively, use a git GUI tool of your choice for checking out the superbuild repository.
+**Note:** As a precaution, the path you clone to should be short (under 20 characters); see also notes in the next section.
 
-**Note:** On Windows, take care that the full path string of the folder where you place open\_iA is very short; ideally something like `C:\open_iA`. The exact possible maximum length is currently untested, but you should be on the safe side with paths shorter than 20 characters. For example `C:\open_iA\build` (16 characters) should work, while `C:\open_iA\superbuild-bin` (25 characters) is definitely too long (for someone interested in technical details: the path will be incorporated into command lines created by CMake; and on Windows, there is a limit of 32.768 characters on the length of a command; and in some created command lines, the chosen path appears many times).
 
 ### 3. CMake Configure+Generate
 
@@ -91,12 +91,13 @@ Run CMake; you have two options:
 2. Run the graphical user interface version of CMake:
   - Enter the cloned repository folder under "Where is the source code"
   - Enter the folder you wish that vtk, itk and open\_iA sources and binaries shall be put in, under "Where to build the binaries".
-  - If you have a folder where you are caching or want to cache downloaded archives of any of the libraries built by the superbuild, adapt `ARCHIVE_DIR`. This can save download bandwidth, as existing source code archives are taken from there and not downloaded again (default: /archives subfolder of your binary folder)
+    **Note:** On Windows, take care that the full path string of the folder specified in "Where you build the binaries" is very short; ideally something like `C:\open_iA_sb`. The exact possible maximum length is currently untested, but we have tested that it's safe with paths shorter than 20 characters. For example `C:\open_iA\build` (16 characters) should work, while `C:\open_iA\superbuild-bin` (25 characters) is definitely too long (for someone interested in technical details: the path will be incorporated into command lines created by CMake; and on Windows, there is a limit of 32.768 characters on the length of a command; and in some created command lines, the chosen path appears many times).
+  - If you have a folder where you are caching or want to cache downloaded archives of any of the libraries built by the superbuild, adapt `ARCHIVE_DIR`. This can save download bandwidth, as existing source code archives are taken from there and not downloaded again (default: /archives subfolder of your binaries folder)
   - Press "Configure"
   - When asked for a build environment:
-    - On Linux, use the usually pre-selected "Unix Makefiles"
-    - On Windows, use the 64 bit version of the respective Visual Studio toolchain, e.g. "Visual Studio 16 2019 Win64" for Visual Studio 2019 ("Visual Studio 16 2019" as generator and "x64" as platform on CMake versions >= 3.14)
-  - If Qt is installed in a non-standard folder, you will see a corresponding error. You will have to adapt the `QT_DIR` to point to the "lib/cmake/Qt5" (/"lib/cmake/Qt6") subdirectory of the respective version/build directory in the Qt installation folder (e.g. `5.15.2/msvc2019_64/lib/cmake/Qt5`).
+    - On Linux, use the usually pre-selected "Unix Makefiles"; "ninja" should also work, if you have ninja build tools installed (see prerequisites above)
+    - On Windows, use the 64 bit version of the respective Visual Studio toolchain, e.g. "Visual Studio 17 2022" as generator (and "x64" as platform, but this is default anyway).
+  - If Qt is installed in a non-standard folder, you will see a corresponding error. You will have to adapt the `QT_DIR` to point to the "lib/cmake/Qt6" (/"lib/cmake/Qt6") subdirectory of the respective version/build directory in the Qt installation folder (e.g. `6.4.3/msvc2019_64/lib/cmake/Qt6`).
   - In case you want to change some default options (for example to enable more than the default set of modules), check [Configuration Options](#configuration-options).
 
 ### 4. Build Everything
@@ -107,15 +108,29 @@ Build everything. The specific steps required here differ for the build environm
 
 ### 5. Done!
 
-When the build finishes successfully, open\_iA executables will be built in the `open_iA/bin/bin` subfolder of the folder configured in CMake as "Where to build the binaries".
+When the build finishes successfully, open\_iA executables will be built in a subfolder to `open_iA/bin` configured in CMake as "Where to build the binaries".
 
-**Note:** The superbuild is intended for setting up a build environment with all dependencies.
-For development in open\_iA or its modules, you therefore subsequently don't need to (and in fact **should not**) run the full superbuild anymore.
-Once the superbuild has finished successfully, to start developing in open\_iA, navigate to the `open_iA` subfolder.
+How to run the open_iA you just built:
+
+  - Under Linux, the executables are located under `open_iA/bin/bin`, and you can just execute the `open_iA` / `open_iA_cmd` executables directly (from the shell or via double-click in a file manager)
+  - Under Windows, the executables are located `open_iA/bin/x64/CONFIGURATION` (with CONFIGURATION one of Release, Debug, RelWithDebInfo or MinSizeRel). Only the executables in the CONFIGURATION that was selected in Visual Studio when you built will be available. If you try to start the executable directly, you will get an error that dll's (Qt, VTK, ...) cannot be found. You have two options:
+      - Use the .bat files (open_iA_gui_CONFIGURATION.bat) in `open_iA/bin/x64` - these will set the PATH environment accordingly so that the needed dll files are found
+      - Run directly from the Visual Studio solution: in the superbuild, right-click on the "open_iA" project and select "Set as Startup Project"; then select "Start without Debugging" from the "Debug" menu (or press Ctrl+F5); or open the open_iA.sln in the `open_iA/bin/bin` subfolder, and proceed as with the superbuild solution (that is, mark "open_iA" as startup project, and run it via Ctrl+F5).
+
+
+### Continuing from here
+
+The superbuild is intended for setting up a build environment with all libraries that open_iA depends on.
+For development in open\_iA or its modules, you subsequently don't need to (and in fact **should not**) run the full superbuild anymore.
+Once the superbuild has finished successfully, focus your attention on the `open_iA` subfolder.
 In its `src` subfolder, you will find a git repository set up for you with all of open\_iA's sources.
-Use the `bin` subfolder as basis for building and for CMake Configure/Generate runs.
+Use the `bin` subfolder as basis for building and for CMake Configure/Generate runs (that is, in the CMake GUI, enter 
+Under Windows, you can open the .sln file generated in that folder to see open_iA and all its libraries and modules as separate sub-projects.
 
-**You only need to go back to executing a build on the whole superbuild folder if you need to change something in one of the libraries that open\_iA depends on.**
+**You only ever need to go back to executing a build on the whole superbuild folder if you need to change something in one of the libraries that open\_iA depends on.**
+
+You can continue with [our guide on how to develop a module](https://github.com/3dct/open_iA/wiki/Developing-a-simple-module).
+
 
 
 ## Configuration Options
@@ -123,11 +138,11 @@ Use the `bin` subfolder as basis for building and for CMake Configure/Generate r
 
 ### Enabling specific features/modules
 
-- `ENABLE_AI` - Whether to build AI module; requires ONNX runtime, which will be fetched automatically; on Windows, you can change whether CUDA or DirectML backend is chosen with the option `AI_ONNX_USE_CUDA` (default: disabled) **Note:** Make sure to install a fitting CUDA version; there are built in checks / messages regarding the required CUDA version for the chosen ONNX runtime version. The latest versions (1.9.0 and 1.10.0) currently require CUDA 11.4, which only supports Visual Studio <= 2019.
-- `ENABLE_ASTRA` - Whether to build the [astra toolbox](https://www.astra-toolbox.com) reconstruction library and open\_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time. (default: disabled). **Note:** Make sure to install a fitting CUDA version; on Windows, make sure it works together with the version of Visual Studio you are using!
+- `ENABLE_AI` - Whether to build AI module; requires ONNX runtime, which will be fetched automatically; on Windows, you can change whether CUDA or DirectML backend is chosen with the option `AI_ONNX_USE_CUDA` (default: disabled) **Note:** AI support is currently under construction, as the onnx runtime interface and required libraries changed considerably recently; it will probably not work at this moment.
+- `ENABLE_ASTRA` - Whether to build the [astra toolbox](https://www.astra-toolbox.com) reconstruction library and open\_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time. (default: disabled). **Note:** Make sure to install a fitting CUDA version; on Windows, make sure it works together with the version of Visual Studio you are using, on Linux, make sure it's compatible with the used compiler!
 - `ENABLE_EIGEN` - Whether to fetch and use eigen (default: disabled)
 - `ENABLE_FILTERS` - Whether to build image processing filters (smoothing, segmentation, intensity transformations, geometric transformations, ...) (default: enabled)
-- `ENABLE_HDF5` - Whether to fetch and build HDF5 library and use it in open\_iA (default: disabled). **Note:** The currently latest HDF5 version (1.12.1) does not come with support for building on Visual Studio 2022, use Visual Studio <= 2019 if you want to use HDF5!
+- `ENABLE_HDF5` - Whether to fetch and build HDF5 library and use it in open\_iA (default: disabled).
 - `ENABLE_OPENCL` - Enables OpenCL; the DreamCaster tool depends is only enabled if this setting is enabled; enabling this option also enables some GPU-optimized ITK filters (default: disabled)
 - `ENABLE_PRECOMPILE` - Whether to build open\_iA with precompiled headers enabled (default: disabled; NOT included in `ENABLE_ALL`)
 - `ENABLE_TOOLS` - Whether to build common tool modules, e.g. FeatureScout, 4DCT, GEMSe, Dynamic Volume Lines, FIAKER, ... (default: enabled)
