@@ -110,22 +110,22 @@ Build everything. The specific steps required here differ for the build environm
 
 When the build finishes successfully, open\_iA executables will be built in a subfolder to `open_iA/bin` configured in CMake as "Where to build the binaries".
 
-How to run the open_iA you just built:
+How to run the open\_iA you just built:
 
   - Under Linux, the executables are located under `open_iA/bin/bin`, and you can just execute the `open_iA` / `open_iA_cmd` executables directly (from the shell or via double-click in a file manager)
   - Under Windows, the executables are located `open_iA/bin/x64/CONFIGURATION` (with CONFIGURATION one of Release, Debug, RelWithDebInfo or MinSizeRel). Only the executables in the CONFIGURATION that was selected in Visual Studio when you built will be available. If you try to start the executable directly, you will get an error that dll's (Qt, VTK, ...) cannot be found. You have two options:
-      - Use the .bat files (open_iA_gui_CONFIGURATION.bat) in `open_iA/bin/x64` - these will set the PATH environment accordingly so that the needed dll files are found
-      - Run directly from the Visual Studio solution: in the superbuild, right-click on the "open_iA" project and select "Set as Startup Project"; then select "Start without Debugging" from the "Debug" menu (or press Ctrl+F5); or open the open_iA.sln in the `open_iA/bin/bin` subfolder, and proceed as with the superbuild solution (that is, mark "open_iA" as startup project, and run it via Ctrl+F5).
+      - Use the .bat files (`open_iA_gui_CONFIGURATION.bat`) in `open_iA/bin/x64` - these will set the PATH environment accordingly so that the needed dll files are found
+      - Run directly from the Visual Studio solution: in the superbuild, right-click on the "open\_iA" project and select "Set as Startup Project"; then select "Start without Debugging" from the "Debug" menu (or press Ctrl+F5); or open the open\_iA.sln in the `open_iA/bin/bin` subfolder, and proceed as with the superbuild solution (that is, mark "open\_iA" as startup project, and run it via Ctrl+F5).
 
 
 ### Continuing from here
 
-The superbuild is intended for setting up a build environment with all libraries that open_iA depends on.
+The superbuild is intended for setting up a build environment with all libraries that open\_iA depends on.
 For development in open\_iA or its modules, you subsequently don't need to (and in fact **should not**) run the full superbuild anymore.
 Once the superbuild has finished successfully, focus your attention on the `open_iA` subfolder.
 In its `src` subfolder, you will find a git repository set up for you with all of open\_iA's sources.
 Use the `bin` subfolder as basis for building and for CMake Configure/Generate runs (that is, in the CMake GUI, enter 
-Under Windows, you can open the .sln file generated in that folder to see open_iA and all its libraries and modules as separate sub-projects.
+Under Windows, you can open the .sln file generated in that folder to see open\_iA and all its libraries and modules as separate sub-projects.
 
 **You only ever need to go back to executing a build on the whole superbuild folder if you need to change something in one of the libraries that open\_iA depends on.**
 
@@ -207,7 +207,7 @@ You can continue with [our guide on how to develop a module](https://github.com/
 
 - On Ubuntu (22.04, but maybe also other versions), there is a known incompatibility between CUDA 11.5 as installed from the package sources and boost, resulting in the astra build reporting `configure: error: Boost and CUDA versions are incompatible. You probably have to upgrade boost.`, similar [as reported here](https://github.com/NVlabs/instant-ngp/issues/119). This happens even when using the latest boost version available (1.78 at the time of writing this); it is fixed with CUDA 11.6. So, in order to use CUDA on Ubuntu, install the latest CUDA 11.6 release with the "runfile" installer.
 
-- On Windows, open_iA might refuse to build the AstraReconstruction module if only the Debug configuration was built (output window message: `CMake Warning at cmake/Modules/Modules.cmake:58 (message): Module_AstraReconstruction requires ASTRA_TOOLBOX_FOUND to be TRUE disabling the option!`). As a workaround, build the Release configuration, afterwards finding Astra should work fine (there can be errors when building multiple astra configurations though, see next point).
+- On Windows, open\_iA might refuse to build the AstraReconstruction module if only the Debug configuration was built (output window message: `CMake Warning at cmake/Modules/Modules.cmake:58 (message): Module_AstraReconstruction requires ASTRA_TOOLBOX_FOUND to be TRUE disabling the option!`). As a workaround, build the Release configuration, afterwards finding Astra should work fine (there can be errors when building multiple astra configurations though, see next point).
 
 - On Windows, when switching configuration and building the astra library a second time, the build will probably fail due to the patch step being applied again, with output such as this:
   ```
