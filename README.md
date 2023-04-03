@@ -124,8 +124,8 @@ The superbuild is intended for setting up a build environment with all libraries
 For development in open\_iA or its modules, you subsequently don't need to (and in fact **should not**) run the full superbuild anymore.
 Once the superbuild has finished successfully, focus your attention on the `open_iA` subfolder.
 In its `src` subfolder, you will find a git repository set up for you with all of open\_iA's sources.
-Use the `bin` subfolder as basis for building and for CMake Configure/Generate runs (that is, in the CMake GUI, enter 
-Under Windows, you can open the .sln file generated in that folder to see open\_iA and all its libraries and modules as separate sub-projects.
+Use the `bin` subfolder as basis for building and for CMake Configure/Generate runs (that is, in the CMake GUI, enter the `open_iA/bin` subfolder of your superbuild, and you should magically see all open\_iA configuration options appear!
+Under Windows, you can open the `open_iA.sln` file generated in that folder to see open\_iA and all its libraries and modules as separate sub-projects.
 
 **You only ever need to go back to executing a build on the whole superbuild folder if you need to change something in one of the libraries that open\_iA depends on.**
 
