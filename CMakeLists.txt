@@ -430,7 +430,7 @@ if (BUILD_VTK)
 			set(ADDITIONAL_LIB_PATHS "${ADDITIONAL_LIB_PATHS};${OPENVR_WIN_DIR}\\bin\\win64")
 		endif()
 		if (VTK_VERSION VERSION_GREATER "9.1.0" AND (NOT VTK_USE_GIT_REPO OR NOT VTK_GIT_TAG STREQUAL "master"))  # so far, any version
-			# apply Open(X/V)R patch:
+			# apply Open(X/V)R patch (see https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9620):
 			list(APPEND VTK_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/vtk-9.2-vr-9620.patch")
 		endif()
 	endif()
