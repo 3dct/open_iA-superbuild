@@ -148,8 +148,8 @@ set(VTK_VERSION_OPTIONS "9.0.3" "9.1.0" "9.2.2" "9.2.5" "9.2.6")
 set(VTK_VERSION_DESC "Choose the VTK version to build (only used if VTK_USE_GIT_REPO is DISABLED; if VTK_USE_GIT_REPO is enabled, use VTK_GIT_TAG instead).")
 selector(VTK_VERSION "${VTK_VERSION_OPTIONS}" "9.1.0" ${VTK_VERSION_DESC})
 
-set(VTK_SMP_TYPE_OPTIONS "Sequential" "OpenMP" "TBB")
-set(VTK_SMP_TYPE_DEFAULT "OpenMP")
+set(VTK_SMP_TYPE_OPTIONS "Sequential" "OpenMP" "TBB" "STDThread")
+set(VTK_SMP_TYPE_DEFAULT "STDThread")
 set(VTK_SMP_TYPE_DESC "Choose the SMP implementation to use in the VTK build to speed up filters with parallel implementations - available are sequential (no parallelization), OpenMP, and TBB (Intel Thread Building Blocks - will require installation of Intel OneAPI SDK)  (default: ${VTK_SMP_TYPE_DEFAULT}).")
 selector(VTK_SMP_TYPE "${VTK_SMP_TYPE_OPTIONS}" ${VTK_SMP_TYPE_DEFAULT} ${VTK_SMP_TYPE_DESC})
 
@@ -353,6 +353,9 @@ endif()
 set(ITK_DEPENDS "")
 
 if (BUILD_VTK)
+	if (VTK_VERSION VERSION_LESS "9.1.0" AND "${VTK_SMP_TYPE}" STREQUAL "STDThread")
+		message(SEND_ERROR "VTK only supports VTK_SMP_TYPE = STDThread with version 9.1.0 or higher; you have selected ${VTK_VERSION}. Please either chose a different VTK_SMP_TYPE or a higher VTK_VERSION!")
+	endif()
 	set(VTK_CMAKE_ARGS
 		"-DBUILD_SHARED_LIBS:BOOL=On"
 		"-DVTK_LEGACY_REMOVE:BOOL=On"
