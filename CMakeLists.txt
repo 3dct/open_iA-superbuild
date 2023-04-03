@@ -612,9 +612,9 @@ if (BUILD_ITK)
 #	endif()
 	if (QT_VERSION_MAJOR GREATER_EQUAL 6)
 		list(APPEND ITK_CMAKE_ARGS
-			"-DQt6WidgetsTools_DIR=${Qt6_DIR}WidgetsTools"
-			"-DQt6CoreTools_DIR=${Qt6_DIR}CoreTools"
-			"-DQt6GuiTools_DIR=${Qt6_DIR}GuiTools")
+			"-DQt6WidgetsTools_DIR:PATH=${Qt6_DIR}WidgetsTools"
+			"-DQt6CoreTools_DIR:PATH=${Qt6_DIR}CoreTools"
+			"-DQt6GuiTools_DIR:PATH=${Qt6_DIR}GuiTools")
 	endif()
 	if (NOT CMAKE_CONFIGURATION_TYPES)
 		LIST(APPEND ITK_CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
@@ -1035,9 +1035,9 @@ set(OPEN_IA_CMAKE_ARGS
 )
 if (QT_VERSION_MAJOR GREATER_EQUAL 6)
 	list(APPEND OPEN_IA_CMAKE_ARGS
-		"-DQt6WidgetsTools_DIR=${Qt6_DIR}WidgetsTools"
-		"-DQt6CoreTools_DIR=${Qt6_DIR}CoreTools"
-		"-DQt6GuiTools_DIR=${Qt6_DIR}GuiTools")
+		"-DQt6WidgetsTools_DIR:PATH=${Qt6_DIR}WidgetsTools"
+		"-DQt6CoreTools_DIR:PATH=${Qt6_DIR}CoreTools"
+		"-DQt6GuiTools_DIR:PATH=${Qt6_DIR}GuiTools")
 endif()
 if (NOT CMAKE_CONFIGURATION_TYPES)
 	list(APPEND OPEN_IA_CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
