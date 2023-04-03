@@ -419,12 +419,16 @@ if (BUILD_VTK)
 			"-DVTK_MODULE_ENABLE_VTK_RenderingOpenVR=YES"
 			${OPENVR_LIB_AND_INCLUDE})
 		# In VTK 9, some code was changed in Rendering/OpenVR module that produces an error on clang 10, let's patch it:
-		if (VTK_VERSION VERSION_LESS "9.1.0" AND NOT VTK_USE_GIT_REPO)	# but it's fixed in >= 9.1.0
+		if (VTK_VERSION VERSION_LESS "9.1.0")	# but it's fixed in >= 9.1.0
 			list(APPEND VTK_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/vtk-9.0.0-openvr.patch")
 		endif()
 		if (MSVC)
 			string(REPLACE "/" "\\" OPENVR_WIN_DIR "${OPENVR_ROOT_DIR}")
 			set(ADDITIONAL_LIB_PATHS "${ADDITIONAL_LIB_PATHS};${OPENVR_WIN_DIR}\\bin\\win64")
+		endif()
+		if (VTK_VERSION VERSION_GREATER "9.1.0" AND (NOT VTK_USE_GIT_REPO OR NOT VTK_GIT_TAG STREQUAL "master"))  # so far, any version
+			# apply Open(X/V)R patch:
+			list(APPEND VTK_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/vtk-9.2-vr-9620.patch")
 		endif()
 	endif()
 	# let's apply the fix for parallel coordinate charts potentially causing a crash
