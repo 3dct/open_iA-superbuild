@@ -38,6 +38,11 @@ if (MSVC AND BUILD_VTK)
 	option(ENABLE_VTK_AVIWRITER "Enable usage of *.avi (an old Windows movie file format) writer in open_iA. Note that enabling this might cause linker errors, since we cannot reliably determine whether VTK builds the required parts or not." OFF)
 endif()
 
+if (MSVC AND MSVC_VERSION LESS 1920)
+	message(WARNING "You are using a Visual Studio versions < 2019. Note that such old versions are not supported, you are on your own!")
+endif()
+
+
 # Find proper way to append flags here...
 #if(MSVC)
 #	set(DISABLE_WARNINGS_OPT "\"-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} /W0\"")
