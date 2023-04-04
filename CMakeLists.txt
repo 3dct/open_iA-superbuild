@@ -1004,6 +1004,7 @@ if (ENABLE_AI)
 	endif()
 
 	if (AI_ONNX_USE_CUDA)
+		message(WARNING "ONNX CUDA support in open_iA is currently BROKEN! Please use DirectML on Windows (by disabling AI_ONNX_USE_CUDA).")
 		if ("${ONNX_VERSION}" STREQUAL "1.9.0" OR "${ONNX_VERSION}" STREQUAL "1.10.0" OR "${ONNX_VERSION}" STREQUAL "1.11.1" OR "${ONNX_VERSION}" STREQUAL "1.12.1" OR "${ONNX_VERSION}" STREQUAL "1.13.1")
 			set(ONNX_REQUIRED_CUDA_MAJOR_VERSION "11")
 			if (WIN32)
