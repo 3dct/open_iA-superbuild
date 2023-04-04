@@ -1088,8 +1088,10 @@ if (ENABLE_TOOLS)
 		"-DModule_Labelling:BOOL=ON"
 		"-DModule_NModalTF:BOOL=ON"
 		"-DModule_PolygonPrimitives:BOOL=ON"
+		"-DModule_Remote:BOOL=ON"
 		"-DModule_TripleHistogramTF:BOOL=ON"
-		"-DModule_Uncertainty:BOOL=ON")
+		"-DModule_Uncertainty:BOOL=ON"
+		"-DModule_VolumePlayer:BOOL=ON")
 	# Qt 6.0 does not come with Qt Charts; any Qt 5 version ships it though, and Qt >= 6.1 does too:
 	if (QT_VERSION_MAJOR LESS 6 OR QT_VERSION VERSION_GREATER_EQUAL "6.1.0" AND Qt${QT_VERSION_MAJOR}Charts_FOUND)
 		list(APPEND OPEN_IA_CMAKE_ARGS
