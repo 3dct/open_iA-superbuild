@@ -5,7 +5,7 @@ if (CMAKE_MAJOR_VERSION GREATER 3 OR (CMAKE_MAJOR_VERSION EQUAL 3 AND CMAKE_MINO
 	# prevent all submodules to be fetched in ExternalProject_Add if GIT_SUBMODULES is ""
 	CMAKE_POLICY(SET CMP0097 NEW)
 endif()
-project(open_iA_superbuild LANGUAGES CXX)
+project(open_iA_superbuild LANGUAGES C CXX)
 
 include(ExternalProject)
 
