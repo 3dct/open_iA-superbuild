@@ -23,7 +23,10 @@ option(ENABLE_OPENCL "Enables OpenCL; the DreamCaster tool depends is only enabl
 option(ENABLE_PRECOMPILE "Whether to build open_iA with precompiled headers enabled (default: disabled; NOT included in \"ENABLE_ALL\")" OFF)
 option(ENABLE_TOOLS "Whether to build common tool modules, e.g. FeatureScout, 4DCT, GEMSe, Dynamic Volume Lines, FIAKER, ... (default: enabled)" ON)
 option(ENABLE_TEST "Whether to enable build of tests runners and the capability to submit CDash test runs (default: disabled)" OFF)
-option(ENABLE_VR "Enable VR module; requires OpenVR SDK, which will be fetched automatically; also boost (includes) are required (default: disabled)" OFF)
+option(ENABLE_VR "Enable VR module; requires OpenVR or OpenXR SDK; these can automatically be fetched, depending on ENABLE_OPENVR / ENABLE_OPENXR; also boost (includes) are required (default: disabled)" OFF)
+if (ENABLE_VR)
+	option(ENABLE_OPENVR "Enable automatic fetching of OpenVR SDK, if ENABLE_VR is enabled. OpenVR is more thoroughly tested than OpenXR, but OpenVR will probably not receive future maintenance (default: enabled)" ON)
+endif()
 
 option(BUILD_VTK "Build VTK in the superbuild. If disabled, you need to set VTK_DIR to an existing VTK build (default: enabled)" ON)
 option(BUILD_ITK "Build ITK in the superbuild. If disabled, you need to set ITK_DIR to an existing ITK build (default: enabled)" ON)
@@ -81,6 +84,7 @@ if (ENABLE_ALL)
 	set(ENABLE_TOOLS "ON" CACHE BOOL "" FORCE)
 	set(ENABLE_TEST "ON" CACHE BOOL "" FORCE)
 	set(ENABLE_VR "ON" CACHE BOOL "" FORCE)
+	set(ENABLE_OPENVR "ON" CACHE BOOL "" FORCE)
 endif()
 
 if (ENABLE_ASTRA)
@@ -252,19 +256,43 @@ endif()
 # TODO:
 #   - check behavior when there are changes in git (and tag not the one referenced in ExternalProject_Add) / offline
 
-## OpenVR SDK
-
 if (ENABLE_VR)
-	set(OPENVR_VERSION_OPTIONS "1.14.15" "1.16.8" "1.23.7")
-	selector(OPENVR_VERSION "${OPENVR_VERSION_OPTIONS}" "1.23.7" "Choose the OpenVR version to build.")
-	if ("${OPENVR_VERSION}" STREQUAL "1.14.15")
-		set(OPENVR_ARCHIVE_SHA512 "F076F0453C99601A4AEC9B5C8DAC25F16C294D0E902879D44D85EF28F693E746758694428DA7F172723CEB1422070F0114750FEFA98D50713AF103A3FA120603")
-	elseif ("${OPENVR_VERSION}" STREQUAL "1.16.8")
-		set(OPENVR_ARCHIVE_SHA512 "A64287039447648ABB30F25936A73155B77F8E8C7BD618BD64CB327D9108F69A3BCB6BC8BB8672A28D2EB69A7A02AB4D44CB3513460872E5A7AA4AD22EC9A0B3")
-	elseif ("${OPENVR_VERSION}" STREQUAL "1.23.7")
-		set(OPENVR_ARCHIVE_SHA512 "D6D9650CD801940C083649B7875B51E8CF55B6989850A7493784FEA17449565A6BA84C19A6185FF3C15BC8D37C190C9C03F78D451AC81331BF80F90F1F41A826")
+	# OpenVR SDK
+	if (ENABLE_OPENVR)
+		set(OPENVR_VERSION_OPTIONS "1.14.15" "1.16.8" "1.23.7")
+		selector(OPENVR_VERSION "${OPENVR_VERSION_OPTIONS}" "1.23.7" "Choose the OpenVR version to fetch.")
+		if ("${OPENVR_VERSION}" STREQUAL "1.14.15")
+			set(OPENVR_ARCHIVE_SHA512 "F076F0453C99601A4AEC9B5C8DAC25F16C294D0E902879D44D85EF28F693E746758694428DA7F172723CEB1422070F0114750FEFA98D50713AF103A3FA120603")
+		elseif ("${OPENVR_VERSION}" STREQUAL "1.16.8")
+			set(OPENVR_ARCHIVE_SHA512 "A64287039447648ABB30F25936A73155B77F8E8C7BD618BD64CB327D9108F69A3BCB6BC8BB8672A28D2EB69A7A02AB4D44CB3513460872E5A7AA4AD22EC9A0B3")
+		elseif ("${OPENVR_VERSION}" STREQUAL "1.23.7")
+			set(OPENVR_ARCHIVE_SHA512 "D6D9650CD801940C083649B7875B51E8CF55B6989850A7493784FEA17449565A6BA84C19A6185FF3C15BC8D37C190C9C03F78D451AC81331BF80F90F1F41A826")
+		endif()
+		set(OPENVR_URL "https://github.com/ValveSoftware/openvr/archive/v${OPENVR_VERSION}.zip")
 	endif()
-	set(OPENVR_URL "https://github.com/ValveSoftware/openvr/archive/v${OPENVR_VERSION}.zip")
+	if (VTK_VERSION VERSION_GREATER "9.2.0")
+		option(ENABLE_OPENXR "Enable automatic fetching of OpenXR SDK, if ENABLE_VR is enabled. OpenXR is less tested than OpenVR and does not support ImNDT's built-in AR mode at the moment, but it has broader support for devices and will probably be better supported in future (default: disabled)" OFF)
+		if (ENABLE_ALL)
+			set(ENABLE_OPENXR "ON" CACHE BOOL "" FORCE)
+		endif()
+	endif()
+	# OpenXR SDK
+	if (ENABLE_OPENXR)
+		if (VTK_VERSION VERSION_LESS "9.2.0")
+			message(WARNING "OpenXR is only supported for VTK >= 9.2.0, but currently, VTK ${VTK_VERSION} is configured to be built! If you need OpenXR, please switch to an appropriate VTK version!")
+		else()
+			set(OPENXR_VERSION_OPTIONS "1.0.27")
+			selector(OPENXR_VERSION "${OPENXR_VERSION_OPTIONS}" "1.0.27" "Choose the OpenXR SDK version to fetch.")
+			if ("${OPENXR_VERSION}" STREQUAL "1.0.27")
+				set(OPENXR_ARCHIVE_SHA512 "FBA6166F3A27245BE68105F6DB84E4DD67E7262124323E430CB0BE3FA5DD686074D946BDED05284F89E9D327C704CC78C9881D1624F48802E4AAF76433F1C28A")
+			endif()
+			if (WIN32)
+				set(OPENXR_URL "https://github.com/KhronosGroup/OpenXR-SDK-Source/releases/download/release-${OPENXR_VERSION}/openxr_loader_windows-${OPENXR_VERSION}.zip")
+			else()
+				message(SEND_ERROR "Fetching OpenXR is not supported currently under any other system than Windows! At the moment please set ENABLE_OPENXR to FALSE and set ENABLE_OPENVR to TRUE instead")
+			endif()
+		endif()
+	endif()
 endif()
 
 ## Astra Toolbox
@@ -410,44 +438,73 @@ if (BUILD_VTK)
 	set(VTK_DEPENDS "")
 	set(VTK_PATCH_COMMAND ${GIT_APPLY_CMD})
 	if (ENABLE_VR)
-		set(OPENVR_ROOT_DIR "${CMAKE_BINARY_DIR}/openvr-${OPENVR_VERSION}")
-		set(OPENVR_INCLUDE_DIR "${OPENVR_ROOT_DIR}/headers")
-		if (WIN32)
-			set(OPENVR_LIB_FILES "${OPENVR_ROOT_DIR}/lib/win64/openvr_api.lib")
-		elseif (UNIX)
-			set(OPENVR_LIB_FILES "${OPENVR_ROOT_DIR}/lib/linux64/libopenvr_api.so")
-		elseif (APPLE)
-			set(OPENVR_LIB_FILES "${OPENVR_ROOT_DIR}/lib/osx64/OpenVR.framework")
-		else()
-			message(WARNING "Unknown operating system, probably no VR support!")
+		if (ENABLE_OPENVR)
+			set(OPENVR_ROOT_DIR "${CMAKE_BINARY_DIR}/openvr-${OPENVR_VERSION}")
+			set(OPENVR_INCLUDE_DIR "${OPENVR_ROOT_DIR}/headers")
+			if (WIN32)
+				set(OPENVR_LIB_FILES "${OPENVR_ROOT_DIR}/lib/win64/openvr_api.lib")
+			elseif (UNIX)
+				set(OPENVR_LIB_FILES "${OPENVR_ROOT_DIR}/lib/linux64/libopenvr_api.so")
+			elseif (APPLE)
+				set(OPENVR_LIB_FILES "${OPENVR_ROOT_DIR}/lib/osx64/OpenVR.framework")
+			else()
+				message(WARNING "Unknown operating system, probably no VR support!")
+			endif()
+			set(OPENVR_LIB_AND_INCLUDE
+				"-DOpenVR_INCLUDE_DIR:PATH=${OPENVR_INCLUDE_DIR}"
+				"-DOpenVR_LIBRARY:FILEPATH=${OPENVR_LIB_FILES}")
+			ExternalProject_Add (OpenVR
+				URL               ${OPENVR_URL}
+				URL_HASH          "SHA512=${OPENVR_ARCHIVE_SHA512}"
+				DOWNLOAD_DIR      ${ARCHIVE_DIR}
+				SOURCE_DIR        "${OPENVR_ROOT_DIR}"
+				BUILD_IN_SOURCE   1
+				CONFIGURE_COMMAND ""
+				BUILD_COMMAND     ""
+				INSTALL_COMMAND   "")
+			list(APPEND VTK_DEPENDS OpenVR)
+			list(APPEND VTK_CMAKE_ARGS
+				"-DVTK_MODULE_ENABLE_VTK_RenderingOpenVR=YES"
+				${OPENVR_LIB_AND_INCLUDE})
+			# In VTK 9, some code was changed in Rendering/OpenVR module that produces an error on clang 10, let's patch it:
+			if (VTK_VERSION VERSION_LESS "9.1.0")	# but it's fixed in >= 9.1.0
+				list(APPEND VTK_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/vtk-9.0.0-openvr.patch")
+			endif()
+			if (MSVC)
+				string(REPLACE "/" "\\" OPENVR_WIN_DIR "${OPENVR_ROOT_DIR}")
+				set(ADDITIONAL_LIB_PATHS "${ADDITIONAL_LIB_PATHS};${OPENVR_WIN_DIR}\\bin\\win64")
+			endif()
+			if (VTK_VERSION VERSION_GREATER "9.1.0" AND (NOT VTK_USE_GIT_REPO OR NOT VTK_GIT_TAG STREQUAL "master"))  # so far, any version
+				# apply Open(X/V)R patch (see https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9620):
+				list(APPEND VTK_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/vtk-9.2-vr-9620.patch")
+			endif()
 		endif()
-		set(OPENVR_LIB_AND_INCLUDE
-			"-DOpenVR_INCLUDE_DIR:PATH=${OPENVR_INCLUDE_DIR}"
-			"-DOpenVR_LIBRARY:FILEPATH=${OPENVR_LIB_FILES}")
-		ExternalProject_Add (OpenVR
-			URL               ${OPENVR_URL}
-			URL_HASH          "SHA512=${OPENVR_ARCHIVE_SHA512}"
-			DOWNLOAD_DIR      ${ARCHIVE_DIR}
-			SOURCE_DIR        "${OPENVR_ROOT_DIR}"
-			BUILD_IN_SOURCE   1
-			CONFIGURE_COMMAND ""
-			BUILD_COMMAND     ""
-			INSTALL_COMMAND   "")
-		set(VTK_DEPENDS OpenVR)
-		list(APPEND VTK_CMAKE_ARGS
-			"-DVTK_MODULE_ENABLE_VTK_RenderingOpenVR=YES"
-			${OPENVR_LIB_AND_INCLUDE})
-		# In VTK 9, some code was changed in Rendering/OpenVR module that produces an error on clang 10, let's patch it:
-		if (VTK_VERSION VERSION_LESS "9.1.0")	# but it's fixed in >= 9.1.0
-			list(APPEND VTK_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/vtk-9.0.0-openvr.patch")
-		endif()
-		if (MSVC)
-			string(REPLACE "/" "\\" OPENVR_WIN_DIR "${OPENVR_ROOT_DIR}")
-			set(ADDITIONAL_LIB_PATHS "${ADDITIONAL_LIB_PATHS};${OPENVR_WIN_DIR}\\bin\\win64")
-		endif()
-		if (VTK_VERSION VERSION_GREATER "9.1.0" AND (NOT VTK_USE_GIT_REPO OR NOT VTK_GIT_TAG STREQUAL "master"))  # so far, any version
-			# apply Open(X/V)R patch (see https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9620):
-			list(APPEND VTK_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/vtk-9.2-vr-9620.patch")
+		if (ENABLE_OPENXR AND VTK_VERSION VERSION_GREATER_EQUAL "9.2.0")
+			set(OPENXR_ROOT_DIR "${CMAKE_BINARY_DIR}/openxr-${OPENXR_VERSION}")
+			set(OPENXR_INCLUDE_DIR "${OPENXR_ROOT_DIR}/include/openxr")
+			#if (WIN32)
+				set(OPENXR_LIBRARY "${OPENXR_ROOT_DIR}/x64/lib/openxr_loader.lib")
+			#endif()
+			set(OPENXR_LIB_AND_INCLUDE
+				"-DOpenXR_INCLUDE_DIR:PATH=${OPENXR_INCLUDE_DIR}"
+				"-DOpenXR_LIBRARY:FILEPATH=${OPENXR_LIBRARY}")
+			ExternalProject_Add (OpenXR
+				URL               ${OPENXR_URL}
+				URL_HASH          "SHA512=${OPENXR_ARCHIVE_SHA512}"
+				DOWNLOAD_DIR      ${ARCHIVE_DIR}
+				SOURCE_DIR        "${OPENXR_ROOT_DIR}"
+				BUILD_IN_SOURCE   1
+				CONFIGURE_COMMAND ""
+				BUILD_COMMAND     ""
+				INSTALL_COMMAND   "")
+			list(APPEND VTK_DEPENDS OpenXR)
+			list(APPEND VTK_CMAKE_ARGS
+				"-DVTK_MODULE_ENABLE_VTK_RenderingOpenXR=YES"
+				${OPENXR_LIB_AND_INCLUDE})
+			if (MSVC)
+				string(REPLACE "/" "\\" OPENXR_WIN_DIR "${OPENXR_ROOT_DIR}")
+				set(ADDITIONAL_LIB_PATHS "${ADDITIONAL_LIB_PATHS};${OPENXR_WIN_DIR}\\x64\\bin")
+			endif()
 		endif()
 	endif()
 	# let's apply the fix for parallel coordinate charts potentially causing a crash
@@ -493,7 +550,7 @@ if (BUILD_VTK)
 			INSTALL_COMMAND   ""
 			DEPENDS           ${VTK_DEPENDS})
 	endif()
-	set(ITK_DEPENDS VTK)
+	list(APPEND ITK_DEPENDS VTK)
 else()
 	set(VTK_DIR "${VTK_DIR}" CACHE PATH
 		"VTK build folder.")
@@ -649,8 +706,12 @@ if (BUILD_ITK)
 		endif()
 	endif()
 	if (ENABLE_VR)
-		list(APPEND ITK_CMAKE_ARGS
-			${OPENVR_LIB_AND_INCLUDE})
+		if (ENABLE_OPENVR)
+			list(APPEND ITK_CMAKE_ARGS ${OPENVR_LIB_AND_INCLUDE})
+		endif()
+		if (ENABLE_OPENXR)
+			list(APPEND ITK_CMAKE_ARGS ${OPENXR_LIB_AND_INCLUDE})
+		endif()
 	endif()
 	set(ITK_PATCH_COMMAND ${GIT_APPLY_CMD})
 	if (ITK_VERSION VERSION_LESS "5.1.0")
@@ -1136,8 +1197,13 @@ endif()
 if (ENABLE_VR)
 	list(APPEND OPEN_IA_CMAKE_ARGS
 		"-DModule_ImNDT:BOOL=ON"
-		"-DModule_XVRA:BOOL=ON"
-		${OPENVR_LIB_AND_INCLUDE})
+		"-DModule_XVRA:BOOL=ON")
+	if (ENABLE_OPENVR)
+		list(APPEND OPEN_IA_CMAKE_ARGS ${OPENVR_LIB_AND_INCLUDE})
+	endif()
+	if (ENABLE_OPENXR)
+		list(APPEND OPEN_IA_CMAKE_ARGS ${OPENXR_LIB_AND_INCLUDE})
+	endif()
 	if (BUILD_BOOST)
 		list(APPEND openiA_DEPENDS boost)
 	endif()
