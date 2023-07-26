@@ -110,18 +110,16 @@ if (WIN32 AND NOT MSVC)
 	message(WARNING "Building under windows with non-VS generator/compiler is currently not tested, expect errors! Please report any findings under https://github.com/3dct/open_iA-superbuild/issues!")
 endif()
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets OpenGLWidgets REQUIRED)
-if (QT_VERSION VERSION_LESS "5.15.0")
-	message(FATAL_ERROR "Your Qt version is too old. Please use Qt >= 5.15.0")
-endif()
+find_package(QT NAMES Qt6 COMPONENTS Widgets OpenGLWidgets REQUIRED)  # for now, keep this way of searching for Qt - avoids having to manually set the ...Tools directories!
+#if (QT_VERSION VERSION_LESS "6.0.0")
+#	message(FATAL_ERROR "Your Qt version is too old. Please use Qt >= 6.0.0")
+#endif()
 if (QT_DIR AND NOT Qt${QT_VERSION_MAJOR}_DIR)
 	set(Qt${QT_VERSION_MAJOR}_DIR ${QT_DIR} CACHE PATH "" FORCE)
-	if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-		set(Qt${QT_VERSION_MAJOR}_DIR ${QT_DIR})
-		set(Qt${QT_VERSION_MAJOR}CoreTools_DIR ${QT_DIR}CoreTools CACHE PATH "" FORCE)
-		set(Qt${QT_VERSION_MAJOR}GuiTools_DIR ${QT_DIR}GuiTools CACHE PATH "" FORCE)
-		set(Qt${QT_VERSION_MAJOR}WidgetsTools_DIR ${QT_DIR}WidgetsTools CACHE PATH "" FORCE)
-	endif()
+	set(Qt${QT_VERSION_MAJOR}_DIR ${QT_DIR})
+	set(Qt${QT_VERSION_MAJOR}CoreTools_DIR ${QT_DIR}CoreTools CACHE PATH "" FORCE)
+	set(Qt${QT_VERSION_MAJOR}GuiTools_DIR ${QT_DIR}GuiTools CACHE PATH "" FORCE)
+	set(Qt${QT_VERSION_MAJOR}WidgetsTools_DIR ${QT_DIR}WidgetsTools CACHE PATH "" FORCE)
 endif()
 if (QT_VERSION VERSION_GREATER_EQUAL "6.4.0")
 	find_package(Qt${QT_VERSION_MAJOR} REQUIRED Concurrent Gui OpenGL Svg Widgets Xml OPTIONAL_COMPONENTS Charts HttpServer WebSockets)
@@ -185,10 +183,6 @@ if (VTK_USE_GIT_REPO)
 	endif()
 	set(VTK_REPOSITORY "https://github.com/Kitware/VTK.git")
 	# set(VTK_REPOSITORY "https://gitlab.kitware.com/vtk/vtk.git")
-endif()
-
-if (${QT_VERSION_MAJOR} GREATER_EQUAL 6 AND (NOT VTK_USE_GIT_REPO AND VTK_VERSION VERSION_LESS "9.1.0"))
-	message(SEND_ERROR "The chosen VTK version does not support Qt >= 6.x! Please either chose VTK >= 9.1.0, git master (VTK_USE_GIT_REPO ON, VTK_GIT_TAG \"master\"), or an older Qt version!")
 endif()
 
 if (NOT VTK_USE_GIT_REPO)
@@ -403,7 +397,10 @@ if (BUILD_VTK)
 	set(VTK_CMAKE_ARGS
 		"-DBUILD_SHARED_LIBS:BOOL=On"
 		"-DVTK_LEGACY_REMOVE:BOOL=On"
-		"-DQt${QT_VERSION_MAJOR}_DIR:PATH=${QT_PATH}"
+		"-DQt6_DIR:PATH=${Qt6_DIR}"
+		"-DQt6WidgetsTools_DIR:PATH=${Qt6_DIR}WidgetsTools"
+		"-DQt6CoreTools_DIR:PATH=${Qt6_DIR}CoreTools"
+		"-DQt6GuiTools_DIR:PATH=${Qt6_DIR}GuiTools"
 		"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
 		"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
 		"-DVTK_SMP_IMPLEMENTATION_TYPE=${VTK_SMP_TYPE}"
@@ -419,12 +416,6 @@ if (BUILD_VTK)
 		# use "legacy" XCode buildsystem, since there seem to be problems with the "new build system" (https://discourse.vtk.org/t/problem-building-vtk/6197/5)
 		# solution from https://stackoverflow.com/questions/65473503
 		set (VTK_GENERATOR_TOOLSET "buildsystem=1")
-	endif()
-	if (QT_VERSION_MAJOR GREATER_EQUAL 6)
-		list(APPEND VTK_CMAKE_ARGS
-			"-DQt6WidgetsTools_DIR:PATH=${Qt6_DIR}WidgetsTools"
-			"-DQt6CoreTools_DIR:PATH=${Qt6_DIR}CoreTools"
-			"-DQt6GuiTools_DIR:PATH=${Qt6_DIR}GuiTools")
 	endif()
 	#if (DISABLE_LIB_WARNINGS)
 	#	list(APPEND VTK_CMAKE_ARGS ${DISABLE_WARNINGS_OPT})
@@ -672,19 +663,16 @@ if (BUILD_ITK)
 		"-DModule_HigherOrderAccurateGradient:BOOL=On"
 		"-DModule_SplitComponents:BOOL=On"
 		"-DVTK_DIR:PATH=${VTK_DIR}"
-		"-DQt${QT_VERSION_MAJOR}_DIR:PATH=${QT_PATH}"
+		"-DQt6_DIR:PATH=${Qt6_DIR}"
+		"-DQt6WidgetsTools_DIR:PATH=${Qt6_DIR}WidgetsTools"
+		"-DQt6CoreTools_DIR:PATH=${Qt6_DIR}CoreTools"
+		"-DQt6GuiTools_DIR:PATH=${Qt6_DIR}GuiTools"
 		"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
 		"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
 	)
 #	if (DISABLE_LIB_WARNINGS)
 #		list(APPEND ITK_CMAKE_ARGS ${DISABLE_WARNINGS_OPT})
 #	endif()
-	if (QT_VERSION_MAJOR GREATER_EQUAL 6)
-		list(APPEND ITK_CMAKE_ARGS
-			"-DQt6WidgetsTools_DIR:PATH=${Qt6_DIR}WidgetsTools"
-			"-DQt6CoreTools_DIR:PATH=${Qt6_DIR}CoreTools"
-			"-DQt6GuiTools_DIR:PATH=${Qt6_DIR}GuiTools")
-	endif()
 	if (NOT CMAKE_CONFIGURATION_TYPES)
 		list(APPEND ITK_CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 	endif()
@@ -1109,18 +1097,15 @@ if (ENABLE_AI)
 endif()
 
 set(OPEN_IA_CMAKE_ARGS
-	"-DQT_DIR:PATH=${QT_PATH}"
+	"-DQT_DIR:PATH=${Qt6_DIR}"
+	"-DQt6WidgetsTools_DIR:PATH=${Qt6_DIR}WidgetsTools"
+	"-DQt6CoreTools_DIR:PATH=${Qt6_DIR}CoreTools"
+	"-DQt6GuiTools_DIR:PATH=${Qt6_DIR}GuiTools"
 	"-DITK_DIR:PATH=${ITK_DIR}"
 	"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
 	"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
 	"-DopeniA_AVX_SUPPORT=${AVX_OPTIMIZATION}"
 )
-if (QT_VERSION_MAJOR GREATER_EQUAL 6)
-	list(APPEND OPEN_IA_CMAKE_ARGS
-		"-DQt6WidgetsTools_DIR:PATH=${Qt6_DIR}WidgetsTools"
-		"-DQt6CoreTools_DIR:PATH=${Qt6_DIR}CoreTools"
-		"-DQt6GuiTools_DIR:PATH=${Qt6_DIR}GuiTools")
-endif()
 if (NOT CMAKE_CONFIGURATION_TYPES)
 	list(APPEND OPEN_IA_CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 endif()
