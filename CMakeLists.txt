@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.17...3.24)
+cmake_minimum_required(VERSION 3.17...3.27 FATAL_ERROR)
 # Required CMake version: as high as open_iA!
 #    CMake 3.17 required for --no-tests=ignore!
 if (CMAKE_MAJOR_VERSION GREATER 3 OR (CMAKE_MAJOR_VERSION EQUAL 3 AND CMAKE_MINOR_VERSION GREATER 15))
@@ -114,12 +114,12 @@ find_package(QT NAMES Qt6 COMPONENTS Widgets OpenGLWidgets REQUIRED)  # for now,
 #if (QT_VERSION VERSION_LESS "6.0.0")
 #	message(FATAL_ERROR "Your Qt version is too old. Please use Qt >= 6.0.0")
 #endif()
-if (QT_DIR AND NOT Qt${QT_VERSION_MAJOR}_DIR)
-	set(Qt${QT_VERSION_MAJOR}_DIR ${QT_DIR} CACHE PATH "" FORCE)
-	set(Qt${QT_VERSION_MAJOR}_DIR ${QT_DIR})
-	set(Qt${QT_VERSION_MAJOR}CoreTools_DIR ${QT_DIR}CoreTools CACHE PATH "" FORCE)
-	set(Qt${QT_VERSION_MAJOR}GuiTools_DIR ${QT_DIR}GuiTools CACHE PATH "" FORCE)
-	set(Qt${QT_VERSION_MAJOR}WidgetsTools_DIR ${QT_DIR}WidgetsTools CACHE PATH "" FORCE)
+if (QT_DIR AND NOT Qt6_DIR)
+	set(Qt6_DIR ${QT_DIR} CACHE PATH "" FORCE)
+	set(Qt6_DIR ${QT_DIR})
+	set(Qt6CoreTools_DIR ${QT_DIR}CoreTools CACHE PATH "" FORCE)
+	set(Qt6GuiTools_DIR ${QT_DIR}GuiTools CACHE PATH "" FORCE)
+	set(Qt6WidgetsTools_DIR ${QT_DIR}WidgetsTools CACHE PATH "" FORCE)
 endif()
 if (QT_VERSION VERSION_GREATER_EQUAL "6.4.0")
 	find_package(Qt${QT_VERSION_MAJOR} REQUIRED Concurrent Gui OpenGL Svg Widgets Xml OPTIONAL_COMPONENTS Charts HttpServer WebSockets)
@@ -1097,7 +1097,7 @@ if (ENABLE_AI)
 endif()
 
 set(OPEN_IA_CMAKE_ARGS
-	"-DQT_DIR:PATH=${Qt6_DIR}"
+	"-DQt6_DIR:PATH=${Qt6_DIR}"
 	"-DQt6WidgetsTools_DIR:PATH=${Qt6_DIR}WidgetsTools"
 	"-DQt6CoreTools_DIR:PATH=${Qt6_DIR}CoreTools"
 	"-DQt6GuiTools_DIR:PATH=${Qt6_DIR}GuiTools"
