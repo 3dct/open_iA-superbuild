@@ -481,7 +481,7 @@ if (BUILD_VTK)
 				string(REPLACE "/" "\\" OPENVR_WIN_DIR "${OPENVR_ROOT_DIR}")
 				set(ADDITIONAL_LIB_PATHS "${ADDITIONAL_LIB_PATHS};${OPENVR_WIN_DIR}\\bin\\win64")
 			endif()
-			if (VTK_VERSION VERSION_GREATER "9.1.0" AND (NOT VTK_USE_GIT_REPO OR NOT VTK_GIT_TAG STREQUAL "master"))  # so far, any version
+			if (VTK_VERSION VERSION_GREATER "9.1.0" AND VTK_VERSION VERSION_LESS "9.3.0" AND (NOT VTK_USE_GIT_REPO OR NOT VTK_GIT_TAG STREQUAL "master"))  # so far, any version
 				# apply Open(X/V)R patch (see https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9620):
 				list(APPEND VTK_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/vtk-9.2-vr-9620.patch")
 			endif()
@@ -514,12 +514,13 @@ if (BUILD_VTK)
 			endif()
 		endif()
 	endif()
-	# let's apply the fix for parallel coordinate charts potentially causing a crash
-	# on mouse move (see https://gitlab.kitware.com/vtk/vtk/-/issues/17441):
-	set(VTK_PARALLEL_COORDINATE_PATCH_LINE 492)
-	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/patches/vtk-parallelCoordinates.patch.template" "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch")
-	list(APPEND VTK_PATCH_COMMAND "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch")
-
+	if (VTK_VERSION VERSION_LESS "9.3.0")
+		# let's apply the fix for parallel coordinate charts potentially causing a crash
+		# on mouse move (see https://gitlab.kitware.com/vtk/vtk/-/issues/17441):
+		set(VTK_PARALLEL_COORDINATE_PATCH_LINE 492)
+		CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/patches/vtk-parallelCoordinates.patch.template" "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch")
+		list(APPEND VTK_PATCH_COMMAND "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch")
+	endif()
 	if (VTK_PATCH_COMMAND STREQUAL "${GIT_APPLY_CMD}")
 		set(VTK_PATCH_COMMAND "")	# if no patch to apply, set empty
 	endif()
