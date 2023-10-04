@@ -495,6 +495,7 @@ if (BUILD_VTK)
 			set(OPENXR_LIB_AND_INCLUDE
 				"-DOpenXR_INCLUDE_DIR:PATH=${OPENXR_INCLUDE_DIR}"
 				"-DOpenXR_LIBRARY:FILEPATH=${OPENXR_LIBRARY}")
+			set(OPENXR_DIR "-DOpenXR_DIR=${OPENXR_ROOT_DIR}/x64/lib/cmake/openxr")
 			ExternalProject_Add (OpenXR
 				URL               ${OPENXR_URL}
 				URL_HASH          "SHA512=${OPENXR_ARCHIVE_SHA512}"
@@ -1205,6 +1206,7 @@ if (ENABLE_VR)
 	endif()
 	if (ENABLE_OPENXR)
 		list(APPEND OPEN_IA_CMAKE_ARGS ${OPENXR_LIB_AND_INCLUDE})
+		list(APPEND OPEN_IA_CMAKE_ARGS ${OPENXR_DIR})
 	endif()
 	if (BUILD_BOOST)
 		list(APPEND openiA_DEPENDS boost)
