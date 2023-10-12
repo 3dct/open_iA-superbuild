@@ -566,59 +566,76 @@ else()
 endif()
 
 if (ENABLE_OPENCL)
-	option(BUILD_OPENCL "Build OpenCL ICD loader. If disabled, you need to set OPENCL_DIR to an existing OpenCL ICD loader build" ON)
+	option(BUILD_OPENCL "Build OpenCL ICD loader. If disabled, you need to specify existing OpenCL Headers / C++ Headers / ICD loader!" ON)
 	if (BUILD_OPENCL)
-		set(OPENCL_DIR "${CMAKE_BINARY_DIR}/OpenCL" CACHE PATH
-			"OpenCL ICD loader directory" FORCE)
-		set(OPENCL_C_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-Headers.git")
-		set(OPENCL_CPP_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-CLHPP.git")
+		set(OPENCL_ROOT_DIR "${CMAKE_BINARY_DIR}/OpenCL" CACHE PATH "OpenCL ICD loader directory" FORCE)
+		set(OpenCL_DIR "${OPENCL_ROOT_DIR}/install")
+
+		# C Headers
+		set(OPENCL_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-Headers.git")
+		set(OPENCL_VERSION_OPTIONS "v2023.04.17" "v2023.02.06")
+		set(OPENCL_VERSION_DESC "Choose the version of OpenCL C headers and ICD loader to build.")
+		selector(OPENCL_VERSION "${OPENCL_VERSION_OPTIONS}" "v2023.04.17" ${OPENCL_VERSION_DESC})
+		# other available versions: (for both OpenCL-ICD-Loader and OpenCL-Headers) see github tags; of note:
+		#   - v2022.05.18  known to cause error (`OpenCL/icdloader/test/layer/icd_print_layer_generated.c:946:50: error: expected function body after function declarator`) and warning (`CL_TARGET_OPENCL_VERSION is not a valid value (100, 110, 120, 200, 210, 220). Defaulting to 220 (OpenCL 2.2)")`)
+		#   - v2020.12.18  not tested; first version to contain CMakeLists.txt file
+		#   - v2020.06.16  known to work well; previously used, hard-coded;
+		#   - v2020.03.13  known to make problems on linux (`multiple definition of ret_val`)
+		set(OPENCL_HEADERS_CMAKE_ARGS
+			"-DCMAKE_INSTALL_PREFIX=${OpenCL_DIR}"
+			"-DOPENCL_HEADERS_BUILD_CXX_TESTS:BOOL=OFF"
+			"-DBUILD_TESTING:BOOL=OFF"
+		)
+		ExternalProject_Add (OpenCL_Headers
+			GIT_REPOSITORY    ${OPENCL_HEADERS_REPO}
+			GIT_TAG           "${OPENCL_VERSION}"
+			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
+			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
+			CMAKE_ARGS        ${OPENCL_HEADERS_CMAKE_ARGS}
+			SOURCE_DIR        "${OPENCL_ROOT_DIR}/Headers/src.git"
+			BINARY_DIR        "${OPENCL_ROOT_DIR}/Headers/bin"
+		)
+		set(OpenCLHeaders_DIR "${OpenCL_DIR}/share/cmake/OpenCLHeaders")
+
+		# C++ Headers
+		set(OPENCL_CLHPP_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-CLHPP.git")
+		#set(OPENCL_CLHPP_VERSION_OPTIONS "v2023.04.17")  # slightly different than Headers and ICD-Loader versions, but seem to have unified for recent versions
+		#set(OPENCL_CLHPP_VERSION_DESC "Choose the version of OpenCL C++ headers (OpenCL-CLHPP) to build.")
+		#selector(OPENCL_CLHPP_VERSION "${OPENCL_CLHPP_VERSION_OPTIONS}" "v2.0.11" ${OPENCL_CLHPP_VERSION_DESC})
+		set(OPENCL_CLHPP_VERSION ${OPENCL_VERSION})
+		# other available OpenCL-CLHPP versions see github tags; of note:
+		#   - v2.0.11  last version to include cl.hpp, which open_iA still needed until recently
+		#   - v2.0.9   first version listed on github; already contains CMakeLists.txt
+		set(OPENCL_CLHPP_CMAKE_ARGS
+			"-DCMAKE_INSTALL_PREFIX=${OpenCL_DIR}"
+			"-DOpenCLHeaders_DIR:PATH=\"${OpenCLHeaders_DIR}\""
+			"-DBUILD_DOCS:BOOL=OFF"
+			"-DBUILD_EXAMPLES:BOOL=OFF"
+			"-DBUILD_TESTING:BOOL=OFF"
+		)
+		ExternalProject_Add (OpenCL_CLHPP
+			GIT_REPOSITORY    ${OPENCL_CLHPP_HEADERS_REPO}
+			GIT_TAG           "${OPENCL_CLHPP_VERSION}"
+			GIT_SUBMODULES    ""          # avoid pulling in CMock/Unity submodules only required for testing
+			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
+			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
+			CMAKE_ARGS        ${OPENCL_CLHPP_CMAKE_ARGS}
+			SOURCE_DIR        "${OPENCL_ROOT_DIR}/CLHPP/src.git"
+			BINARY_DIR        "${OPENCL_ROOT_DIR}/CLHPP/bin"
+			DEPENDS           OpenCL_Headers
+		)
+		set(OpenCLHeadersCpp_DIR "${OpenCL_DIR}/share/cmake/OpenCLHeadersCpp")
+
+		# ICD loader library:
 		set(OPENCL_ICD_REPO "https://github.com/KhronosGroup/OpenCL-ICD-Loader.git")
-		set(OPENCL_TAG "v2020.06.16")
-# Notes on above ICD Loader versions:
-#      - v2022.05.18  known to cause error (`OpenCL/icdloader/test/layer/icd_print_layer_generated.c:946:50: error: expected function body after function declarator`) and warning (`CL_TARGET_OPENCL_VERSION is not a valid value (100, 110, 120, 200, 210, 220). Defaulting to 220 (OpenCL 2.2)")`)
-#      - v2022.01.04  not tested
-#      - v2021.06.30  not tested
-#      - v2021.04.29  not tested
-#      - v2020.12.18  not tested
-#      - v2020.06.16  known to work well!
-#      - v2020.03.13  known to make problems on linux (`multiple definition of ret_val)
-
-		# newer versions of OpenCL CPP don't include cl.hpp, which we still need
-		set(OPENCL_CPP_TAG "v2.0.11")
-		ExternalProject_Add (OpenCL_C
-			GIT_REPOSITORY    ${OPENCL_C_HEADERS_REPO}
-			GIT_TAG           "${OPENCL_TAG}"
-			UPDATE_DISCONNECTED 1
-			SOURCE_DIR        "${OPENCL_DIR}/cheaders"
-			BUILD_IN_SOURCE   1
-			CONFIGURE_COMMAND ""
-			BUILD_COMMAND     ""
-			INSTALL_COMMAND   "")
-		ExternalProject_Add (OpenCL_CPP
-			GIT_REPOSITORY    ${OPENCL_CPP_HEADERS_REPO}
-			GIT_TAG           "${OPENCL_CPP_TAG}"
-			GIT_SUBMODULES    ""
-			UPDATE_DISCONNECTED 1
-			SOURCE_DIR        "${OPENCL_DIR}/cppheaders"
-			BUILD_IN_SOURCE   1
-			CONFIGURE_COMMAND ""
-			BUILD_COMMAND     ""
-			INSTALL_COMMAND   "")
-		# Find way to skip re-build of OpenCL every time!
-
-		set(CMD_COPY_OPENCL_C_HEADERS ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/cheaders/CL" "${OPENCL_DIR}/icdloader/inc/CL")
-		set(CMD_COPY_OPENCL_CPP_HEADERS ${CMAKE_COMMAND} -E copy "${OPENCL_DIR}/cppheaders/include/CL/cl.hpp" "${OPENCL_DIR}/cppheaders/include/CL/cl2.hpp" "${OPENCL_DIR}/icdloader/inc/CL/")
-		set(OPENCL_ICD_INSTALL_HEADERS_COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icdloader/inc/CL" "${OPENCL_DIR}/include/CL")
-		# Find way to use different configurations properly...?
-		if (CMAKE_CONFIGURATION_TYPES)
-			# multi-configuration generator type
-			set(OPENCL_ICD_INSTALL_LIBS_COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icd-bin/$(Configuration)" "${OPENCL_DIR}/lib")
-		else()
-			set(OPENCL_ICD_INSTALL_LIBS_COMMAND ${CMAKE_COMMAND} -E copy_directory "${OPENCL_DIR}/icd-bin" "${OPENCL_DIR}/lib")
-		endif()
 		set(OPENCL_ICD_CMAKE_ARGS
 			"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
 			"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
+			"-DCMAKE_INSTALL_PREFIX=${OpenCL_DIR}"
+			"-DOpenCLHeaders_DIR:PATH=\"${OpenCLHeaders_DIR}\""
+			"-DENABLE_OPENCL_LAYERINFO:BOOL=OFF"
+			"-DOPENCL_ICD_LOADER_BUILD_SHARED_LIBS:BOOL=ON"
+			"-DBUILD_TESTING:BOOL=OFF"
 		)
 		#if (DISABLE_LIB_WARNINGS)
 		#	list(APPEND OPENCL_ICD_CMAKE_ARGS ${DISABLE_WARNINGS_OPT})
@@ -626,49 +643,37 @@ if (ENABLE_OPENCL)
 		if (NOT CMAKE_CONFIGURATION_TYPES)
 			list(APPEND OPENCL_ICD_CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 		endif()
-		if (WIN32)
-			list(APPEND OPENCL_ICD_CMAKE_ARGS "-DOPENCL_ICD_LOADER_REQUIRE_WDK:BOOL=OFF")
-		endif()
-		set (OPENCL_PATCH_APPLE_PROBLEMS "")
-		if (APPLE)
-			set (OPENCL_PATCH_APPLE_PROBLEMS ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/OpenCL-Apple.patch")
-		endif()
 		ExternalProject_Add (OpenCL_ICD
 			GIT_REPOSITORY    ${OPENCL_ICD_REPO}
-			GIT_TAG           "${OPENCL_TAG}"
-			GIT_SUBMODULES    ""
-			UPDATE_DISCONNECTED 1
-			PATCH_COMMAND     ${CMD_COPY_OPENCL_C_HEADERS}
-			      COMMAND     ${CMD_COPY_OPENCL_CPP_HEADERS}
-			      COMMAND     ${OPENCL_PATCH_APPLE_PROBLEMS}
-			SOURCE_DIR        "${OPENCL_DIR}/icdloader"
-			BINARY_DIR        "${OPENCL_DIR}/icd-bin"
+			GIT_TAG           "${OPENCL_VERSION}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
 			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
+			SOURCE_DIR        "${OPENCL_ROOT_DIR}/ICD-Loader/src.git"
+			BINARY_DIR        "${OPENCL_ROOT_DIR}/ICD-Loader/bin"
 			CMAKE_ARGS        ${OPENCL_ICD_CMAKE_ARGS}
-			INSTALL_COMMAND   ${OPENCL_ICD_INSTALL_HEADERS_COMMAND}
-			        COMMAND   ${OPENCL_ICD_INSTALL_LIBS_COMMAND}
-			DEPENDS           OpenCL_CPP OpenCL_C)
-
+			DEPENDS           OpenCL_CLHPP OpenCL_Headers
+		)
+		set(OpenCLICDLoader_DIR "${OpenCL_DIR}/share/cmake/OpenCLICDLoader")
 		list(APPEND ITK_DEPENDS OpenCL_ICD)
-		set(OPENCL_INCLUDE_DIRS "${OPENCL_DIR}/include")
-		if (WIN32)
-			set(OPENCL_LIB_SUFFIX ".lib") # only Windows has the peculiarity of requiring to link against the stub .lib file
-		else()
-			set(OPENCL_LIB_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
-		endif()
-		set(OPENCL_LIB_PATH "${OPENCL_DIR}/lib")
-		if (APPLE AND CMAKE_CONFIGURATION_TYPES) # when using XCode multi-config generator on Mac OS
-			set(OPENCL_LIB_PATH "${OPENCL_LIB_PATH}/$(CONFIGURATION)")
-		endif()
-		set(OPENCL_LIBRARIES "${OPENCL_LIB_PATH}/${CMAKE_SHARED_LIBRARY_PREFIX}OpenCL${OPENCL_LIB_SUFFIX}")
 	else()
-		find_package(OpenCL REQUIRED)
-		if (OPENCL_FOUND)
-			message(STATUS "OpenCL: ${OpenCL_INCLUDE_DIRS}, ${OpenCL_LIBRARIES}")
-			set(OPENCL_INCLUDE_DIRS ${OpenCL_INCLUDE_DIRS})
-			set(OPENCL_LIBRARIES ${OpenCL_LIBRARIES})
-		endif()
+		find_package(OpenCLHeaders REQUIRED)
+		find_package(OpenCLICDLoader REQUIRED)
+		find_package(OpenCLHeadersCpp REQUIRED)
+		# assume these packages all are in share/cmake/OpenCL... subdirectory of install location:
+		string(REPLACE "/share/cmake/OpenCLHeaders" "" OpenCL_DIR ${OpenCLHeaders_DIR})
+		# not working for some reason:
+		# get_target_property(OpenCLHeaders_INCLUDE_DIRS OpenCL::Headers INCLUDE_DIRECTORIES)
+		# get_target_property(OpenCLICDLoader_LIBRARIES OpenCL::OpenCL LINK_LIBRARIES)
+		# assume C and C++ headers are in same directory...
+		# set(OpenCL_INCLUDE_DIRS ${OpenCLHeaders_INCLUDE_DIRS})
+		# ...and assume that only ICD loader holds a library to link
+		# set(OpenCL_LIBRARIES ${OpenCLICDLoader_LIBRARIES})
+	endif()
+	if (DEFINED OpenCLICDLoader_DIR)
+		# maybe use get_target_property somehow, as tried above (but not working)?
+		set(OpenCL_INCLUDE_DIRS "${OpenCL_DIR}/include")
+		set(OpenCL_LIBRARIES "${OpenCL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}OpenCL${CMAKE_SHARED_LIBRARY_SUFFIX}")
+		message(STATUS "OpenCL: ${OpenCL_DIR}; include: ${OpenCL_INCLUDE_DIRS}; lib: ${OpenCL_LIBRARIES}")
 	endif()
 endif()
 
@@ -702,13 +707,13 @@ if (BUILD_ITK)
 		# the way to specify OpenCL includes libraries changed from ITK 5.2.x to 5.3.0:
 		if (ITK_VERSION VERSION_GREATER_EQUAL "5.3.0")
 			list(APPEND ITK_CMAKE_ARGS
-				"-DOpenCL_INCLUDE_DIR=${OPENCL_INCLUDE_DIRS}"
+				"-DOpenCL_INCLUDE_DIR=${OpenCL_INCLUDE_DIRS}"
 				"-DOpenCL_LIBRARY=${OPENCL_LIBRARIES}")
 		else()
 			list(APPEND ITK_CMAKE_ARGS
-				"-DOPENCL_ROOT_DIR=${OPENCL_DIR}"
-				"-DOPENCL_INCLUDE_DIRS=${OPENCL_INCLUDE_DIRS}"
-				"-DOPENCL_LIBRARIES=${OPENCL_LIBRARIES}")
+				"-DOPENCL_ROOT_DIR=${OpenCL_DIR}"
+				"-DOPENCL_INCLUDE_DIRS=${OpenCL_INCLUDE_DIRS}"
+				"-DOPENCL_LIBRARIES=${OpenCL_LIBRARIES}")
 		endif()
 	endif()
 	if (ENABLE_VR)
@@ -1133,9 +1138,11 @@ if (NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 if (ENABLE_OPENCL)
 	list(APPEND OPEN_IA_CMAKE_ARGS
-	"-DOPENCL_ROOT_DIR=${OPENCL_DIR}"
-	"-DOPENCL_INCLUDE_DIRS=${OPENCL_INCLUDE_DIRS}"
-	"-DOPENCL_LIBRARIES=${OPENCL_LIBRARIES}")
+	"-DOPENCL_ROOT_DIR=${OpenCL_DIR}"
+	"-DOpenCLHeaders_DIR=${OpenCLHeaders_DIR}"
+	"-DOpenCLHeadersCpp_DIR=${OpenCLHeadersCpp_DIR}"
+	"-DOpenCLICDLoader_DIR=${OpenCLICDLoader_DIR}"
+	)
 endif()
 if (ENABLE_FILTERS)
 	list(APPEND OPEN_IA_CMAKE_ARGS
