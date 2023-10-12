@@ -667,13 +667,17 @@ if (ENABLE_OPENCL)
 		# assume C and C++ headers are in same directory...
 		# set(OpenCL_INCLUDE_DIRS ${OpenCLHeaders_INCLUDE_DIRS})
 		# ...and assume that only ICD loader holds a library to link
-		# set(OpenCL_LIBRARIES ${OpenCLICDLoader_LIBRARIES})
+		# set(OpenCL_LIBRARY ${OpenCLICDLoader_LIBRARIES})
 	endif()
 	if (DEFINED OpenCLICDLoader_DIR)
 		# maybe use get_target_property somehow, as tried above (but not working)?
+		# get rid of hard-coded references, this must be a property somewhere!
 		set(OpenCL_INCLUDE_DIRS "${OpenCL_DIR}/include")
-		set(OpenCL_LIBRARIES "${OpenCL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}OpenCL${CMAKE_SHARED_LIBRARY_SUFFIX}")
-		message(STATUS "OpenCL: ${OpenCL_DIR}; include: ${OpenCL_INCLUDE_DIRS}; lib: ${OpenCL_LIBRARIES}")
+		set(OpenCL_LIBRARY "${OpenCL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}OpenCL${CMAKE_SHARED_LIBRARY_SUFFIX}")
+		if (NOT EXISTS ${OpenCL_LIBRARY})
+			set(OpenCL_LIBRARY "${OpenCL_DIR}/lib64/${CMAKE_SHARED_LIBRARY_PREFIX}OpenCL${CMAKE_SHARED_LIBRARY_SUFFIX}")
+		endif()
+		message(STATUS "OpenCL: ${OpenCL_DIR}; include: ${OpenCL_INCLUDE_DIRS}; lib: ${OpenCL_LIBRARY}")
 	endif()
 endif()
 
@@ -708,12 +712,12 @@ if (BUILD_ITK)
 		if (ITK_VERSION VERSION_GREATER_EQUAL "5.3.0")
 			list(APPEND ITK_CMAKE_ARGS
 				"-DOpenCL_INCLUDE_DIR=${OpenCL_INCLUDE_DIRS}"
-				"-DOpenCL_LIBRARY=${OpenCL_LIBRARIES}")
+				"-DOpenCL_LIBRARY=${OpenCL_LIBRARY}")
 		else()
 			list(APPEND ITK_CMAKE_ARGS
 				"-DOPENCL_ROOT_DIR=${OpenCL_DIR}"
 				"-DOPENCL_INCLUDE_DIRS=${OpenCL_INCLUDE_DIRS}"
-				"-DOPENCL_LIBRARIES=${OpenCL_LIBRARIES}")
+				"-DOPENCL_LIBRARIES=${OpenCL_LIBRARY}")
 		endif()
 	endif()
 	if (ENABLE_VR)
