@@ -1135,7 +1135,6 @@ if (NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 if (ENABLE_OPENCL)
 	list(APPEND OPEN_IA_CMAKE_ARGS
-	"-DOPENCL_ROOT_DIR=${OpenCL_DIR}"
 	"-DOpenCLHeaders_DIR=${OpenCLHeaders_DIR}"
 	"-DOpenCLHeadersCpp_DIR=${OpenCLHeadersCpp_DIR}"
 	"-DOpenCLICDLoader_DIR=${OpenCLICDLoader_DIR}"
