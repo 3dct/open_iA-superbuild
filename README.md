@@ -44,14 +44,14 @@ On Linux, those packages should be available from the distribution repository.
   - On Fedora (36), the command required to install the required packages is:
     ```
     $ sudo dnf install automake boost-devel clang cmake \
-      cmake-gui libomp-devel libtool libxkbcommon-devel \
+      cmake-gui git libomp-devel libtool libxkbcommon-devel \
       make ninja-build mesa-libGL-devel ocl-icd-devel \
       opencl-headers qt6-qtbase-devel qt6-qtcharts-devel \
       qt6-qtsvg-devel qt6-qttools-devel
     ```
     (installing both ninja and make build tools, and the clang compiler, in this example)
 
-  - If you require any CUDA-dependant module (the Astra Reconstruction and the AI module currently),
+  - If you require any CUDA-dependant module (currently only the AstraReconstruction module),
     please refer to guides for how to install CUDA on your distribution. Also, make sure that the CUDA
     version that you install fits to other required libraries; see [the onnx CUDA execution provider compatibility list](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html), as well as the notes
     on boost and CUDA in the [Troubleshooting section](#Troubleshooting) below.
@@ -152,7 +152,7 @@ You can continue with [our guide on how to develop a module](https://github.com/
 ### Library build options
 
 - `ARCHIVE_DIR` - A cache directory for downloaded library archives. Set to a directory with existing archives to avoid re-downloading files already present on the local machine / in the local network.
-- `AI_ONNX_USE_CUDA` - Whether to use the CUDA version of the ONNX runtime; if disabled, use DirectML. Only available on Windows (on Linux, DirectML is not available) (default: disabled)
+- `AI_ONNX_USE_CUDA` - Whether to use the CUDA version of the ONNX runtime; if disabled, use DirectML. Only available on Windows (on Linux, DirectML is not available). Note that CUDA support is currently broken; leave at default value disabled! (default: disabled)
 - `BUILD_TYPE` - The type of build to do (Release, Debug, RelWithDebInfo or MinSizeRel); only available on single-configuration generators (e.g. Unix Makefiles, ninja), not on multi-configuration generators (Visual Studio, XCode) (default: Release)
 - `BUILD_ASTRA` - Whether to build ASTRA in the superbuild (provided that `ENABLE_ASTRA` is enabled). If disabled, you need to set `ASTRA_DIR` to an existing ASTRA build (default: enabled)
 - `BUILD_BOOST` - Whether to build BOOST in the superbuild (provided that either `ENABLE_ASTRA` or `ENABLE_VR` is enabled). If disabled, you need to either have a boost installation or a boost build available, and you will be required to set `BOOST_DIR` accordingly (default: enabled)
