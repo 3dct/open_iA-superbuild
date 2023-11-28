@@ -1121,7 +1121,7 @@ endif()
 if (ENABLE_FILTERS)
 	list(APPEND OPEN_IA_CMAKE_ARGS
 		"-DModule_CommonImageFilters:BOOL=ON"
-		"-DModule_ExtractSurface:BOOL=ON"
+		"-DModule_Surfaces:BOOL=ON"
 		"-DModule_FeatureCharacteristics:BOOL=ON"
 		"-DModule_MetaFilters:BOOL=ON"
 		"-DModule_Metrics:BOOL=ON"
@@ -1145,7 +1145,6 @@ if (ENABLE_TOOLS)
 		"-DModule_InSpectr:BOOL=ON"
 		"-DModule_Labelling:BOOL=ON"
 		"-DModule_NModalTF:BOOL=ON"
-		"-DModule_PolygonPrimitives:BOOL=ON"
 		"-DModule_Remote:BOOL=ON"
 		"-DModule_TripleHistogramTF:BOOL=ON"
 		"-DModule_Uncertainty:BOOL=ON"
