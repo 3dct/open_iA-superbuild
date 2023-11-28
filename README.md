@@ -41,7 +41,7 @@ On Linux, those packages should be available from the distribution repository.
     ```
     OpenMP is required, and installs as separate package for clang. On versions of Ubuntu prior to 21.04, you might have to also install the `qt6-default` package in order to make Qt 6 the default.
 
-  - On Fedora (36), the command required to install the required packages is:
+  - On Fedora (36-39), the command to install the required packages is:
     ```
     $ sudo dnf install automake boost-devel clang cmake \
       cmake-gui git libomp-devel libtool libxkbcommon-devel \
