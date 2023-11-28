@@ -104,7 +104,7 @@ if (BUILD_BOOST_OPTION)
 	option(BUILD_BOOST "Fetch and build Boost in the superbuild, if astra is enabled. If disabled, you need to set BOOST_DIR to an existing boost build (default: enabled)" ${BUILD_BOOST_DEFAULT_VAL})
 endif()
 
-message(STATUS "Compilers: C++: ${CMAKE_CXX_COMPILER}, C: ${CMAKE_C_COMPILER}")
+message(STATUS "Compilers: C++: ${CMAKE_CXX_COMPILER}")
 
 if (WIN32 AND NOT MSVC)
 	message(WARNING "Building under windows with non-VS generator/compiler is currently not tested, expect errors! Please report any findings under https://github.com/3dct/open_iA-superbuild/issues!")
@@ -1106,7 +1106,6 @@ set(OPEN_IA_CMAKE_ARGS
 	"-DQt6GuiTools_DIR:PATH=${Qt6_DIR}GuiTools"
 	"-DITK_DIR:PATH=${ITK_DIR}"
 	"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
-	"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
 	"-DopeniA_AVX_SUPPORT=${AVX_OPTIMIZATION}"
 )
 if (NOT CMAKE_CONFIGURATION_TYPES)
