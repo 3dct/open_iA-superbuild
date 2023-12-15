@@ -557,7 +557,7 @@ if (ENABLE_OPENCL)
 
 		# C Headers
 		set(OPENCL_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-Headers.git")
-		set(OPENCL_VERSION_OPTIONS "v2023.04.17" "v2023.02.06")
+		set(OPENCL_VERSION_OPTIONS "v2023.12.14" "v2023.04.17" "v2023.02.06")
 		set(OPENCL_VERSION_DESC "Choose the version of OpenCL C headers and ICD loader to build.")
 		selector(OPENCL_VERSION "${OPENCL_VERSION_OPTIONS}" "v2023.04.17" ${OPENCL_VERSION_DESC})
 		# other available versions: (for both OpenCL-ICD-Loader and OpenCL-Headers) see github tags; of note:
