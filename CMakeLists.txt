@@ -157,7 +157,7 @@ endif()
 
 set(VTK_VERSION_OPTIONS "9.1.0" "9.2.2" "9.2.6" "9.3.0")
 set(VTK_VERSION_DESC "Choose the VTK version to build (only used if VTK_USE_GIT_REPO is DISABLED; if VTK_USE_GIT_REPO is enabled, use VTK_GIT_TAG instead).")
-selector(VTK_VERSION "${VTK_VERSION_OPTIONS}" "9.1.0" ${VTK_VERSION_DESC})
+selector(VTK_VERSION "${VTK_VERSION_OPTIONS}" "9.3.0" ${VTK_VERSION_DESC})
 
 set(VTK_SMP_TYPE_OPTIONS "Sequential" "OpenMP" "TBB" "STDThread")
 set(VTK_SMP_TYPE_DEFAULT "STDThread")
