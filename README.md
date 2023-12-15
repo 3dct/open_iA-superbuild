@@ -142,30 +142,35 @@ You can continue with [our guide on how to develop a module](https://github.com/
 - `ENABLE_FILTERS` - Whether to build image processing filters (smoothing, segmentation, intensity transformations, geometric transformations, ...) (default: enabled)
 - `ENABLE_HDF5` - Whether to fetch and build HDF5 library and use it in open\_iA (default: disabled).
 - `ENABLE_OPENCL` - Enables OpenCL; the DreamCaster tool depends is only enabled if this setting is enabled; enabling this option also enables some GPU-optimized ITK filters (default: disabled)
+- `ENABLE_OPENVR` - Enables the OpenVR backend of VR modules; `ENABLE_VR` has to be enabled for this option to become available (default: disabled; enabled along with `ENABLE_VR`).
+- `ENABLE_OPENXR` - Enables the OpenXR backend of VR modules; `ENABLE_VR` has to be enabled for this option to become available (default: disabled).
 - `ENABLE_PRECOMPILE` - Whether to build open\_iA with precompiled headers enabled (default: disabled; NOT included in `ENABLE_ALL`)
 - `ENABLE_TOOLS` - Whether to build common tool modules, e.g. FeatureScout, 4DCT, GEMSe, Dynamic Volume Lines, FIAKER, ... (default: enabled)
 - `ENABLE_TEST` - Whether to enable build of tests runners and the capability to submit CDash test runs (default: disabled)
 - `ENABLE_VR` - Whether to build VR module; requires OpenVR SDK, which will be fetched automatically; also boost (includes) are required (default: disabled).
-- `ENABLE_ALL` Enables all optional modules and filters (see also the ENABLE\_xyz options above; all except for `ENABLE_PRECOMPILE` are enabled if this is set to on. Note that unchecking this box again does NOT have any direct effect; it will not automatically set these options to unchecked or their state before. But you will have to uncheck the option if you want to disable any of the single `ENABLE_xyz` options affected by this setting, otherwise they will be re-enabled on next 'Configure' run) (default: disabled)
+- `ENABLE_ALL` Enables all optional modules and filters (all above options except for `ENABLE_PRECOMPILE` are enabled if this is set to on. Note that unchecking this box again does NOT have any direct effect; it will not automatically set these options to unchecked or their state before. But you will have to uncheck the option if you want to disable any of the single `ENABLE_xyz` options affected by this setting, otherwise they will be re-enabled on next 'Configure' run) (default: disabled)
 
 
 ### Library build options
 
 - `ARCHIVE_DIR` - A cache directory for downloaded library archives. Set to a directory with existing archives to avoid re-downloading files already present on the local machine / in the local network.
 - `AI_ONNX_USE_CUDA` - Whether to use the CUDA version of the ONNX runtime; if disabled, use DirectML. Only available on Windows (on Linux, DirectML is not available). Note that CUDA support is currently broken; leave at default value disabled! (default: disabled)
+- `BOOST_VERSION` - The version of boost to fetch from [boost.org](https://www.boost.org/) and build if `BUILD_BOOST` is enabled.
 - `BUILD_TYPE` - The type of build to do (Release, Debug, RelWithDebInfo or MinSizeRel); only available on single-configuration generators (e.g. Unix Makefiles, ninja), not on multi-configuration generators (Visual Studio, XCode) (default: Release)
 - `BUILD_ASTRA` - Whether to build ASTRA in the superbuild (provided that `ENABLE_ASTRA` is enabled). If disabled, you need to set `ASTRA_DIR` to an existing ASTRA build (default: enabled)
 - `BUILD_BOOST` - Whether to build BOOST in the superbuild (provided that either `ENABLE_ASTRA` or `ENABLE_VR` is enabled). If disabled, you need to either have a boost installation or a boost build available, and you will be required to set `BOOST_DIR` accordingly (default: enabled)
 - `BUILD_VTK` - Whether to build VTK in the superbuild. If disabled, you need to set `VTK_DIR` to an existing VTK build (default: enabled)
 - `BUILD_ITK` - Whether to build ITK in the superbuild. If disabled, you need to set `ITK_DIR` to an existing ITK build (default: enabled)
+- `HDF5_VERSION` - The HDF5 version to build, in case `ENABLE_HDF5` is enabled.
 - `ITK_USE_GIT_REPO` - Whether to use git repository for ITK library. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times significantly (since cloning the full repository is much slower than downloading and extracting a release archive).
-- `ITK_VERSION` - The ITK version to build, in case `BUILD_ITK` is enabled and `ITK_USE_GIT_REPO` is disabled; if `ITK_USE_GIT_REPO` is enabled, use `ITK_GIT_TAG` instead.
+- `ITK_VERSION` - The ITK version to fetch from [itk.org](https://docs.itk.org/en/latest/download.html) and build, in case `BUILD_ITK` is enabled and `ITK_USE_GIT_REPO` is disabled; if `ITK_USE_GIT_REPO` is enabled, use `ITK_GIT_TAG` instead.
 - `ITK_GIT_TAG` - The ITK git tag to use in build, in case `BUILD_ITK` is enabled and `ITK_USE_GIT_REPO` is enabled; if `ITK_USE_GIT_REPO` is disabled, use `ITK_VERSION` instead.
-- `OPENVR_VERSION` - The OpenVR version to fetch, if `ENABLE_VR` is enabled.
+- `OPENVR_VERSION` - The OpenVR SDK version to fetch (from [KhronosGroup/OpenXR-SDK-Source](https://github.com/KhronosGroup/OpenXR-SDK-Source/releases), if `ENABLE_VR` and `ENABLE_OPENVR` are enabled.
+- `OPENXR_VERSION` - The OpenXR SDK version to fetch (from [ValveSoftware/openvr](https://github.com/ValveSoftware/openvr/releases), if `ENABLE_VR` and `ENABLE_OPENXR` are enabled.
 - `VTK_GIT_TAG` - The VTK git tag to use in build, in case `BUILD_VTK` is enabled and `VTK_USE_GIT_REPO` is enabled; if `VTK_USE_GIT_REPO` is disabled, use `VTK_VERSION` instead.
 - `VTK_SMP_TYPE` - Choose the SMP implementation to use in the VTK build to speed up filters with parallel implementations - available are sequential (no parallelization), OpenMP, and TBB (Intel Thread Building Blocks - will require installation of Intel OneAPI SDK) (default: OpenMP)
 - `VTK_USE_GIT_REPO` - Whether to use git repository for VTK library. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times significantly (since cloning the full repository is much slower than downloading and extracting a release archive).
-- `VTK_VERSION` - The VTK version to build, in case `BUILD_VTK` is enabled and `VTK_USE_GIT_REPO` is disabled; if `VTK_USE_GIT_REPO` is enabled, use `VTK_GIT_TAG` instead.
+- `VTK_VERSION` - The VTK version to fetch from [vtk.org](https://vtk.org/download/) and build, in case `BUILD_VTK` is enabled and `VTK_USE_GIT_REPO` is disabled; if `VTK_USE_GIT_REPO` is enabled, use `VTK_GIT_TAG` instead.
 
 
 
