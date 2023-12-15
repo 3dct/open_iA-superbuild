@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.17...3.27 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.17...3.28 FATAL_ERROR)
 # Required CMake version: as high as open_iA!
-#    CMake 3.17 required for --no-tests=ignore!
+#    CMake 3.17 required for --no-tests=ignore, FindCUDAToolkit
 if (CMAKE_MAJOR_VERSION GREATER 3 OR (CMAKE_MAJOR_VERSION EQUAL 3 AND CMAKE_MINOR_VERSION GREATER 15))
 	# prevent all submodules to be fetched in ExternalProject_Add if GIT_SUBMODULES is ""
 	CMAKE_POLICY(SET CMP0097 NEW)
