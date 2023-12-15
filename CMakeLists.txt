@@ -502,6 +502,10 @@ if (BUILD_VTK)
 		CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/patches/vtk-parallelCoordinates.patch.template" "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch")
 		list(APPEND VTK_PATCH_COMMAND "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch")
 	endif()
+	if (VTK_VERSION VERSION_EQUAL "9.3.0")
+		# fix compilation error for VS: https://gitlab.kitware.com/vtk/vtk/-/issues/19166
+		list(APPEND VTK_PATCH_COMMAND "${CMAKE_SOURCE_DIR}/patches/vtk-9.3-vs-debug.patch")
+	endif()
 	if (VTK_PATCH_COMMAND STREQUAL "${GIT_APPLY_CMD}")
 		set(VTK_PATCH_COMMAND "")	# if no patch to apply, set empty
 	endif()
