@@ -1214,7 +1214,7 @@ if (NOT CUDA_FIND_ENABLED)
 		"-DopeniA_CUDA_ENABLED:BOOL=OFF")
 endif()
 
-set(OPEN_IA_GIT_TAG_OPTIONS "develop" "main" "2022.06" "2021.08" "2020.09")
+set(OPEN_IA_GIT_TAG_OPTIONS "develop" "main" "2023.04" "2023.02" "2022.06")
 selector(OPEN_IA_GIT_TAG "${OPEN_IA_GIT_TAG_OPTIONS}" "develop" "Choose the open_iA version to build.")
 set(OPEN_IA_BIN_DIR "${CMAKE_BINARY_DIR}/open_iA/bin")
 ExternalProject_Add (open_iA
