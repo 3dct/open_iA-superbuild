@@ -405,7 +405,7 @@ if (BUILD_VTK)
 		"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
 		"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
 		"-DVTK_SMP_IMPLEMENTATION_TYPE=${VTK_SMP_TYPE}"
-		"-DVTK_BUILD_TESTING=OFF"
+		"-DVTK_BUILD_TESTING:BOOL=OFF"
 		"-DVTK_MODULE_ENABLE_VTK_GUISupportQt=YES"
 		"-DVTK_MODULE_ENABLE_VTK_GUISupportQtSQL=NO"
 		"-DVTK_MODULE_ENABLE_VTK_RenderingQt=YES"
@@ -456,7 +456,7 @@ if (BUILD_VTK)
 				INSTALL_COMMAND   "")
 			list(APPEND VTK_DEPENDS OpenVR)
 			list(APPEND VTK_CMAKE_ARGS
-				"-DVTK_MODULE_ENABLE_VTK_RenderingOpenVR=YES"
+				"-DVTK_MODULE_ENABLE_VTK_RenderingOpenVR:BOOL=YES"
 				${OPENVR_LIB_AND_INCLUDE})
 			if (MSVC)
 				string(REPLACE "/" "\\" OPENVR_WIN_DIR "${OPENVR_ROOT_DIR}")
@@ -488,7 +488,7 @@ if (BUILD_VTK)
 				INSTALL_COMMAND   "")
 			list(APPEND VTK_DEPENDS OpenXR)
 			list(APPEND VTK_CMAKE_ARGS
-				"-DVTK_MODULE_ENABLE_VTK_RenderingOpenXR=YES"
+				"-DVTK_MODULE_ENABLE_VTK_RenderingOpenXR:BOOL=YES"
 				${OPENXR_LIB_AND_INCLUDE})
 			if (MSVC)
 				string(REPLACE "/" "\\" OPENXR_WIN_DIR "${OPENXR_ROOT_DIR}")
@@ -567,7 +567,7 @@ if (ENABLE_OPENCL)
 		#   - v2020.06.16  known to work well; previously used, hard-coded;
 		#   - v2020.03.13  known to make problems on linux (`multiple definition of ret_val`)
 		set(OPENCL_HEADERS_CMAKE_ARGS
-			"-DCMAKE_INSTALL_PREFIX=${OpenCL_DIR}"
+			"-DCMAKE_INSTALL_PREFIX:PATH=${OpenCL_DIR}"
 			"-DOPENCL_HEADERS_BUILD_CXX_TESTS:BOOL=OFF"
 			"-DBUILD_TESTING:BOOL=OFF"
 		)
@@ -592,7 +592,7 @@ if (ENABLE_OPENCL)
 		#   - v2.0.11  last version to include cl.hpp, which open_iA still needed until recently
 		#   - v2.0.9   first version listed on github; already contains CMakeLists.txt
 		set(OPENCL_CLHPP_CMAKE_ARGS
-			"-DCMAKE_INSTALL_PREFIX=${OpenCL_DIR}"
+			"-DCMAKE_INSTALL_PREFIX:PATH=${OpenCL_DIR}"
 			"-DOpenCLHeaders_DIR:PATH=\"${OpenCLHeaders_DIR}\""
 			"-DBUILD_DOCS:BOOL=OFF"
 			"-DBUILD_EXAMPLES:BOOL=OFF"
@@ -616,7 +616,7 @@ if (ENABLE_OPENCL)
 		set(OPENCL_ICD_CMAKE_ARGS
 			"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
 			"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
-			"-DCMAKE_INSTALL_PREFIX=${OpenCL_DIR}"
+			"-DCMAKE_INSTALL_PREFIX:PATH=${OpenCL_DIR}"
 			"-DOpenCLHeaders_DIR:PATH=\"${OpenCLHeaders_DIR}\""
 			"-DENABLE_OPENCL_LAYERINFO:BOOL=OFF"
 			"-DOPENCL_ICD_LOADER_BUILD_SHARED_LIBS:BOOL=ON"
@@ -701,12 +701,12 @@ if (BUILD_ITK)
 		# the way to specify OpenCL includes libraries changed from ITK 5.2.x to 5.3.0:
 		if (ITK_VERSION VERSION_GREATER_EQUAL "5.3.0")
 			list(APPEND ITK_CMAKE_ARGS
-				"-DOpenCL_INCLUDE_DIR=${OpenCL_INCLUDE_DIRS}"
-				"-DOpenCL_LIBRARY=${OpenCL_LIBRARY}")
+				"-DOpenCL_INCLUDE_DIR:PATH=${OpenCL_INCLUDE_DIRS}"
+				"-DOpenCL_LIBRARY:FILEPATH=${OpenCL_LIBRARY}")
 		else()
 			list(APPEND ITK_CMAKE_ARGS
-				"-DOPENCL_ROOT_DIR=${OpenCL_DIR}"
-				"-DOPENCL_INCLUDE_DIRS=${OpenCL_INCLUDE_DIRS}"
+				"-DOPENCL_ROOT_DIR:PATH=${OpenCL_DIR}"
+				"-DOPENCL_INCLUDE_DIRS:PATH=${OpenCL_INCLUDE_DIRS}"
 				"-DOPENCL_LIBRARIES=${OpenCL_LIBRARY}")
 		endif()
 	endif()
