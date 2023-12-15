@@ -991,7 +991,7 @@ if (ENABLE_AI)
 	# CUDA or DirectML versions of onnx runtime are available
 	# (there is a CPU version as well, but open_iA currently does not support it)
 	set(ONNX_VERSION_OPTIONS "1.13.1" "1.14.1" "1.16.1" "1.16.3")
-	selector(ONNX_VERSION "${ONNX_VERSION_OPTIONS}" "1.14.1" "Choose the onnx runtime version to use.")
+	selector(ONNX_VERSION "${ONNX_VERSION_OPTIONS}" "1.16.3" "Choose the onnx runtime version to use.")
 	set(ONNX_SRC_DIR "${CMAKE_BINARY_DIR}/onnx-${ONNX_VERSION}")
 	set(ONNX_INCLUDE_SUBDIR "include")
 	if (WIN32)
