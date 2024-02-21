@@ -680,6 +680,12 @@ endif()
 set(openiA_DEPENDS "")
 if (BUILD_ITK)
 	set(ENABLE_ITK_GPU ${ENABLE_OPENCL})
+	# on Apple, an ITK build with GPU/OpenCL fails with `undefined symbols: _clBuildProgram...`
+	# see also https://github.com/InsightSoftwareConsortium/ITK/issues/3821
+	# Since above issue mentions ITK_USE_GPU to be deprecated, simply disable it for now:
+	if (APPLE)
+		set(ENABLE_ITK_GPU OFF)
+	endif()
 	set(ITK_CMAKE_ARGS
 		"-DBUILD_SHARED_LIBS:BOOL=On"
 		"-DBUILD_TESTING:BOOL=Off"
