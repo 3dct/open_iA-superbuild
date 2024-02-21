@@ -419,12 +419,6 @@ if (BUILD_VTK)
 		"-DVTK_MODULE_ENABLE_VTK_RenderingContextOpenGL2=YES"
 		"-DVTK_MODULE_ENABLE_VTK_ViewsQt=YES"
 	)
-	set (VTK_GENERATOR_TOOLSET "")
-	if (APPLE)
-		# use "legacy" XCode buildsystem, since there seem to be problems with the "new build system" (https://discourse.vtk.org/t/problem-building-vtk/6197/5)
-		# solution from https://stackoverflow.com/questions/65473503
-		set (VTK_GENERATOR_TOOLSET "buildsystem=1")
-	endif()
 	#if (DISABLE_LIB_WARNINGS)
 	#	list(APPEND VTK_CMAKE_ARGS ${DISABLE_WARNINGS_OPT})
 	#endif()
@@ -537,7 +531,6 @@ if (BUILD_VTK)
 			BINARY_DIR        "${VTK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
 			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
-			CMAKE_GENERATOR_TOOLSET "${VTK_GENERATOR_TOOLSET}"
 			CMAKE_ARGS        "${VTK_CMAKE_ARGS}"
 			INSTALL_COMMAND   ""
 			DEPENDS           ${VTK_DEPENDS})
@@ -553,7 +546,6 @@ if (BUILD_VTK)
 			BINARY_DIR        "${VTK_DIR}"
 			CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
 			CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
-			CMAKE_GENERATOR_TOOLSET "${VTK_GENERATOR_TOOLSET}"
 			CMAKE_ARGS        "${VTK_CMAKE_ARGS}"
 			INSTALL_COMMAND   ""
 			DEPENDS           ${VTK_DEPENDS})
