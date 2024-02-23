@@ -495,9 +495,15 @@ if (BUILD_VTK)
 				BUILD_COMMAND     ""
 				INSTALL_COMMAND   "")
 			list(APPEND VTK_DEPENDS OpenXR)
-			list(APPEND VTK_CMAKE_ARGS
-				"-DVTK_MODULE_ENABLE_VTK_RenderingOpenXR:BOOL=YES"
-				${VTK_OPENXR_LIB_AND_INCLUDE})
+			if (VTK_VERSION VERSION_GREATER "9.3.0" OR (VTK_USE_GIT_REPO AND VTK_GIT_TAG STREQUAL "master"))
+				# new: use CMake config provided by newer OpenXR versions:
+				list(APPEND VTK_CMAKE_ARGS ${OPENXR_DIR})
+			else()
+				# old (VTK 9.3.0 or older): use include and lib directory
+				list(APPEND VTK_CMAKE_ARGS
+					"-DVTK_MODULE_ENABLE_VTK_RenderingOpenXR:BOOL=YES"
+					${VTK_OPENXR_LIB_AND_INCLUDE})
+			endif()
 			if (MSVC)
 				string(REPLACE "/" "\\" OPENXR_WIN_DIR "${OPENXR_ROOT_DIR}")
 				set(ADDITIONAL_LIB_PATHS "${ADDITIONAL_LIB_PATHS};${OPENXR_WIN_DIR}\\x64\\bin")
