@@ -1,12 +1,12 @@
 ## open\_iA Superbuild
 
-This document provides the currently simplest way of setting up a build environment for [open\_iA](https://github.com/3dct/open_iA). The build steps here were tested on Ubuntu 18.04.1 and 18.10, as well as on Windows 10. They might or might not work on other distributions and operating systems. In case of problems, make sure to check the [Troubleshooting section](#Troubleshooting) below. Please let us know of your experience [in the issue tracker](https://github.com/3dct/open_iA-superbuild/issues).
+This repository provides an easy way for setting up a build environment for [open\_iA](https://github.com/3dct/open_iA). The build steps here should work for Windows 10 and 11, on many Linux distributions including latest Ubuntu LTS and Fedora, as well as on Mac OS. In case of any problems, make sure to check the [Troubleshooting section](#Troubleshooting) below. Please let us know of your experience [in the issue tracker](https://github.com/3dct/open_iA-superbuild/issues).
 
 ## Build steps
 
 In short, these are the steps required to set up a build environment for open\_iA:
 1. Install prerequisites - git, CMake, and C++ build toolchain, as well as libraries and headers for OpenGL and Qt (and optionally OpenCL)
-2. Clone  this repository to some folder on your machine
+2. Clone this repository to some folder on your machine
 3. Run CMake on the checked out repository for the desired toolchain
 4. Build with the toolchain configured in CMake
 5. You're all set up: For further developments in open\_iA, use the `open_iA` subfolder of the superbuild binary folder.
