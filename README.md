@@ -136,7 +136,7 @@ You can continue with [our guide on how to develop a module](https://github.com/
 
 ### Enabling specific features/modules
 
-- `ENABLE_AI` - Whether to build AI module; requires ONNX runtime, which will be fetched automatically; on Windows, you can change whether CUDA or DirectML backend is chosen with the option `AI_ONNX_USE_CUDA` (default: disabled) **Note:** AI support is currently under construction; at this time, only the DirectML backend works.
+- `ENABLE_AI` - Whether to build AI module; requires ONNX runtime, which will be fetched automatically; on Windows, you can change whether CUDA or DirectML backend is chosen with the option `AI_ONNX_USE_CUDA` (default: disabled) **Note:** AI support is currently under construction; at this time, only the DirectML backend works. See also [open_iA build notes on ONNX runtime](https://github.com/3dct/open_iA/wiki/Windows-Build#onnx-runtime) on how to set up the required DirectML library.
 - `ENABLE_ASTRA` - Whether to build the [astra toolbox](https://www.astra-toolbox.com) reconstruction library and open\_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time. (default: disabled). **Note:** Make sure to install a fitting CUDA version; on Windows, make sure it works together with the version of Visual Studio you are using, on Linux, make sure it's compatible with the used compiler!
 - `ENABLE_EIGEN` - Whether to fetch and use eigen (default: disabled)
 - `ENABLE_FILTERS` - Whether to build image processing filters (smoothing, segmentation, intensity transformations, geometric transformations, ...) (default: enabled)
