@@ -11,8 +11,10 @@ include(ExternalProject)
 
 option(VTK_USE_GIT_REPO "Whether to use git repository for VTK library. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times significantly. Also, you have to take care of any eventually required patches manually (as for example 'master' branch is subject to daily change)." OFF)
 option(ITK_USE_GIT_REPO "Whether to use git repository for ITK library. If disabled (default), the release archives will be used instead. Note that enabling this option might increase build times significantly." OFF)
+mark_as_advanced(VTK_USE_GIT_REPO)
+mark_as_advanced(ITK_USE_GIT_REPO)
 
-option(ENABLE_ALL "Enables all optional modules and filters (see also separate ENABLE_xyz options; all except for ENABLE_PRECOMPILE are enabled if this is set to on. Note that unchecking this box again does NOT have any direct effect; it will not automatically set these options to unchecked or their state before. But you will have to uncheck the option if you want to disable any of the single ENABLE_xyz options affected by this setting, otherwise they will be re-enabled on next 'Configure' run) (default: disabled)" OFF)
+option(ENABLE_ALL "Enables all optional modules and filters (see also separate ENABLE_xyz options; all except for ENABLE_PRECOMPILE and ENABLE_VTK_AVIWRITER are enabled if this is set to on. Note that unchecking this box again does NOT have any direct effect; it will not automatically set these options to unchecked or their state before. But you will have to uncheck the option if you want to disable any of the single ENABLE_xyz options affected by this setting, otherwise they will be re-enabled on next 'Configure' run) (default: disabled)" OFF)
 
 option(ENABLE_AI "Whether to enable AI module; requires onnx runtime, which will be fetched automatically; on Windows, you can change whether CUDA or DirectML backend is chosen with the option AI_ONNX_USE_CUDA (default: disabled)" OFF)
 option(ENABLE_ASTRA "Whether to build ASTRA reconstruction library and open_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time! (default: disabled)" OFF)
@@ -21,6 +23,7 @@ option(ENABLE_FILTERS "Whether to build image processing filters (smoothing, seg
 option(ENABLE_HDF5 "Whether to fetch and build HDF5 library and use it in open_iA (default: disabled)" OFF)
 option(ENABLE_OPENCL "Enables OpenCL; the DreamCaster tool depends is only enabled if this setting is enabled; enabling this option also enables some GPU-optimized ITK filters (default: disabled)" OFF)
 option(ENABLE_PRECOMPILE "Whether to build open_iA with precompiled headers enabled (default: disabled; NOT included in \"ENABLE_ALL\")" OFF)
+mark_as_advanced(ENABLE_PRECOMPILE)
 option(ENABLE_TOOLS "Whether to build common tool modules, e.g. FeatureScout, 4DCT, GEMSe, Dynamic Volume Lines, FIAKER, ... (default: enabled)" ON)
 option(ENABLE_TEST "Whether to enable build of tests runners and the capability to submit CDash test runs (default: disabled)" OFF)
 option(ENABLE_VR "Enable VR module; requires OpenVR or OpenXR SDK; these can automatically be fetched, depending on ENABLE_OPENVR / ENABLE_OPENXR; also boost (includes) are required (default: disabled)" OFF)
@@ -36,9 +39,11 @@ option(BUILD_ITK "Build ITK in the superbuild. If disabled, you need to set ITK_
 #option(FETCH_ONNX "Fetch required ONNX runtime. If disabled, you need to set ONNX_RUNTIME_DIR to an existing ONNX runtime directory" ON) # could be a bit complicated to implement, since we would have to check the type of runtime (CUDA/DirectML/CPU) and set according flags
 
 option(DISABLE_LIB_WARNINGS "Disables all compilation warnings on the built libraries" OFF)
+mark_as_advanced(DISABLE_LIB_WARNINGS)
 
 if (MSVC AND BUILD_VTK)
 	option(ENABLE_VTK_AVIWRITER "Enable usage of *.avi (an old Windows movie file format) writer in open_iA. Note that enabling this might cause linker errors, since we cannot reliably determine whether VTK builds the required parts or not." OFF)
+	mark_as_advanced(ENABLE_VTK_AVIWRITER)
 endif()
 
 if (MSVC AND MSVC_VERSION LESS 1920)
@@ -69,6 +74,7 @@ set(AVX_OPTIMIZATION_OPTIONS "off" "AVX" "AVX2")
 set(AVX_OPTIMIZATION_DEFAULT "off")
 set(AVX_OPTIMIZATION_DESC "Choose whether code should use AVX instructions, and if so which (AVX/AVX2)  (default: ${AVX_OPTIMIZATION_DEFAULT}).")
 selector(AVX_OPTIMIZATION "${AVX_OPTIMIZATION_OPTIONS}" ${AVX_OPTIMIZATION_DEFAULT} ${AVX_OPTIMIZATION_DESC})
+mark_as_advanced(AVX_OPTIMIZATION)
 
 if (NOT ARCHIVE_DIR)
 	set(ARCHIVE_DIR ${CMAKE_BINARY_DIR}/archives CACHE PATH "Directory for storing downloaded archive files." FORCE)
@@ -164,6 +170,7 @@ set(VTK_SMP_TYPE_OPTIONS "Sequential" "OpenMP" "TBB" "STDThread")
 set(VTK_SMP_TYPE_DEFAULT "STDThread")
 set(VTK_SMP_TYPE_DESC "Choose the SMP implementation to use in the VTK build to speed up filters with parallel implementations - available are sequential (no parallelization), OpenMP, and TBB (Intel Thread Building Blocks - will require installation of Intel OneAPI SDK)  (default: ${VTK_SMP_TYPE_DEFAULT}).")
 selector(VTK_SMP_TYPE "${VTK_SMP_TYPE_OPTIONS}" ${VTK_SMP_TYPE_DEFAULT} ${VTK_SMP_TYPE_DESC})
+mark_as_advanced(VTK_SMP_TYPE)
 
 if (VTK_USE_GIT_REPO)
 	set(VTK_GIT_TAG_OPTIONS "")
@@ -842,6 +849,7 @@ if (ENABLE_ASTRA)
 			"Astra toolbox directory" FORCE)
 		if (MSVC)
 			option(ASTRA_PATCH "Whether to patch Astra Toolbox project files. Only required to be set first time sources are fetched, disable later." ON)
+			mark_as_advanced(ASTRA_PATCH)
 		endif()
 
 		set(ASTRA_DEPENDS "")
@@ -992,6 +1000,7 @@ if (ENABLE_AI)
 	set(ONNX_INCLUDE_SUBDIR "include")
 	if (WIN32)
 		option(AI_ONNX_USE_CUDA "Whether to use CUDA for running ONNX. Note that CUDA support is currently BROKEN in open_iA. If disabled (default), DirectML will be used (on Windows)." OFF)
+		mark_as_advanced(AI_ONNX_USE_CUDA)
 		if (AI_ONNX_USE_CUDA)
 			if (NOT CUDAToolkit_FOUND)	# CUDA might have been found for Astra already
 				FIND_PACKAGE(CUDAToolkit)
