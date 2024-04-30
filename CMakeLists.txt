@@ -363,7 +363,7 @@ if (ENABLE_EIGEN)
 		endif()
 		set(EIGEN_URL "https://gitlab.com/libeigen/eigen/-/archive/${EIGEN_VERSION}/eigen-${EIGEN_VERSION}.zip")
 	else()
-		set(EIGEN_URL "https://git.fh-ooe.at/fe-wls/ctdev/tools/open_ia-superbuild.git")
+		set(EIGEN_URL "https://gitlab.com/libeigen/eigen.git")
 	endif()
 endif()
 
