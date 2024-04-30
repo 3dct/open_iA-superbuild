@@ -211,7 +211,7 @@ endif()
 
 ## ITK
 
-set(ITK_VERSION_OPTIONS "5.0.1" "5.1.2" "5.2.1" "5.3.0" "5.4rc02" "5.4.rc04")
+set(ITK_VERSION_OPTIONS "5.0.1" "5.1.2" "5.2.1" "5.3.0" "5.4rc02" "5.4rc04")
 
 set(ITK_VERSION_DESC "Choose the ITK version to build (only used if ITK_USE_GIT_REPO is DISABLED; if ITK_USE_GIT_REPO is enabled, use ITK_GIT_TAG instead).")
 selector(ITK_VERSION "${ITK_VERSION_OPTIONS}" "5.3.0" "${ITK_VERSION_DESC}")
