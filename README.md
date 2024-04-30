@@ -31,25 +31,33 @@ On Linux, those packages should be available from the distribution repository.
     $ sudo apt install cmake cmake-qt-gui g++ make git \
       libgl1-mesa-dev libxt-dev \
       ocl-icd-opencl-dev opencl-headers opencl-clhpp-headers \
-      qtbase5-dev libqt5x11extras5-dev qttools5-dev \
-      libxt-dev libqt5opengl5-dev libqt5svg5-dev libqt5charts5-dev \
-      libxcursor-dev libsdl2-dev
+      libxt-dev libxcursor-dev libsdl2-dev \
+      qt6-base-dev qt6-tools-dev qt6-svg-dev
     ```
     In case you want to use clang instead of gcc, you can remove `g++` from the above command line, and additionally execute:
     ```
     $ sudo apt install clang libomp-dev
     ```
     OpenMP is required, and installs as separate package for clang. On versions of Ubuntu prior to 21.04, you might have to also install the `qt6-default` package in order to make Qt 6 the default.
+    For some modules, additional packages are required: AdaptiveThresholding module (qt6-charts-dev), Remote module (qt6-httpserver-dev, qt6-websockets-dev, npm), VR/Astra module (libboost-dev); the following command would for example install all:
+    ```
+    $ sudo apt install qt6-charts-dev qt6-httpserver-dev qt6-websockets-dev libboost-dev npm
+    ```
 
   - On Fedora (36-39), the command to install the required packages is:
     ```
-    $ sudo dnf install automake boost-devel clang cmake \
+    $ sudo dnf install automake clang cmake \
       cmake-gui git libomp-devel libtool libxkbcommon-devel \
-      make ninja-build mesa-libGL-devel ocl-icd-devel \
-      opencl-headers qt6-qtbase-devel qt6-qtcharts-devel \
-      qt6-qtsvg-devel qt6-qttools-devel
+      make ninja-build mesa-libGL-devel \
+      ocl-icd-devel opencl-headers \
+      qt6-qtbase-devel qt6-qtsvg-devel qt6-qttools-devel
     ```
     (installing both ninja and make build tools, and the clang compiler, in this example)
+
+    For some modules, additional packages are required: AdaptiveThresholding module (qt6-qtcharts-devel), Remote module (qt6-qthttpserver-devel, qt6-qtwebsockets-devel, nodejs-npm), VR/Astra module (boost-devel); the following command would for example install all:
+    ```
+    $ sudo dnf install boost-devel qt6-qtcharts-devel qt6-qthttpserver-devel qt6-qtwebsockets-devel nodejs-npm
+    ```
 
   - If you require any CUDA-dependant module (currently only the AstraReconstruction module),
     please refer to guides for how to install CUDA on your distribution. Also, make sure that the CUDA
