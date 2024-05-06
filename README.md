@@ -16,9 +16,9 @@ Additional information can also be found in the [Windows build instructions](htt
 
 ### 1. Install Prerequisites
 First, you need to install the following applications:
-- CMake (>= 3.14.0)
+- CMake (>= 3.26.0)
 - Git
-- A build toolchain (build tool and compiler, e.g. make and g++ / clang on Linux; or Visual Studio on Windows)
+- A C++ build toolchain (build tool and compiler, e.g. make and g++ / clang on Linux; or Visual Studio on Windows) supporting C++20
 
 open\_iA also requires some headers and libraries:
 - OpenGL
@@ -26,7 +26,7 @@ open\_iA also requires some headers and libraries:
 - Qt
 
 On Linux, those packages should be available from the distribution repository.
-  - For example, on Ubuntu 22.04, execute:
+  - For example, on latest Ubuntu, execute:
     ```
     $ sudo apt install cmake cmake-qt-gui g++ make git \
       libgl1-mesa-dev libxt-dev \
@@ -44,7 +44,7 @@ On Linux, those packages should be available from the distribution repository.
     $ sudo apt install qt6-charts-dev qt6-httpserver-dev qt6-websockets-dev libboost-dev npm
     ```
 
-  - On Fedora (36-39), the command to install the required packages is:
+  - On Fedora, the command to install the required packages is:
     ```
     $ sudo dnf install automake clang cmake \
       cmake-gui git libomp-devel libtool libxkbcommon-devel \
