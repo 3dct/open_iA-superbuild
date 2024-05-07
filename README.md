@@ -18,7 +18,7 @@ Additional information can also be found in the [Windows build instructions](htt
 First, you need to install the following applications:
 - CMake (>= 3.26.0)
 - Git
-- A C++ build toolchain (build tool and compiler, e.g. make and g++ / clang on Linux; or Visual Studio on Windows) supporting C++20
+- A C++ build toolchain (build tool and compiler, e.g. make and g++ / clang on Linux; or Visual Studio on Windows) supporting C++20 (specifically, std::format)
 
 open\_iA also requires some headers and libraries:
 - OpenGL
