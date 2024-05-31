@@ -233,4 +233,6 @@ You can continue with [our guide on how to develop a module](https://github.com/
 - If the HDF5 build fails with an error like this: `CUSTOMBUILD : CMake error : Problem with archive_read_open_file(): Failed to open '.../hdf5-1.14.2-src/build/HDF5-1.14.2-win64.zip'`, check the `cpack.log` file in the `hdf5-1.14.3-src/build` subfolder of the superbuild (replacing 1.14.3 with the version of HDF5 selected for the superbuild, see `HDF5_VERSION` in the "Library build options" section above).
 In our case, we had chocolatey installed and specified in our `PATH` environment variable. Apparently the HDF5 build automatically enables a chocolatey packaging if it's available, but then fails (cpack.log: `No .nuspec files (or more than 1) were found`). Workaround: Uninstall chocolate / remove it from PATH.
 
+- Boost 1.85 (and probably any version before) does not compile with Visual Studio 2022 >= 17.10 (or probably, rather msvc-toolset >= 14.4), see [this boost bug](https://github.com/boostorg/boost/issues/914). Workaround: use an older (14.3x) runtime.
+
 - If you encounter any error not mentioned here, please [post an issue](https://github.com/3dct/open_iA-superbuild/issues)!
