@@ -1178,7 +1178,8 @@ endif()
 if (ENABLE_ASTRA)
 	list(APPEND OPEN_IA_CMAKE_ARGS
 		"-DModule_AstraReconstruction:BOOL=ON"
-		"-DASTRA_TOOLBOX_DIR:PATH=${ASTRA_DIR}")
+		"-DASTRA_TOOLBOX_DIR:PATH=${ASTRA_DIR}"
+		"-DCUDAToolkit_ROOT:PATH=${CUDAToolkit_ROOT_DIR}")
 	if (BUILD_ASTRA)
 		list(APPEND openiA_DEPENDS astra)
 	endif()
