@@ -145,7 +145,7 @@
 +      readStreamTemp->open(fName.c_str(), std::ios::binary | std::ios::in);
        if (!readStreamTemp->rdbuf()->is_open())
        {
-         std::cout << "MetaArray: Read: Cannot open data file" << std::endl;
+         std::cout << "MetaArray: Read: Cannot open data file" << '\n';
 @@ -756,19 +744,9 @@
      }
    }
@@ -270,16 +270,16 @@
    std::string filename = m_Name;
    filename += ".gad.xml";
  
--  std::::ofstream file;
+-  std::ofstream file;
 +  METAIO_STREAM::ofstream file;
  #ifdef __sgi
    file.open(filename.c_str(), std::ios::out);
  #else
 --- a/Modules/ThirdParty/MetaIO/src/MetaIO/src/metaForm.cxx
 +++ b/Modules/ThirdParty/MetaIO/src/MetaIO/src/metaForm.cxx
-@@ -543,13 +543,8 @@
+@@ -546,12 +546,8 @@
  
-   std::cout << "Read FileName = _" << m_FileName << "_" << std::endl;
+   std::cout << "Read FileName = _" << m_FileName << "_" << '\n';
  
 -  auto * tmpReadStream = new std::ifstream;
 -#ifdef __sgi
@@ -287,13 +287,12 @@
 -#else
 -  tmpReadStream->open(m_FileName, std::ios::binary | std::ios::in);
 -#endif
--#endif
 +  auto * tmpReadStream = new METAIO_STREAM::ifstream;
 +  tmpReadStream->open(m_FileName.c_str(), std::ios::binary | std::ios::in);
  
    if (!tmpReadStream->rdbuf()->is_open())
    {
-@@ -574,7 +569,7 @@
+@@ -576,7 +571,7 @@
  }
  
  bool
@@ -302,7 +301,7 @@
  {
    if (_stream)
    {
-@@ -587,7 +582,7 @@
+@@ -589,7 +584,7 @@
  }
  
  bool
@@ -311,9 +310,9 @@
  {
    META_DEBUG_PRINT( "MetaForm: ReadStream" );
  
-@@ -621,18 +616,9 @@
+@@ -623,18 +618,9 @@
  
-   std::cout << "Write FileName = _" << m_FileName << "_" << std::endl;
+   std::cout << "Write FileName = _" << m_FileName << "_" << '\n';
  
 -  auto * tmpWriteStream = new std::ofstream;
 +  auto * tmpWriteStream = new METAIO_STREAM::ofstream;
@@ -332,7 +331,7 @@
  
    if (!tmpWriteStream->rdbuf()->is_open())
    {
-@@ -651,7 +637,7 @@
+@@ -653,7 +639,7 @@
  }
  
  bool
@@ -840,8 +839,8 @@
  
 --- a/Modules/ThirdParty/MetaIO/src/MetaIO/src/metaObject.h
 +++ b/Modules/ThirdParty/MetaIO/src/MetaIO/src/metaObject.h
-@@ -35,8 +35,8 @@
- protected:
+@@ -56,8 +56,8 @@
+ 
    typedef std::vector<MET_FieldRecordType *> FieldsContainerType;
  
 -  std::ifstream * m_ReadStream;
@@ -851,7 +850,7 @@
  
    FieldsContainerType m_Fields;
    FieldsContainerType m_UserDefinedWriteFields;
-@@ -127,7 +127,7 @@
+@@ -154,7 +154,7 @@
    Read(const char * _fileName = nullptr);
  
    bool
