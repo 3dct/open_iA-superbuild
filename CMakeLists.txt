@@ -510,7 +510,7 @@ if (BUILD_VTK)
 		# let's apply the fix for parallel coordinate charts potentially causing a crash
 		# on mouse move (see https://gitlab.kitware.com/vtk/vtk/-/issues/17441):
 		set(VTK_PARALLEL_COORDINATE_PATCH_LINE 492)
-		CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/patches/vtk-parallelCoordinates.patch.template" "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch")
+		configure_file("${CMAKE_SOURCE_DIR}/patches/vtk-parallelCoordinates.patch.template" "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch")
 		list(APPEND VTK_PATCH_COMMAND "${CMAKE_BINARY_DIR}/vtk-parallelCoordinates.patch")
 	endif()
 	if (VTK_VERSION VERSION_EQUAL "9.3.0")
