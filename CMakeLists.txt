@@ -779,9 +779,11 @@ if (BUILD_ITK)
 			set(ITK_METAIIO_STREAM_PATCH "${CMAKE_SOURCE_DIR}/patches/itk-5.4.0-METAIO_STREAM.patch")
 			list(APPEND ITK_PATCH_COMMAND ${ITK_METAIIO_STREAM_PATCH})
 		endif()
-		if (ITK_PATCH_COMMAND STREQUAL "${GIT_APPLY_CMD}")
-			set(ITK_PATCH_COMMAND "")	# if no patch to apply, set empty
-		endif()
+		set(ITK_PADSIZE_PATCH "${CMAKE_SOURCE_DIR}/patches/itk-ReconstructionImageFilter-padSize.patch")
+		list(APPEND ITK_PATCH_COMMAND ${ITK_PADSIZE_PATCH})
+		#if (ITK_PATCH_COMMAND STREQUAL "${GIT_APPLY_CMD}")
+		#	set(ITK_PATCH_COMMAND "")	# if no patch to apply, set empty
+		#endif()
 		set(ITK_DIR "${CMAKE_BINARY_DIR}/itk/bin-${ITK_VERSION}" CACHE PATH "ITK build folder." FORCE)
 		ExternalProject_Add (ITK
 			URL               "${ITK_URL}"
