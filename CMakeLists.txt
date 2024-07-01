@@ -59,6 +59,18 @@ endif()
 #endif()
 #
 
+if(MSVC)
+	# CMake configuration for disabling incremental linking (to decrease size of builds which are typically not rebuilt)
+	set(NO_INCREMENTAL_LINKING
+		"-DCMAKE_EXE_LINKER_FLAGS_DEBUG:STRING=/debug /INCREMENTAL:NO"
+		"-DCMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO:STRING=/debug /INCREMENTAL:NO"
+		"-DCMAKE_SHARED_LINKER_FLAGS_DEBUG:STRING=/debug /INCREMENTAL:NO"
+		"-DCMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO:STRING=/debug /INCREMENTAL:NO"
+		"-DCMAKE_MODULE_LINKER_FLAGS_DEBUG:STRING=/debug /INCREMENTAL:NO"
+		"-DCMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO:STRING=/debug /INCREMENTAL:NO"
+	)
+endif()
+
 function(selector varname options default desc)
 	list(FIND options "${${varname}}" options_index)
 	if (${options_index} EQUAL -1)
@@ -401,6 +413,9 @@ if (BUILD_VTK)
 		"-DVTK_MODULE_ENABLE_VTK_RenderingContextOpenGL2=YES"
 		"-DVTK_MODULE_ENABLE_VTK_ViewsQt=YES"
 	)
+	if (MSVC)
+		list(APPEND VTK_CMAKE_ARGS ${NO_INCREMENTAL_LINKING})
+	endif()
 	#if (DISABLE_LIB_WARNINGS)
 	#	list(APPEND VTK_CMAKE_ARGS ${DISABLE_WARNINGS_OPT})
 	#endif()
@@ -686,6 +701,9 @@ if (BUILD_ITK)
 		"-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
 		"-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
 	)
+	if (MSVC)
+		list(APPEND ITK_CMAKE_ARGS ${NO_INCREMENTAL_LINKING})
+	endif()
 #	if (DISABLE_LIB_WARNINGS)
 #		list(APPEND ITK_CMAKE_ARGS ${DISABLE_WARNINGS_OPT})
 #	endif()
