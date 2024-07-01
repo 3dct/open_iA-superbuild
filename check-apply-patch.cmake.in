@@ -1,0 +1,18 @@
+# it seems it is quite impossible to quote command line arguments (-D...) properly in order to pass in a semicolon;
+# therefore, configure_file is used to pass in the arguments here:
+SET(StampFile "@StampFile@")
+SET(CommandWithArgs "@CommandWithArgs@")
+
+if (EXISTS ${StampFile})
+	message(STATUS "${StampFile} already exists, patch has already been applied! Remove file if patch needs to be re-applied!")
+else()
+	message(STATUS "${StampFile} doesn't exist yet, applying patch")
+	message(STATUS "running ${CommandWithArgs}...")
+	execute_process(COMMAND ${CommandWithArgs} RESULT_VARIABLE result)
+	if (${result} EQUAL 0)
+		message(STATUS "Patching success!")
+		# file(TOUCH ${StampFile})
+	else()
+		message(FATAL_ERROR "Patching NOT successful!")
+	endif()
+endif()

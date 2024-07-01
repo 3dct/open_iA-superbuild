@@ -845,12 +845,16 @@ if (BUILD_BOOST)
 		set(B2_COMMAND ${CMAKE_BINARY_DIR}/boost/b2)
 		set(B2_FLAGS ${B2_FLAGS})
 	endif()
-	if (BOOST_VERSION VERSION_EQUAL "1.85.0")
-		set (BOOST_PATCH_COMMAND ${GIT_APPLY_CMD} "${CMAKE_SOURCE_DIR}/patches/boost-1.85-vs17.10.patch")
+	set(BOOST_DIR "${CMAKE_BINARY_DIR}/boost")
+	if (MSVC AND MSVC_VERSION GREATER_EQUAL 1940 AND BOOST_VERSION VERSION_EQUAL "1.85.0")
+		set(CommandWithArgs "${GIT_EXECUTABLE}" apply ${GIT_APPLY_OPTS} "${CMAKE_SOURCE_DIR}/patches/boost-1.85-vs17.10.patch")
+		set(StampFile "${BOOST_DIR}/msvc1940-patched")
+		set(BOOST_PATCH_CMAKE_SCRIPT "${CMAKE_SOURCE_DIR}/boost-patch.cmake")  # file must not reside within boost folder - otherwise it will be removed on clean, but not recreated!
+		configure_file("${CMAKE_SOURCE_DIR}/check-apply-patch.cmake.in" "${BOOST_PATCH_CMAKE_SCRIPT}" @ONLY)
+		set(BOOST_PATCH_COMMAND "${CMAKE_COMMAND}" -P ${BOOST_PATCH_CMAKE_SCRIPT})
 	else()
 		set (BOOST_PATCH_COMMAND "")
 	endif()
-	set(BOOST_DIR "${CMAKE_BINARY_DIR}/boost")
 	ExternalProject_Add (boost
 		URL               ${BOOST_URL}
 		URL_HASH          SHA512=${BOOST_ARCHIVE_SHA512}
