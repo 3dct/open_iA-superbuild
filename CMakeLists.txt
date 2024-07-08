@@ -927,7 +927,7 @@ if (ENABLE_ASTRA)
 			configure_file("${CMAKE_SOURCE_DIR}/patches/astra-${ASTRA_TAG}-vs.patch.template" "${CMAKE_BINARY_DIR}/astra-vs.patch")
 			set(CommandWithArgs "${GIT_EXECUTABLE}" apply ${GIT_APPLY_OPTS} "${CMAKE_BINARY_DIR}/astra-vs.patch")
 			set(StampFile "${ASTRA_DIR}/astra-patched")
-			set(ASTRA_PATCH_CMAKE_SCRIPT "${CMAKE_BINARY_DIR}/astra-patch.cmake")  # file must not reside within boost folder - otherwise it will be removed on clean, but not recreated!
+			set(ASTRA_PATCH_CMAKE_SCRIPT "${CMAKE_BINARY_DIR}/astra-patch.cmake")  # file must not reside within astra folder - otherwise it will be removed on clean, but not recreated!
 			if (DISABLE_LIB_WARNINGS)
 				list(APPEND CommandWithArgs "${CMAKE_SOURCE_DIR}/patches/astra-vs-warnings.patch")
 			endif()
