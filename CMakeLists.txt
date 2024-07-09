@@ -1048,6 +1048,7 @@ if (ENABLE_AI)
 			set(ONNX_ARCHIVE "https://github.com/microsoft/onnxruntime/releases/download/v${ONNX_VERSION}/Microsoft.ML.OnnxRuntime.DirectML.${ONNX_VERSION}.zip")
 			set(ONNX_INCLUDE_SUBDIR "build/native/include")
 			set(ONNX_LIB_DIR "${ONNX_SRC_DIR}/runtimes/win-x64/native")
+			find_file(DIRECTML_LIBRARY NAMES "DirectML.dll")
 		endif()
 		set(ONNX_LIBRARIES "${ONNX_LIB_DIR}/onnxruntime.lib")
 		if (MSVC)
@@ -1209,7 +1210,8 @@ if (ENABLE_AI)
 		"-DONNX_RUNTIME_DIR:PATH=${ONNX_SRC_DIR}"
 		"-DONNX_RUNTIME_INCLUDE_DIR:PATH=${ONNX_INCLUDE_DIR}"
 		"-DONNX_RUNTIME_LIBRARIES:FILEPATH=${ONNX_LIBRARIES}"
-		"-DopeniA_ONNX_CUDA:BOOL=${AI_ONNX_USE_CUDA}")
+		"-DopeniA_ONNX_CUDA:BOOL=${AI_ONNX_USE_CUDA}"
+		"-DDIRECTML_LIBRARY:FILEPATH=${DIRECTML_LIBRARY}")
 	list(APPEND openiA_DEPENDS onnx)
 endif()
 if (ENABLE_EIGEN)
