@@ -190,6 +190,10 @@ mark_as_advanced(VTK_SMP_TYPE)
 
 if (VTK_USE_GIT_REPO)
 	set(VTK_GIT_TAG_OPTIONS "")
+	# tested with:
+	#	"55b8be80a79daa81e57b4e229671c8b1cdcaab1b"    # 2024-04-18
+	#	"918af69adf178db803a71f95572c7e0582901a4d"    # 2024-07-08
+	#)
 	foreach(version ${VTK_VERSION_OPTIONS})
 		list(APPEND VTK_GIT_TAG_OPTIONS "v${version}")
 	endforeach()
