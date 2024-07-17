@@ -332,9 +332,9 @@ endif()
 
 if (ENABLE_ASTRA)
 	set(ASTRA_REPOSITORY "https://github.com/astra-toolbox/astra-toolbox.git")
-	set(ASTRA_TAG_OPTIONS "v2.0.0" "v2.1.0" "master")
+	set(ASTRA_TAG_OPTIONS "v2.0.0" "v2.1.0" "v2.2.0" "master")
 	set(ASTRA_TAG_DESC "Choose the astra version (tag) to fetch and build.")
-	selector(ASTRA_TAG "${ASTRA_TAG_OPTIONS}" "v2.1.0" "${ASTRA_TAG_DESC}")
+	selector(ASTRA_TAG "${ASTRA_TAG_OPTIONS}" "v2.2.0" "${ASTRA_TAG_DESC}")
 endif()
 
 if (BUILD_BOOST)
