@@ -1,6 +1,6 @@
 # Required to use CTest / CDash
 # enabled via ENABLE_TESTING() / INCLUDE(CTest) in CMakeLists.txt (in cmake/Modules/Common.cmake in our case)
-set(CTEST_PROJECT_NAME "OpeniASB")
+set(CTEST_PROJECT_NAME "open_iA_sb")
 set(CTEST_NIGHTLY_START_TIME "14:00:00 UTC")
 
 set(CTEST_DROP_METHOD "https")
