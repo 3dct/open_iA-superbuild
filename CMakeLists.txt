@@ -1250,7 +1250,7 @@ if (ENABLE_AI)
 endif()
 if (ENABLE_EIGEN)
 	if (EIGEN_USE_GIT_REPO)
-		set(EIGEN_GIT_TAG "master")
+		set(EIGEN_GIT_TAG "d791d48859c6fc7850c9fd5270d2b236c818068d")
 		set(EIGEN_BIN_DIR "${CMAKE_BINARY_DIR}/eigen-${EIGEN_GIT_TAG}")
 		ExternalProject_Add (eigen
 			GIT_REPOSITORY    "${EIGEN_URL}"
