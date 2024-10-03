@@ -413,9 +413,6 @@ endif()
 set(ITK_DEPENDS "")
 
 if (BUILD_VTK)
-	if (VTK_VERSION VERSION_LESS "9.1.0" AND "${VTK_SMP_TYPE}" STREQUAL "STDThread")
-		message(SEND_ERROR "VTK only supports VTK_SMP_TYPE = STDThread with version 9.1.0 or higher; you have selected ${VTK_VERSION}. Please either chose a different VTK_SMP_TYPE or a higher VTK_VERSION!")
-	endif()
 	set(VTK_CMAKE_ARGS
 		"-DBUILD_SHARED_LIBS:BOOL=On"
 		"-DVTK_LEGACY_REMOVE:BOOL=On"
@@ -442,7 +439,7 @@ if (BUILD_VTK)
 	if (NOT CMAKE_CONFIGURATION_TYPES)
 		list(APPEND VTK_CMAKE_ARGS "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}")
 	endif()
-	if (WIN32 AND VTK_VERSION VERSION_GREATER_EQUAL "9.1.0")
+	if (WIN32)
 		list(APPEND VTK_CMAKE_ARGS "-DVTK_USE_VIDEO_FOR_WINDOWS=ON")
 	endif()
 	set(VTK_DEPENDS "")
