@@ -829,7 +829,8 @@ if (BUILD_BOOST)
 	# fetch and build boost...
 	# inspired by https://github.com/apache/geode-native/blob/develop/dependencies/boost/CMakeLists.txt
 	string(REPLACE "." "_" BOOST_VERSION_UNDERSCORE ${BOOST_VERSION})
-	set(BOOST_URL "https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_UNDERSCORE}.zip")
+	#set(BOOST_URL "https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_UNDERSCORE}.zip")
+	set(BOOST_URL "https://archives.boost.io/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_UNDERSCORE}.zip")
 	set(BOOST_BOOTSTRAP_OPTS "")
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		set(BOOST_BOOTSTRAP_OPTS "--with-toolset=clang")
