@@ -23,7 +23,7 @@ First, you need to install the following applications:
 open\_iA also requires some headers and libraries:
 - OpenGL
 - optional: OpenCL
-- Qt
+- Qt (TODO: optionally install as part of this superbuild - see e.g. [aqt](https://stackoverflow.com/questions/51910107/install-qt5-11-headles-using-the-script-option)
 
 On Linux, those packages should be available from the distribution repository.
   - For example, on latest Ubuntu, execute:
