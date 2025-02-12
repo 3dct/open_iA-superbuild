@@ -76,14 +76,14 @@ On Windows, download and install:
 - Visual Studio (e.g. the free [Community Edition](https://visualstudio.microsoft.com/de/vs/older-downloads)); we recommend to use Visual Studio 2022.
 - OpenGL headers are included in the Windows SDK installed along with Visual Studio.
 - Qt:
-	- Go to the [Qt for Open Source Development](https://www.qt.io/download-open-source) page.
-	- Under "Looking for Qt binaries?", you should see a button to download the "Qt Online Installer" (if it doesn't show up, try another browser).
-	- In the installer, log in to your Qt account (or create one if you haven't got one yet).
+    - Go to the [Qt for Open Source Development](https://www.qt.io/download-open-source) page.
+    - Under "Looking for Qt binaries?", you should see a button to download the "Qt Online Installer" (if it doesn't show up, try another browser).
+    - In the installer, log in to your Qt account (or create one if you haven't got one yet).
     - In the "Select Components" step:
-		- expand the "Qt" tree item
-		- decide on a version (required: >= 6; recommended: >= 6.4)
-		- for that version, expand the tree and **only check** the "MSVC 2019 64-bit" option, as well as the "Qt Charts", "Qt HTTP Server (TP)" (only available for Qt >= 6.4) and "Qt WebSockets" options under "Additional Libraries"; make sure no other version or option than those two is checked (unless you require them for something else than open\_iA, of course).
-			- **Note:** pre-built binaries are only provided for VS 2019, but these work with VS 2022 as well.
+        - expand the "Qt" tree item
+        - decide on a version (required: >= 6; recommended: >= 6.4)
+        - for that version, expand the tree and **only check** the "MSVC 2019 64-bit" option, as well as the "Qt Charts", "Qt HTTP Server (TP)" (only available for Qt >= 6.4) and "Qt WebSockets" options under "Additional Libraries"; make sure no other version or option than those two is checked (unless you require them for something else than open\_iA, of course).
+            - **Note:** pre-built binaries are only provided for VS 2019, but these work with VS 2022 as well.
 - optional: an OpenCL SDK; if available, some GPU operations will be available; some modules require it. The generic OpenCL-ICD loader can be built from within the superbuild (via `ENABLE_OPENCL`). Or you can use an SDK best fitting your build system, e.g. the AMD OpenCL SDK for an AMD graphics card, the NVidia CUDA SDK for an NVidia graphics card, or the Intel OpenCL SDK for an onboard graphics card (but note that this ties your build to machines having similar compute capabilities)
 
 
