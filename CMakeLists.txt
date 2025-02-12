@@ -568,7 +568,7 @@ if (ENABLE_OPENCL)
 		set(OPENCL_HEADERS_REPO "https://github.com/KhronosGroup/OpenCL-Headers.git")
 		set(OPENCL_VERSION_OPTIONS "v2024.10.24" "v2024.05.08" "v2023.12.14" "v2023.04.17" "v2023.02.06")
 		set(OPENCL_VERSION_DESC "Choose the version of OpenCL C/C++ headers and ICD loader to build.")
-		selector(OPENCL_VERSION "${OPENCL_VERSION_OPTIONS}" "v2024.05.08" ${OPENCL_VERSION_DESC})
+		selector(OPENCL_VERSION "${OPENCL_VERSION_OPTIONS}" "v2024.10.24" ${OPENCL_VERSION_DESC})
 		# other available versions: (for both OpenCL-ICD-Loader and OpenCL-Headers) see github tags; of note:
 		#   - v2022.05.18  known to cause error (`OpenCL/icdloader/test/layer/icd_print_layer_generated.c:946:50: error: expected function body after function declarator`) and warning (`CL_TARGET_OPENCL_VERSION is not a valid value (100, 110, 120, 200, 210, 220). Defaulting to 220 (OpenCL 2.2)")`)
 		#   - v2020.12.18  not tested; first version to contain CMakeLists.txt file
