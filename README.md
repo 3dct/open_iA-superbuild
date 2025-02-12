@@ -54,6 +54,12 @@ On Linux, those packages should be available from the distribution repository.
     ```
     (installing both ninja and make build tools, and the clang compiler, in this example)
 
+  - On OpenSUSE, the command to install the required Qt packages is:
+    ```
+    $ sudo zypper install xcb-util-cursor-devel qt6-concurrent-devel qt6-gui-devel qt6-opengl-devel qt6-svg-devel qt6-xml-devel
+    $ sudo zypper install qt6-charts-devel qt6-httpserver-devel qt6-websockets-devel
+    ```
+
     For some modules, additional packages are required: qt6-qtcharts-devel (for AdaptiveThresholding module ), qt6-qthttpserver-devel, qt6-qtwebsockets-devel, nodejs-npm (for Remote module), boost-devel (for ImNDT/XVRA and Astra modules), openvr-devel and/or openxr-devel (for ImNDT/XVRA modules); the following command would for example install all:
     ```
     $ sudo dnf install boost-devel qt6-qtcharts-devel qt6-qthttpserver-devel qt6-qtwebsockets-devel nodejs-npm openvr-devel openxr-devel
