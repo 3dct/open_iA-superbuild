@@ -258,12 +258,13 @@ else()
 		set(ITK_URL "https://github.com/InsightSoftwareConsortium/ITK/releases/download/v${ITK_VERSION}/InsightToolkit-${ITK_VERSION}")
 	endif()
 	if (WIN32)
-		set(ITK_URL "${ITK_URL}.zip")
+		set(ITK_ARCHIVE_SUFFIX ".zip")
 		set(ITK_ARCHIVE_SHA512 ${ITK_ZIP_SHA512})
 	else()
-		set(ITK_URL "${ITK_URL}.tar.gz")
+		set(ITK_ARCHIVE_SUFFIX ".tar.gz")
 		set(ITK_ARCHIVE_SHA512 ${ITK_TGZ_SHA512})
 	endif()
+	set(ITK_URL "${ITK_URL}${ITK_ARCHIVE_SUFFIX}")
 endif()
 
 
@@ -449,6 +450,7 @@ if (BUILD_VTK)
 				URL               ${OPENVR_URL}
 				URL_HASH          "SHA512=${OPENVR_ARCHIVE_SHA512}"
 				DOWNLOAD_DIR      ${ARCHIVE_DIR}
+				DOWNLOAD_NAME     "openvr-${OPENVR_VERSION}.zip"
 				SOURCE_DIR        "${OPENVR_ROOT_DIR}"
 				BUILD_IN_SOURCE   1
 				CONFIGURE_COMMAND ""
@@ -791,6 +793,7 @@ if (BUILD_ITK)
 			URL               "${ITK_URL}"
 			URL_HASH          "SHA512=${ITK_ARCHIVE_SHA512}"
 			DOWNLOAD_DIR      ${ARCHIVE_DIR}
+			DOWNLOAD_NAME     "ITK-${ITK_VERSION}${ITK_ARCHIVE_SUFFIX}"
 			PATCH_COMMAND     ${ITK_PATCH_COMMAND}
 			SOURCE_DIR        "${CMAKE_BINARY_DIR}/itk/src-${ITK_VERSION}"
 			BINARY_DIR        "${ITK_DIR}"
