@@ -1206,6 +1206,7 @@ endif()
 if (ENABLE_VR)
 	list(APPEND OPEN_IA_CMAKE_ARGS
 		"-DModule_ImNDT:BOOL=ON"
+		"-DModule_VRAnnotations:BOOL=ON"
 		"-DModule_XVRA:BOOL=ON")
 	if (ENABLE_OPENVR)
 		list(APPEND OPEN_IA_CMAKE_ARGS ${OPENVR_LIB_AND_INCLUDE})
