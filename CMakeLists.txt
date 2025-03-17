@@ -17,7 +17,6 @@ mark_as_advanced(ITK_USE_GIT_REPO)
 option(ENABLE_ALL "Enables all optional modules and filters (see also separate ENABLE_xyz options; all except for ENABLE_PRECOMPILE and ENABLE_VTK_AVIWRITER are enabled if this is set to on. Note that unchecking this box again does NOT have any direct effect; it will not automatically set these options to unchecked or their state before. But you will have to uncheck the option if you want to disable any of the single ENABLE_xyz options affected by this setting, otherwise they will be re-enabled on next 'Configure' run) (default: disabled)" OFF)
 
 option(ENABLE_AI "Whether to enable AI module; requires onnx runtime, which will be fetched automatically; on Windows, you can change whether CUDA or DirectML backend is chosen with the option AI_ONNX_USE_CUDA (default: disabled)" OFF)
-option(ENABLE_ASTRA "Whether to build ASTRA reconstruction library and open_iA ASTRA module. This will also fetch and build boost, so enabling it will considerably increase the build time! (default: disabled)" OFF)
 option(ENABLE_EIGEN "Whether to fetch and use eigen (default: disabled)" OFF)
 option(ENABLE_FILTERS "Whether to build image processing filters (smoothing, segmentation, intensity transformations, geometric transformations, ...) (default: enabled)" ON)
 option(ENABLE_HDF5 "Whether to fetch and build HDF5 library and use it in open_iA (default: disabled)" OFF)
@@ -98,7 +97,6 @@ endif()
 
 if (ENABLE_ALL)
 	set(ENABLE_AI "ON" CACHE BOOL "" FORCE)
-	set(ENABLE_ASTRA "ON" CACHE BOOL "" FORCE)
 	set(ENABLE_EIGEN "ON" CACHE BOOL "" FORCE)
 	set(ENABLE_FILTERS "ON" CACHE BOOL "" FORCE)
 	set(ENABLE_HDF5 "ON" CACHE BOOL "" FORCE)
@@ -110,12 +108,8 @@ if (ENABLE_ALL)
 	set(ENABLE_OPENXR "ON" CACHE BOOL "" FORCE)
 endif()
 
-if (ENABLE_ASTRA)
-	option(BUILD_ASTRA "Build Astra Toolbox in the superbuild. If disabled, you need to set ASTRA_DIR to an existing Astra Toolkit build" ON)
-endif()
-
 set(BUILD_BOOST_OPTION OFF)
-if (ENABLE_ASTRA OR ENABLE_VR)
+if (ENABLE_VR)
 	set(BUILD_BOOST_OPTION ON)
 endif()
 if (BUILD_BOOST_OPTION)
@@ -124,7 +118,7 @@ if (BUILD_BOOST_OPTION)
 	else()
 		set(BUILD_BOOST_DEFAULT_VAL OFF)
 	endif()
-	option(BUILD_BOOST "Fetch and build Boost in the superbuild, if astra is enabled. If disabled, you need to set BOOST_DIR to an existing boost build (default: enabled)" ${BUILD_BOOST_DEFAULT_VAL})
+	option(BUILD_BOOST "Fetch and build Boost in the superbuild (required for ImNDT/VR module). If disabled, you need to set Boost_DIR to an existing boost build (default: enabled)" ${BUILD_BOOST_DEFAULT_VAL})
 endif()
 
 message(STATUS "Compilers: C++: ${CMAKE_CXX_COMPILER}")
@@ -322,15 +316,6 @@ if (ENABLE_VR)
 			endif()
 		endif()
 	endif()
-endif()
-
-## Astra Toolbox
-
-if (ENABLE_ASTRA)
-	set(ASTRA_REPOSITORY "https://github.com/astra-toolbox/astra-toolbox.git")
-	set(ASTRA_TAG_OPTIONS "v2.0.0" "v2.1.0" "v2.2.0" "v2.3.0" "master")
-	set(ASTRA_TAG_DESC "Choose the astra version (tag) to fetch and build.")
-	selector(ASTRA_TAG "${ASTRA_TAG_OPTIONS}" "v2.2.0" "${ASTRA_TAG_DESC}")
 endif()
 
 if (BUILD_BOOST)
@@ -810,7 +795,7 @@ else()
 endif()
 
 set(CUDA_FIND_ENABLED OFF)
-if ((ENABLE_ASTRA AND BUILD_ASTRA) OR (ENABLE_AI AND AI_ONNX_USE_CUDA))
+if (ENABLE_AI AND AI_ONNX_USE_CUDA)
 	set(CUDA_FIND_ENABLED ON)
 endif()
 if (CUDA_FIND_ENABLED)
@@ -823,7 +808,7 @@ if (CUDA_FIND_ENABLED)
 		endif()
 		message(STATUS "CUDA: ${CUDAToolkit_VERSION} in ${CUDAToolkit_ROOT_DIR}.")
 	else()
-		message(SEND_ERROR "CUDA, required for ASTRA / AI, not found! Specify where to find CUDAToolkit, or uncheck ENABLE_ASTRA / ENABLE_AI!")
+		message(SEND_ERROR "CUDA, required for current AI module configuration, not found! Specify where to find CUDAToolkit, disable ONNX_USE_CUDE, or disable AI module by disabling ENABLE_AI!")
 	endif()
 endif()
 
@@ -840,7 +825,7 @@ if (BUILD_BOOST)
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		set(BOOST_BOOTSTRAP_OPTS "--with-toolset=clang")
 	endif()
-	set(B2_FLAGS -j8 address-model=64 architecture=x86 link=static threading=multi runtime-link=shared --with-chrono --with-date_time --with-system --with-thread stage)
+	set(B2_FLAGS -j8 address-model=64 architecture=x86 link=static threading=multi runtime-link=shared --with-system stage)
 	if (WIN32)
 		set(BOOST_BOOTSTRAP_COMMAND ${CMAKE_BINARY_DIR}\\boost\\bootstrap.bat)
 		set(BOOST_BOOTSTRAP_OPTS ${BOOST_LIB_SUFFIX})    # in case of multiple VS installations, make sure the one selected as generator is used!
@@ -851,10 +836,10 @@ if (BUILD_BOOST)
 		set(B2_COMMAND ${CMAKE_BINARY_DIR}/boost/b2)
 		set(B2_FLAGS ${B2_FLAGS})
 	endif()
-	set(BOOST_DIR "${CMAKE_BINARY_DIR}/boost")
+	set(Boost_DIR "${CMAKE_BINARY_DIR}/boost")
 	if (MSVC AND MSVC_VERSION GREATER_EQUAL 1940 AND BOOST_VERSION VERSION_EQUAL "1.85.0")
 		set(CommandWithArgs "${GIT_EXECUTABLE}" apply ${GIT_APPLY_OPTS} "${CMAKE_SOURCE_DIR}/patches/boost-1.85-vs17.10.patch")
-		set(StampFile "${BOOST_DIR}/msvc1940-patched")
+		set(StampFile "${Boost_DIR}/msvc1940-patched")
 		set(BOOST_PATCH_CMAKE_SCRIPT "${CMAKE_BINARY_DIR}/boost-patch.cmake")  # file must not reside within boost folder - otherwise it will be removed on clean, but not recreated!
 		configure_file("${CMAKE_SOURCE_DIR}/check-apply-patch.cmake.in" "${BOOST_PATCH_CMAKE_SCRIPT}" @ONLY)
 		set(BOOST_PATCH_COMMAND "${CMAKE_COMMAND}" -P ${BOOST_PATCH_CMAKE_SCRIPT})
@@ -866,114 +851,12 @@ if (BUILD_BOOST)
 		URL_HASH          SHA512=${BOOST_ARCHIVE_SHA512}
 		DOWNLOAD_DIR      ${ARCHIVE_DIR}
 		BUILD_IN_SOURCE   1
-		SOURCE_DIR        "${BOOST_DIR}"
+		SOURCE_DIR        "${Boost_DIR}"
 		PATCH_COMMAND     ${BOOST_PATCH_COMMAND}
 		CONFIGURE_COMMAND ${BOOST_BOOTSTRAP_COMMAND} ${BOOST_BOOTSTRAP_OPTS}
 		BUILD_COMMAND     ${B2_COMMAND} ${B2_FLAGS}
 		INSTALL_COMMAND   ""  # ${B2_COMMAND} ${B2_FLAGS} install
 	)
-	# set boost include dir
-	set(BOOST_INCLUDE_DIR ${BOOST_DIR})
-endif()
-
-if (ENABLE_ASTRA)
-	if (BUILD_ASTRA)
-		set(ASTRA_DIR "${CMAKE_BINARY_DIR}/astra" CACHE PATH
-			"Astra toolbox directory" FORCE)
-		if (BOOST_VERSION VERSION_GREATER_EQUAL "1.85.0" AND CUDAToolkit_VERSION VERSION_LESS "11.8.0")
-			message(WARNING "Note that with boost 1.85 and CUDA toolkit probably < 11.8 (encountered with 11.7, but not with 11.8), the Astra build might report errors like `error : identifier \"__builtin_FUNCSIG\" is undefined` during build! Choose an older version (< 1.85) of boost here, or install a newer version of CUDA (tested to work with 12.4).")
-		endif()
-		string(SUBSTRING ${ASTRA_TAG} 1 -1 ASTRA_VERSION)
-		if (CUDAToolkit_VERSION VERSION_GREATER_EQUAL "12.0.0" AND NOT ("${ASTRA_TAG}" STREQUAL "master" OR ASTRA_VERSION VERSION_GREATER_EQUAL "2.2.0"))
-			message(WARNING "NOTE: You have selected a CUDA version >= 12, and Astra version ${ASTRA_VERSION}; these are not compatible - only versions >= 2.2.0 are compatible with CUDA >= 12; so this configuration will lead to build errors. Please either select a lower CUDA version, or choose an astra version >= 2.2 via ASTRA_TAG!")
-		endif()
-
-		set(ASTRA_DEPENDS "")
-		set(CMD_COPY_BOOST_HEADERS "")
-		set(CMD_CREATE_LIBX64_DIR "")
-		set(CMD_COPY_BOOST_LIBS "")
-
-		if (BUILD_BOOST)
-			# prepare the commands required to copy over boost stuff into astra build tree:
-			set(CMD_COPY_BOOST_HEADERS ${CMAKE_COMMAND} -E copy_directory "${BOOST_DIR}/boost" "${ASTRA_DIR}/lib/include/boost")
-			set(CMD_CREATE_LIBX64_DIR ${CMAKE_COMMAND} -E make_directory "${ASTRA_DIR}/lib/x64")
-			set(BOOST_LIB_BASE "${BOOST_DIR}/stage/lib/libboost_")
-			set(BOOST_LIB_LIST "chrono" "date_time" "system" "thread")
-			if (WIN32)
-				set(BOOST_LIB_LIST1 ${BOOST_LIB_LIST})
-				set(BOOST_LIB_LIST2 ${BOOST_LIB_LIST})
-				list(TRANSFORM BOOST_LIB_LIST1 PREPEND ${BOOST_LIB_BASE})
-				list(TRANSFORM BOOST_LIB_LIST2 PREPEND ${BOOST_LIB_BASE})
-				set(BOOST_LIB_SUFF1 "-${BOOST_LIB_SUFFIX}-mt-gd-x64-${BOOST_SHORTVER}.lib")
-				set(BOOST_LIB_SUFF2 "-${BOOST_LIB_SUFFIX}-mt-x64-${BOOST_SHORTVER}.lib")
-				list(TRANSFORM BOOST_LIB_LIST1 APPEND ${BOOST_LIB_SUFF1})
-				list(TRANSFORM BOOST_LIB_LIST2 APPEND ${BOOST_LIB_SUFF2})
-				set(BOOST_COPY_LIBS ${BOOST_LIB_LIST1} ${BOOST_LIB_LIST2})
-			else()
-				set(BOOST_COPY_LIBS ${BOOST_LIB_LIST})
-				list(TRANSFORM BOOST_COPY_LIBS PREPEND ${BOOST_LIB_BASE})
-				list(TRANSFORM BOOST_COPY_LIBS APPEND ${CMAKE_STATIC_LIBRARY_SUFFIX})
-			endif()
-			# message(STATUS "BOOST Copy libs: ${BOOST_COPY_LIBS}")
-			set(CMD_COPY_BOOST_LIBS ${CMAKE_COMMAND} -E copy ${BOOST_COPY_LIBS} "${ASTRA_DIR}/lib/x64")
-			set(ASTRA_DEPENDS boost)
-		else()
-			message(STATUS "Note: Building Astra Toolbox is enabled but building BOOST is disabled")
-			message(STATUS "	Make sure to install boost via package manager, e.g. on Ubuntu via `sudo apt install libboost-dev`")
-		endif()
-
-		if (MSVC)
-			configure_file("${CMAKE_SOURCE_DIR}/patches/astra-${ASTRA_TAG}-vs.patch.template" "${CMAKE_BINARY_DIR}/astra-vs.patch")
-			set(CommandWithArgs "${GIT_EXECUTABLE}" apply ${GIT_APPLY_OPTS} "${CMAKE_BINARY_DIR}/astra-vs.patch")
-			set(StampFile "${ASTRA_DIR}/astra-patched")
-			set(ASTRA_PATCH_CMAKE_SCRIPT "${CMAKE_BINARY_DIR}/astra-patch.cmake")  # file must not reside within astra folder - otherwise it will be removed on clean, but not recreated!
-			if (DISABLE_LIB_WARNINGS)
-				list(APPEND CommandWithArgs "${CMAKE_SOURCE_DIR}/patches/astra-vs-warnings.patch")
-			endif()
-			if (CUDAToolkit_VERSION VERSION_GREATER_EQUAL "11.0" AND NOT ("${ASTRA_TAG}" STREQUAL "master" OR ASTRA_VERSION VERSION_GREATER_EQUAL "2.2.0"))
-				list(APPEND CommandWithArgs "${CMAKE_SOURCE_DIR}/patches/astra-${ASTRA_TAG}-vs-remove_30.patch")
-			endif()
-			configure_file("${CMAKE_SOURCE_DIR}/check-apply-patch.cmake.in" "${ASTRA_PATCH_CMAKE_SCRIPT}" @ONLY)
-			set(ASTRA_PATCH_COMMAND "${CMAKE_COMMAND}" -P ${ASTRA_PATCH_CMAKE_SCRIPT})
-
-			set(ASTRA_MSVC_SOLUTION "${ASTRA_DIR}/astra_vc14.sln")
-			if (ASTRA_VERSION VERSION_GREATER_EQUAL "2.3.0")
-				set(ASTRA_MSVC_SOLUTION "${ASTRA_DIR}/build/msvc/astra_vc14.sln")
-			endif()
-			set(ASTRA_BUILD_COMMAND "${CMAKE_MAKE_PROGRAM}" "${ASTRA_MSVC_SOLUTION}" -t:astra_vc14 "-p:Configuration=$<IF:$<CONFIG:Debug>,Debug,Release>_CUDA" -p:Platform=x64 -m)
-		else()
-			set(ASTRA_BUILD_DIR "${ASTRA_DIR}/build/linux")
-			set(ASTRA_CONFIGURE_COMMAND1 "${CMAKE_COMMAND}" -E chdir "${ASTRA_BUILD_DIR}" "${ASTRA_BUILD_DIR}/autogen.sh")
-			set(ASTRA_CONFIGURE_COMMAND2 "${CMAKE_COMMAND}" -E chdir "${ASTRA_BUILD_DIR}" "${ASTRA_BUILD_DIR}/configure" "--with-cuda=${CUDAToolkit_ROOT_DIR}")
-			set(ASTRA_BUILD_COMMAND "${CMAKE_COMMAND}" -E chdir "${ASTRA_BUILD_DIR}" "make" -j 8)
-		endif()
-
-		if (UNIX)
-			message(STATUS "Note: Building Astra Toolbox is enabled, and you're building under *nix.")
-			message(STATUS "	Make sure to install autoconf/automake/libtool, e.g. on Ubuntu via `sudo apt install automake libtool`")
-		endif()
-
-		# fetch and build astra:
-		ExternalProject_Add (astra
-			GIT_REPOSITORY    "${ASTRA_REPOSITORY}"
-			GIT_TAG           "${ASTRA_TAG}"
-			UPDATE_DISCONNECTED 1
-			SOURCE_DIR        "${ASTRA_DIR}"
-			BUILD_IN_SOURCE   1
-			PATCH_COMMAND     ${ASTRA_PATCH_COMMAND}
-			      COMMAND     ${CMD_COPY_BOOST_HEADERS}
-			      COMMAND     ${CMD_CREATE_LIBX64_DIR}
-			      COMMAND     ${CMD_COPY_BOOST_LIBS}
-			CONFIGURE_COMMAND ${ASTRA_CONFIGURE_COMMAND1}
-			      COMMAND     ${ASTRA_CONFIGURE_COMMAND2}
-			BUILD_COMMAND     ${ASTRA_BUILD_COMMAND}
-			INSTALL_COMMAND   ""
-			DEPENDS           ${ASTRA_DEPENDS}
-		)
-	else()
-		set(ASTRA_DIR "${ASTRA_DIR}" CACHE PATH
-			"Astra toolbox directory")
-	endif()
 endif()
 
 
@@ -1194,15 +1077,6 @@ endif()
 if (ENABLE_PRECOMPILE)
 	list(APPEND OPEN_IA_CMAKE_ARGS "-DopeniA_PRECOMPILE:BOOL=ON")
 endif()
-if (ENABLE_ASTRA)
-	list(APPEND OPEN_IA_CMAKE_ARGS
-		"-DModule_AstraReconstruction:BOOL=ON"
-		"-DASTRA_TOOLBOX_DIR:PATH=${ASTRA_DIR}"
-		"-DCUDAToolkit_ROOT:PATH=${CUDAToolkit_ROOT_DIR}")
-	if (BUILD_ASTRA)
-		list(APPEND openiA_DEPENDS astra)
-	endif()
-endif()
 if (ENABLE_VR)
 	list(APPEND OPEN_IA_CMAKE_ARGS
 		"-DModule_ImNDT:BOOL=ON"
@@ -1216,13 +1090,10 @@ if (ENABLE_VR)
 	endif()
 	if (BUILD_BOOST)
 		list(APPEND openiA_DEPENDS boost)
-	endif()
-	if (NOT ENABLE_ASTRA)	# if astra module is enabled, it will care for setting up boost include directory; otherwise, we need to set it manually:
-		if (NOT BUILD_BOOST)
-			find_package(Boost)
-			set(BOOST_INCLUDE_DIR ${Boost_INCLUDE_DIR})
-		endif ()
-		list(APPEND OPEN_IA_CMAKE_ARGS "-DBOOST_INCLUDE_DIR:PATH=${BOOST_INCLUDE_DIR}")
+		list(APPEND OPEN_IA_CMAKE_ARGS "-DBoost_DIR:PATH=${Boost_DIR}/stage/lib/cmake/Boost-${BOOST_VERSION}")
+	else()
+		find_package(Boost 1.70.0 REQUIRED)
+		list(APPEND OPEN_IA_CMAKE_ARGS "-DBoost_DIR:PATH=${Boost_DIR}")
 	endif()
 endif()
 if (ENABLE_AI)
