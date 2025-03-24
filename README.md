@@ -39,7 +39,8 @@ On Linux, those packages should be available from the distribution repository.
     $ sudo apt install clang libomp-dev
     ```
     OpenMP is required, and installs as separate package for clang. On versions of Ubuntu prior to 21.04, you might have to also install the `qt6-default` package in order to make Qt 6 the default.
-    For some modules, additional packages are required: qt6-charts-dev (for AdaptiveThresholding module), qt6-httpserver-dev, qt6-websockets-dev, npm (for Remote module), libboost-dev (for ImNDT/XVRA and Astra modules), libopenvr-dev and/or libopenxr-dev (for ImNDT/XVRA modules); the following command would for example install all:
+
+    For some modules, additional packages are required: `qt6-charts-dev` (for AdaptiveThresholding module), `qt6-httpserver-dev`, `qt6-websockets-dev`, `npm` (for Remote module), `libboost-dev` (for ImNDT/XVRA and Astra modules), `libopenvr-dev` and/or `libopenxr-dev` (for ImNDT/XVRA modules); the following command would for example install all:
     ```
     $ sudo apt install qt6-charts-dev qt6-httpserver-dev qt6-websockets-dev libboost-dev libopenvr-dev libopenxr-dev npm
     ```
@@ -54,15 +55,15 @@ On Linux, those packages should be available from the distribution repository.
     ```
     (installing both ninja and make build tools, and the clang compiler, in this example)
 
-  - On OpenSUSE, the command to install the required Qt packages is:
-    ```
-    $ sudo zypper install xcb-util-cursor-devel qt6-concurrent-devel qt6-gui-devel qt6-opengl-devel qt6-svg-devel qt6-xml-devel
-    $ sudo zypper install qt6-charts-devel qt6-httpserver-devel qt6-websockets-devel
-    ```
-
     For some modules, additional packages are required: qt6-qtcharts-devel (for AdaptiveThresholding module ), qt6-qthttpserver-devel, qt6-qtwebsockets-devel, nodejs-npm (for Remote module), boost-devel (for ImNDT/XVRA and Astra modules), openvr-devel and/or openxr-devel (for ImNDT/XVRA modules); the following command would for example install all:
     ```
     $ sudo dnf install boost-devel qt6-qtcharts-devel qt6-qthttpserver-devel qt6-qtwebsockets-devel nodejs-npm openvr-devel openxr-devel
+    ```
+
+  - On OpenSUSE, the command to install the required packages is:
+    ```
+    $ sudo zypper install xcb-util-cursor-devel qt6-concurrent-devel qt6-gui-devel qt6-opengl-devel qt6-svg-devel qt6-xml-devel \
+      qt6-charts-devel qt6-httpserver-devel qt6-websockets-devel
     ```
 
   - If you require any CUDA-dependant module (currently only the AstraReconstruction module),
@@ -82,7 +83,7 @@ On Windows, download and install:
     - In the "Select Components" step:
         - expand the "Qt" tree item
         - decide on a version (required: >= 6; recommended: >= 6.4)
-        - for that version, expand the tree and **only check** the "MSVC 2019 64-bit" option, as well as the "Qt Charts", "Qt HTTP Server (TP)" (only available for Qt >= 6.4) and "Qt WebSockets" options under "Additional Libraries"; make sure no other version or option than those two is checked (unless you require them for something else than open\_iA, of course).
+        - for that version, expand the tree and **only check** the "MSVC 2019 64-bit" option, as well as the "Qt Charts", "Qt HTTP Server" (only available for Qt >= 6.4) and "Qt WebSockets" options under "Additional Libraries"; make sure no other version or option than those two is checked (unless you require them for something else than open\_iA, of course).
             - **Note:** pre-built binaries are only provided for VS 2019, but these work with VS 2022 as well.
 - optional: an OpenCL SDK; if available, some GPU operations will be available; some modules require it. The generic OpenCL-ICD loader can be built from within the superbuild (via `ENABLE_OPENCL`). Or you can use an SDK best fitting your build system, e.g. the AMD OpenCL SDK for an AMD graphics card, the NVidia CUDA SDK for an NVidia graphics card, or the Intel OpenCL SDK for an onboard graphics card (but note that this ties your build to machines having similar compute capabilities)
 
