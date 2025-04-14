@@ -313,17 +313,14 @@ if (ENABLE_VR)
 endif()
 
 if (BUILD_BOOST)
-	set(BOOST_VERSION_OPTIONS "1.85.0" "1.86.0" "1.87.0")
-	selector(BOOST_VERSION "${BOOST_VERSION_OPTIONS}" "1.87.0" "Choose the boost library version to build.")
-	if ("${BOOST_VERSION}" STREQUAL "1.85.0")
-		set(BOOST_ARCHIVE_SHA512 "F090B0CD97D0B0037013EAD8928F4773B9009D1ACA57ACE1359CACFB47805DBA8FB52EE410CF6CAC47B9C981DB21457A9D278335D378AE9BE94358392A4CDBFA")
-		if (CUDAToolkit_FOUND AND CUDAToolkit_VERSION VERSION_LESS 12)
-			message(WARNING "Note that with boost 1.85, CUDA (encountered with 11.7) might report errors like `error : identifier \"__builtin_FUNCSIG\" is undefined` during build! Choose an older version (< 1.85) of boost here, or install a newer version of CUDA (tested to work with 12.4)")
-		endif()
-	elseif ("${BOOST_VERSION}" STREQUAL "1.86.0")
+	set(BOOST_VERSION_OPTIONS "1.86.0" "1.87.0" "1.88.0")
+	selector(BOOST_VERSION "${BOOST_VERSION_OPTIONS}" "1.88.0" "Choose the boost library version to build.")
+	if ("${BOOST_VERSION}" STREQUAL "1.86.0")
 		set(BOOST_ARCHIVE_SHA512 "01129D3629088193481DC31BF3EDDE6F3ADAA6EFB43FE7FE0EA9C37BDF91258BCC463A4F61A000BFBC1514D1DFC70D380FE2C40501286490B6AD41F09A4BDE4F")
 	elseif ("${BOOST_VERSION}" STREQUAL "1.87.0")
 		set(BOOST_ARCHIVE_SHA512 "5260974B737EEEA43A2CE25EFE562732595D75ECF7BB00CB0CD22DF99B0A71E18D29A706B8B27D31895C24154CA944A91205CD242D7FD772876984DFABE5D0D7")
+	elseif ("${BOOST_VERSION}" STREQUAL "1.88.0")
+		set(BOOST_ARCHIVE_SHA512 "E00C88BD082625F53166ABA40356426BF3EAF3C8C0A2D819762128C670EEAB6116EF3378D4BFD75C1DC2035496E26ADE0AD8A99600951FC5B3D3CDE2BEB569B5")
 	endif()
 	string(SUBSTRING "${BOOST_VERSION}" 0 4 BOOST_SHORTVERSION)
 	string(REPLACE "." "_" BOOST_SHORTVER "${BOOST_SHORTVERSION}")
@@ -337,6 +334,8 @@ if (BUILD_BOOST)
 			set(BOOST_MSVC_TOOLSET "msvc-14.3")
 			set(BOOST_LIB_SUFFIX "vc143")
 		endif()
+	else()
+		message(WARNING "You are running the superbuild on a non-Windows system yet are building boost via the superbuild (BUILD_BOOST). On non-Windows systems, we highly recommend to use the boost version from the respective distribution repository; we only test building boost on Windows!")
 	endif()
 endif()
 
@@ -831,22 +830,14 @@ if (BUILD_BOOST)
 		set(B2_FLAGS ${B2_FLAGS})
 	endif()
 	set(Boost_DIR "${CMAKE_BINARY_DIR}/boost")
-	if (MSVC AND MSVC_VERSION GREATER_EQUAL 1940 AND BOOST_VERSION VERSION_EQUAL "1.85.0")
-		set(CommandWithArgs "${GIT_EXECUTABLE}" apply ${GIT_APPLY_OPTS} "${CMAKE_SOURCE_DIR}/patches/boost-1.85-vs17.10.patch")
-		set(StampFile "${Boost_DIR}/msvc1940-patched")
-		set(BOOST_PATCH_CMAKE_SCRIPT "${CMAKE_BINARY_DIR}/boost-patch.cmake")  # file must not reside within boost folder - otherwise it will be removed on clean, but not recreated!
-		configure_file("${CMAKE_SOURCE_DIR}/check-apply-patch.cmake.in" "${BOOST_PATCH_CMAKE_SCRIPT}" @ONLY)
-		set(BOOST_PATCH_COMMAND "${CMAKE_COMMAND}" -P ${BOOST_PATCH_CMAKE_SCRIPT})
-	else()
-		set (BOOST_PATCH_COMMAND "")
-	endif()
+	# set (BOOST_PATCH_COMMAND "")
 	ExternalProject_Add (boost
 		URL               ${BOOST_URL}
 		URL_HASH          SHA512=${BOOST_ARCHIVE_SHA512}
 		DOWNLOAD_DIR      ${ARCHIVE_DIR}
 		BUILD_IN_SOURCE   1
 		SOURCE_DIR        "${Boost_DIR}"
-		PATCH_COMMAND     ${BOOST_PATCH_COMMAND}
+		# PATCH_COMMAND     ${BOOST_PATCH_COMMAND}
 		CONFIGURE_COMMAND ${BOOST_BOOTSTRAP_COMMAND} ${BOOST_BOOTSTRAP_OPTS}
 		BUILD_COMMAND     ${B2_COMMAND} ${B2_FLAGS}
 		INSTALL_COMMAND   ""  # ${B2_COMMAND} ${B2_FLAGS} install
