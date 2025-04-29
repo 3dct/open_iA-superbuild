@@ -1028,21 +1028,17 @@ if (ENABLE_TOOLS)
 		"-DModule_CompVis:BOOL=ON"
 		"-DModule_DreamCaster:BOOL=${ENABLE_OPENCL}"
 		"-DModule_DynamicVolumeLines:BOOL=ON"
-		"-DModule_ElastixRegistration:BOOL=ON"
 		"-DModule_FeatureAnalyzer:BOOL=ON"
 		"-DModule_FeatureAnalyzerComputation:BOOL=ON"
 		"-DModule_FeatureScout:BOOL=ON"
 		"-DModule_FiAKEr:BOOL=ON"
 		"-DModule_FilterPreview:BOOL=ON"
-		"-DModule_FoamCharacterization:BOOL=ON"
 		"-DModule_FuzzyFeatureTracking:BOOL=ON"
 		"-DModule_GEMSe:BOOL=ON"
 		"-DModule_InSpectr:BOOL=ON"
 		"-DModule_Labelling:BOOL=ON"
-		"-DModule_NModalTF:BOOL=ON"
+		"-DModule_MultiModalTF:BOOL=ON"
 		"-DModule_Remote:BOOL=ON"
-		"-DModule_TripleHistogramTF:BOOL=ON"
-		"-DModule_Uncertainty:BOOL=ON"
 		"-DModule_VolumePlayer:BOOL=ON")
 	# Qt 6.0 does not come with Qt Charts; any Qt 5 version ships it though, and Qt >= 6.1 does too:
 	if (QT_VERSION_MAJOR LESS 6 OR QT_VERSION VERSION_GREATER_EQUAL "6.1.0" AND Qt${QT_VERSION_MAJOR}Charts_FOUND)
