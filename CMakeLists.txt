@@ -172,7 +172,7 @@ endif()
 
 ## VTK
 
-set(VTK_VERSION_OPTIONS "9.1.0" "9.2.6" "9.3.1" "9.4.2")
+set(VTK_VERSION_OPTIONS "9.1.0" "9.2.6" "9.3.1" "9.4.2" "9.5.0.rc2")
 set(VTK_VERSION_DESC "Choose the VTK version to build (only used if VTK_USE_GIT_REPO is DISABLED; if VTK_USE_GIT_REPO is enabled, use VTK_GIT_TAG instead).")
 selector(VTK_VERSION "${VTK_VERSION_OPTIONS}" "9.4.2" ${VTK_VERSION_DESC})
 
@@ -217,6 +217,10 @@ if (NOT VTK_USE_GIT_REPO)
 	set(VTK_URL "https://www.vtk.org/files/release/${VTK_SHORT_VERSION}/VTK-${VTK_VERSION}")
 	set(VTK_URL "${VTK_URL}.tar.gz")
 	set(VTK_ARCHIVE_SHA512 ${VTK_TGZ_SHA512})
+	if ("${VTK_VERSION}" STREQUAL "9.5.0.rc2")
+		set(VTK_ARCHIVE_SHA512 "0F938E2DB0189B59A0536DCD171EB50D4DD8BF4DF939AC00B1D3301F241A65CCF3D6F5D0E91CBE3C0F7A8DFCC4050CE5AD6FBBBD68379399B23D958E9512A277")
+		set(VTK_URL "https://github.com/Kitware/VTK/archive/refs/tags/v9.5.0.rc2.zip")
+	endif()
 endif()
 
 ## ITK
