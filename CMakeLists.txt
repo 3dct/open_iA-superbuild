@@ -33,6 +33,7 @@ endif()
 option(BUILD_VTK "Build VTK in the superbuild. If disabled, you need to set VTK_DIR to an existing VTK build (default: enabled)" ON)
 option(BUILD_ITK "Build ITK in the superbuild. If disabled, you need to set ITK_DIR to an existing ITK build (default: enabled)" ON)
 #option(FETCH_OPENVR "Fetch release of OpenVR SDK. If disabled, you need to set OPENVR_DIR to an existing OpenVR SDK directory" ON)
+option(BUILD_OPENXR "On Unix/Linux, whether to build OpenXR in the superbuild. If disabled, the system-provided OpenXR is searched for (linux/unix)" OFF)
 #option(FETCH_EIGEN "Fetch release of eigen. If disabled, you need to set EIGEN3_DIR to an existing Eigen 3.x directory" ON)
 #option(BUILD_HDF5 "Fetch and build HDF5. If disabled, you need to set HDF5_DIR to an existing HDF5 build" ON)
 #option(FETCH_ONNX "Fetch required ONNX runtime. If disabled, you need to set ONNX_RUNTIME_DIR to an existing ONNX runtime directory" ON) # could be a bit complicated to implement, since we would have to check the type of runtime (CUDA/DirectML/CPU) and set according flags
@@ -290,26 +291,39 @@ if (ENABLE_VR)
 		if (VTK_VERSION VERSION_LESS "9.2.0")
 			message(WARNING "OpenXR is only supported for VTK >= 9.2.0, but currently, VTK ${VTK_VERSION} is configured to be built! If you need OpenXR, please switch to an appropriate VTK version!")
 		else()
-			set(OPENXR_VERSION_OPTIONS  "1.0.34" "1.1.47" "1.1.48" "1.1.49" "1.1.50" "1.1.52")
+			set(OPENXR_VERSION_OPTIONS  "1.0.34" "1.1.47" "1.1.48" "1.1.49" "1.1.50" "1.1.52" "1.1.54" "1.1.57")
 			selector(OPENXR_VERSION "${OPENXR_VERSION_OPTIONS}" "1.1.50" "Choose the OpenXR SDK version to fetch.")
-			if ("${OPENXR_VERSION}" STREQUAL "1.0.34")
-				set(OPENXR_ARCHIVE_SHA512 "81A03B3B96D80D6A06DAAD8B5ABB5C37ECB9242CE6D6EAD3737FD4570F44B156CFE401249EAA5BA6339B9B8627EF128C509DE0853E3A30D63381B910F6571E58")
-			elseif ("${OPENXR_VERSION}" STREQUAL "1.1.48")
-				set(OPENXR_ARCHIVE_SHA512 "FF3E9A18C7D1A86CA1DE07EB5DE40A9731C7F9841ADF1235664569D44B9548B99F2E223B79F1220C4ED2E1FCAAC9118873FE4A9780A5C90ECDC98AB8B08C67CE")
-			elseif ("${OPENXR_VERSION}" STREQUAL "1.1.49")
-				set(OPENXR_ARCHIVE_SHA512 "0068DBE01BB4FEB9CE646684A76D7399CBB0C3C40C4806A12E067AF19E359750FB65BE6A66B1E67E779D4B16D8582AA73BAA611267107B0BB7CE6C8F4849A886")
-			elseif ("${OPENXR_VERSION}" STREQUAL "1.1.50")
-				set(OPENXR_ARCHIVE_SHA512 "DF73D1E8FCB1503AF0F6FFF7C9963F2E368275D550B9B5F2DE85F26679E2E3F054F8A0275D3B8D170BE8061ABFEEA46FD4F360BFC6F596F9565ABDDCCD9539C5")
-			elseif ("${OPENXR_VERSION}" STREQUAL "1.1.52")
-				set(OPENXR_ARCHIVE_SHA512 "098553EF1AB5869AAE49AFA3992ED153BC2F2423F62E3F9AA8EE031E9DC22CBEA168C38F883D4BCEAB9A9B37A97ABC5341D8A5FD23699EFA05119A4D191E7B2C")
+			if (WIN32)
+				if ("${OPENXR_VERSION}" STREQUAL "1.0.34")
+					set(OPENXR_ARCHIVE_SHA512 "81A03B3B96D80D6A06DAAD8B5ABB5C37ECB9242CE6D6EAD3737FD4570F44B156CFE401249EAA5BA6339B9B8627EF128C509DE0853E3A30D63381B910F6571E58")
+				elseif ("${OPENXR_VERSION}" STREQUAL "1.1.48")
+					set(OPENXR_ARCHIVE_SHA512 "FF3E9A18C7D1A86CA1DE07EB5DE40A9731C7F9841ADF1235664569D44B9548B99F2E223B79F1220C4ED2E1FCAAC9118873FE4A9780A5C90ECDC98AB8B08C67CE")
+				elseif ("${OPENXR_VERSION}" STREQUAL "1.1.49")
+					set(OPENXR_ARCHIVE_SHA512 "0068DBE01BB4FEB9CE646684A76D7399CBB0C3C40C4806A12E067AF19E359750FB65BE6A66B1E67E779D4B16D8582AA73BAA611267107B0BB7CE6C8F4849A886")
+				elseif ("${OPENXR_VERSION}" STREQUAL "1.1.50")
+					set(OPENXR_ARCHIVE_SHA512 "DF73D1E8FCB1503AF0F6FFF7C9963F2E368275D550B9B5F2DE85F26679E2E3F054F8A0275D3B8D170BE8061ABFEEA46FD4F360BFC6F596F9565ABDDCCD9539C5")
+				elseif ("${OPENXR_VERSION}" STREQUAL "1.1.52")
+					set(OPENXR_ARCHIVE_SHA512 "098553EF1AB5869AAE49AFA3992ED153BC2F2423F62E3F9AA8EE031E9DC22CBEA168C38F883D4BCEAB9A9B37A97ABC5341D8A5FD23699EFA05119A4D191E7B2C")
+				elseif ("${OPENXR_VERSION}" STREQUAL "1.1.54")
+					set(OPENXR_ARCHIVE_SHA512 "6CCBE7582CC0886CD067D22EE2D9EF089C011077761989A624C617431ADFEDF58B379E4A1F3B576E71D26D43AAB4B2DACDA4CAF4D721097AAE6334D2308B798C")
+				elseif ("${OPENXR_VERSION}" STREQUAL "1.1.57")
+					set(OPENXR_ARCHIVE_SHA512 "5CA1700FB897533C541451346CC841814440439B4501CD93E2699044BA2A60916C0395C64C85D41448BEB164A160C346758DED8572D2B986FF54C4A14553ED74")
+				endif()
+				set(OPENXR_URL "https://github.com/KhronosGroup/OpenXR-SDK-Source/releases/download/release-${OPENXR_VERSION}/openxr_loader_windows-${OPENXR_VERSION}.zip")
+			elseif (UNIX)
+				if (BUILD_OPENXR)
+					if ("${OPENXR_VERSION}" STREQUAL "1.1.54")
+						set(OPENXR_ARCHIVE_SHA512 "BE99658FF3D27BD8674DCEB8B5D50BFBBFAF2F3667A8C38D6AFB0CDB2701881C945A4C423CE68E4591CC468A9A499803FFB05A9A610F52A1C47FCA97D73E13D8")
+					else ("${OPENXR_VERSION}" STREQUAL "1.1.57")
+						set(OPENXR_ARCHIVE_SHA512 "C07A5B8A25D22AD8EFF136BB9F5C15C7459E45AEDDEFCBC78CCE29D0A730A5D4AB8ADA52AF71C7E9D8FB7300D77DBAAF20A8B195159520776C0FAB90DF6D4739")
+					endif()
+					set(OPENXR_URL "https://github.com/KhronosGroup/OpenXR-SDK-Source/releases/download/release-${OPENXR_VERSION}/OpenXR-SDK-Source-release-${OPENXR_VERSION}.tar.gz")
+				endif()
+			else()
+				message(SEND_ERROR "Fetching OpenXR is not supported currently under any other system than Windows! You might have more luck with OpenVR (set ENABLE_OPENVR to TRUE, ENABLE_OPENXR to FALSE); but OpenVR support under non-Windows operating systems for open_iA is also currently untested!")
 			endif()
 			if (VTK_VERSION VERSION_LESS "9.3.1" AND OPENXR_VERSION VERSION_GREATER_EQUAL "1.1.36")
 				message(WARNING "Note: VTK <= 9.3.1 is not compatible with OpenXR SDK >= 1.1.36; it requires a patch (for 9.3.1, it can be applied automatically by this superbuild): https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11318! Without the patch, the program will compile, but crash when starting up OpenXR.")
-			endif()
-			if (WIN32)
-				set(OPENXR_URL "https://github.com/KhronosGroup/OpenXR-SDK-Source/releases/download/release-${OPENXR_VERSION}/openxr_loader_windows-${OPENXR_VERSION}.zip")
-			else()
-				message(SEND_ERROR "Fetching OpenXR is not supported currently under any other system than Windows! You might have more luck with OpenVR (set ENABLE_OPENVR to TRUE, ENABLE_OPENXR to FALSE); but OpenVR support under non-Windows operating systems for open_iA is also currently untested!")
 			endif()
 		endif()
 	endif()
@@ -447,32 +461,71 @@ if (BUILD_VTK)
 			endif()
 		endif()
 		if (ENABLE_OPENXR AND VTK_VERSION VERSION_GREATER_EQUAL "9.2.0")
-			set(OPENXR_ROOT_DIR "${CMAKE_BINARY_DIR}/openxr-${OPENXR_VERSION}")
-			set(OPENXR_INCLUDE_DIR "${OPENXR_ROOT_DIR}/include")
 			set(VTK_OPENXR_INCLUDE_DIR ${OPENXR_INCLUDE_DIR})
 			if ( VTK_VERSION VERSION_LESS_EQUAL "9.3.1")
 				set(VTK_OPENXR_INCLUDE_DIR "${OPENXR_ROOT_DIR}/include/openxr")
 			endif()
-			#if (WIN32)
+			if (WIN32)
+				set(OPENXR_ROOT_DIR "${CMAKE_BINARY_DIR}/openxr-${OPENXR_VERSION}")
 				set(OPENXR_LIBRARY "${OPENXR_ROOT_DIR}/x64/lib/openxr_loader.lib")
-			#endif()
+				ExternalProject_Add (OpenXR
+					URL               ${OPENXR_URL}
+					URL_HASH          "SHA512=${OPENXR_ARCHIVE_SHA512}"
+					DOWNLOAD_DIR      ${ARCHIVE_DIR}
+					SOURCE_DIR        "${OPENXR_ROOT_DIR}"
+					BUILD_IN_SOURCE   1
+					CONFIGURE_COMMAND ""
+					BUILD_COMMAND     ""
+					INSTALL_COMMAND   "")
+			set(OPENXR_DIR "-DOpenXR_DIR:PATH=${OPENXR_ROOT_DIR}/x64/lib/cmake/openxr")
+			elseif(UNIX)
+				if (BUILD_OPENXR)
+					set(OPENXR_SRC_DIR "${CMAKE_BINARY_DIR}/openxr/src-${OPENXR_VERSION}")
+					set(OPENXR_BIN_DIR "${CMAKE_BINARY_DIR}/openxr/bin-${OPENXR_VERSION}")
+					set(OPENXR_ROOT_DIR "${OPENXR_BIN_DIR}")
+					set(OPENXR_LIBRARY "${OPENXR_BIN_DIR}/src/loader/libopenxr_loader.so.${OPENXR_VERSION}")
+					set(OPENXR_CMAKE_ARGS 
+						"-DBUILD_TESTS:BOOL=OFF"
+						"-DBUILD_SDK_TESTS:BOOL=OFF"
+						"-DBUILD_TESTING:BOOL=OFF"
+					)
+					ExternalProject_Add (OpenXR
+						URL               ${OPENXR_URL}
+						URL_HASH          "SHA512=${OPENXR_ARCHIVE_SHA512}"
+						DOWNLOAD_DIR      ${ARCHIVE_DIR}
+						SOURCE_DIR        "${OPENXR_ROOT_DIR}"
+						BINARY_DIR        "${OPENXR_BIN_DIR}"
+						CMAKE_GENERATOR   "${CMAKE_GENERATOR}"
+						CMAKE_GENERATOR_PLATFORM "${CMAKE_GENERATOR_PLATFORM}"
+						CMAKE_ARGS        "${OPENXR_CMAKE_ARGS}"
+						INSTALL_COMMAND   "")
+					set(OPENXR_DIR "-DOpenXR_DIR:PATH=${OPENXR_ROOT_DIR}/x64/lib/cmake/openxr")
+				else()
+					find_package(OpenXR REQUIRED)
+					#get_cmake_property(_variableNames VARIABLES)
+					#list (SORT _variableNames)
+					#foreach (_variableName ${_variableNames})
+					#	message(STATUS "${_variableName}=${${_variableName}}")
+					#endforeach()
+					get_property(importTargets DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
+					message(STATUS "Targets: ${importTargets}")
+					get_target_property(OPENXR_LOCATION OpenXR::openxr_loader LOCATION)
+					message(STATUS "OpenXR: ${OpenXR_VERSION} in ${OpenXR_DIR}, include: ${OpenXR_INCLUDE_DIR}, libs: ${OPENXR_LOCATION}")
+					set(OPENXR_ROOT_DIR "${OpenXR_DIR}")
+					set(OPENXR_INCLUDE_DIR "${OpenXR_INCLUDE_DIR}")
+					set(OPENXR_LIBRARY "${OPENXR_LOCATION}")
+				endif()
+			endif()
+			set(OPENXR_INCLUDE_DIR "${OPENXR_ROOT_DIR}/include")
 			set(OPENXR_LIB_AND_INCLUDE
 				"-DOpenXR_INCLUDE_DIR:PATH=${OPENXR_INCLUDE_DIR}"
 				"-DOpenXR_LIBRARY:FILEPATH=${OPENXR_LIBRARY}")
 			set(VTK_OPENXR_LIB_AND_INCLUDE
 				"-DOpenXR_INCLUDE_DIR:PATH=${VTK_OPENXR_INCLUDE_DIR}"
 				"-DOpenXR_LIBRARY:FILEPATH=${OPENXR_LIBRARY}")
-			set(OPENXR_DIR "-DOpenXR_DIR:PATH=${OPENXR_ROOT_DIR}/x64/lib/cmake/openxr")
-			ExternalProject_Add (OpenXR
-				URL               ${OPENXR_URL}
-				URL_HASH          "SHA512=${OPENXR_ARCHIVE_SHA512}"
-				DOWNLOAD_DIR      ${ARCHIVE_DIR}
-				SOURCE_DIR        "${OPENXR_ROOT_DIR}"
-				BUILD_IN_SOURCE   1
-				CONFIGURE_COMMAND ""
-				BUILD_COMMAND     ""
-				INSTALL_COMMAND   "")
-			list(APPEND VTK_DEPENDS OpenXR)
+			if (NOT UNIX AND NOT BUILD_OPENXR)
+				list(APPEND VTK_DEPENDS OpenXR)
+			endif()
 			list(APPEND VTK_CMAKE_ARGS "-DVTK_MODULE_ENABLE_VTK_RenderingOpenXR:BOOL=YES")
 			if (VTK_VERSION VERSION_GREATER "9.3.1" OR (VTK_USE_GIT_REPO AND VTK_GIT_TAG STREQUAL "master"))
 				# new: use CMake config provided by newer OpenXR versions:
